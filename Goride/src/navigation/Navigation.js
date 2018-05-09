@@ -20,6 +20,7 @@ import SearchPlaceScreen from '../screens/Customer/SearchPlaceScreen';
 import FeedScreen from '../screens/Customer/FeedScreen';  
 import FavScreen from '../screens/Customer/FavScreen';  
 import EditScreen from '../screens/Customer/EditScreen';  
+import SearchRiderScreen from '../screens/Customer/SearchRiderScreen';  
 import LandingPageRider from '../screens/Rider/LandingPageRider';  
 import SocketTest from '../screens/Rider/SocketTest';
 import Rideprofile from '../screens/Rider/Rideprofile';  
@@ -53,6 +54,7 @@ const Navigation = () => {
         <Stack.Screen name="Rideprofile" component={Rideprofile} />
         <Stack.Screen name="NoInternetScreen" component={NoInternetScreen} />
         <Stack.Screen name="ServiceError" component={ServiceError} />
+        <Stack.Screen name="SearchRiderScreen" component={SearchRiderScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

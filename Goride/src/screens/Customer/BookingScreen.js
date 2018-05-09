@@ -147,11 +147,14 @@ const BookingConfirmationScreen = ({ navigation }) => {
         Alert.alert("Error", "Failed to calculate duration. Please try again.");
         return;
       }
-  
      
-      await requestRide(pickup, destination, serviceType, fare, convertedDistance, convertedDuration);
-      Alert.alert("Success", "Your ride has been successfully requested.");
-
+      const response = await requestRide(pickup, destination, serviceType, fare, convertedDistance, convertedDuration);
+  if (response.success) {
+    Alert.alert("Success", "Your ride has been successfully requested.");
+    navigation.navigate("SearchingScreen");
+  } else {
+    Alert.alert("Error", response.message || "Failed to request ride");
+  }
     } catch (error) {
       console.error("Error requesting ride:", error);
       Alert.alert("Error", "Failed to request ride. Please try again.");
