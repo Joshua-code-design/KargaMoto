@@ -105,8 +105,7 @@ const MobileNumberScreen = ({ countryCode = "PH", callingCode = "+63" }) => {
           <CountryPicker
             withFlag
             withCallingCode
-            withFilter
-            countryCode={selectedCountryCode}
+            countryCode="PH" // Set to only show Philippines flag
             onSelect={(country) => {
               setCountryCode(country.cca2);
               setCallingCode(`+${country.callingCode[0]}`);

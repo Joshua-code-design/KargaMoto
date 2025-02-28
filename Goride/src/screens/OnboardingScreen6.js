@@ -7,11 +7,8 @@ import {
   Text, 
   StyleSheet, 
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   SafeAreaView
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 
 const RegisterForm = () => {
   const [username, setUsername] = useState('');
@@ -54,72 +51,51 @@ const RegisterForm = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.keyboardAvoid}
-      >
-        <View style={styles.formContainer}>
-          <View style={styles.headerContainer}>
-            <Text style={styles.titlePrimary}>Create Account</Text>
-            <Text style={styles.titleSecondary}>Join our community today</Text>
-          </View>
-          
-          <View style={styles.inputsContainer}>
-            <View style={styles.inputWrapper}>
-              <TextInput
-                style={styles.input}
-                placeholder="Phone Number"
-                placeholderTextColor="#666666"
-                keyboardType="phone-pad"
-                value={phone}
-                onChangeText={setPhone}
-              />
-            </View>
-            
-            <View style={styles.inputWrapper}>
-              <TextInput
-                style={styles.input}
-                placeholder="First Name"
-                placeholderTextColor="#666666"
-                value={username}
-                onChangeText={setUsername}
-              />
-            </View>
-            
-            <View style={styles.inputWrapper}>
-              <TextInput
-                style={styles.input}
-                placeholder="Last Name"
-                placeholderTextColor="#666666"
-                value={lastName}
-                onChangeText={setLastName}
-              />
-            </View>
-          </View>
-          
-          <TouchableOpacity 
-            onPress={handleRegister}
-            disabled={isLoading}
-          >
-            <LinearGradient
-              colors={['#4776E6', '#8E54E9']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.button}
-            >
-              <Text style={styles.buttonText}>
-                {isLoading ? 'Processing...' : 'Register Now'}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
-          
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>
-              Already have an account? <Text style={styles.footerLink}>Sign In</Text>
-            </Text>
-          </View>
+      <View style={styles.formContainer}>
+        <Text style={styles.titlePrimary}>Create Account</Text>
+        <Text style={styles.titleSecondary}>Join our community today</Text>
+        
+        <View style={styles.inputsContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Phone Number"
+            placeholderTextColor="#666666"
+            keyboardType="phone-pad"
+            value={phone}
+            onChangeText={setPhone}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="First Name"
+            placeholderTextColor="#666666"
+            value={username}
+            onChangeText={setUsername}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Last Name"
+            placeholderTextColor="#666666"
+            value={lastName}
+            onChangeText={setLastName}
+          />
         </View>
-      </KeyboardAvoidingView>
+        
+        <TouchableOpacity 
+          onPress={handleRegister}
+          disabled={isLoading}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>
+            {isLoading ? 'Processing...' : 'Register Now'}
+          </Text>
+        </TouchableOpacity>
+        
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            Already have an account? <Text style={styles.footerLink}>Sign In</Text>
+          </Text>
+        </View>
+      </View>
     </SafeAreaView>
   );
 };
@@ -129,16 +105,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F9FA',
   },
-  keyboardAvoid: {
-    flex: 1,
-  },
   formContainer: {
     flex: 1,
     padding: 24,
     justifyContent: 'center',
-  },
-  headerContainer: {
-    marginBottom: 40,
   },
   titlePrimary: {
     fontSize: 32,
@@ -154,9 +124,6 @@ const styles = StyleSheet.create({
   inputsContainer: {
     marginBottom: 32,
   },
-  inputWrapper: {
-    marginBottom: 20,
-  },
   input: {
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
@@ -166,21 +133,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E0E0E0',
     color: '#333333',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    marginBottom: 20,
   },
   button: {
+    backgroundColor: '#4776E6',
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
-    shadowColor: '#4776E6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
   },
   buttonText: {
     color: 'white',
