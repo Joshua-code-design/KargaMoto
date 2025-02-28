@@ -7,10 +7,13 @@ import {
   Animated,
   StyleSheet,
   Image,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+
+const { width, height } = Dimensions.get('window');
 
 const MobileNumberScreen = () => {
   const navigation = useNavigation();
@@ -40,7 +43,7 @@ const MobileNumberScreen = () => {
 
   const handleChangeText = (text) => {
     if (text.startsWith("0")) return;
-    setPhoneNumber(text.replace(/\D/g, "").slice(0, 10));
+    setPhoneNumber(text); // Removed formatting
   };
 
   const handleSubmit = async () => {
@@ -60,7 +63,11 @@ const MobileNumberScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Hi! What's your mobile number?</Text>
+      <Text style={styles.heading}>HI NEW USER WELCOME TO KARGAMOTO!!</Text>
+      <Text style={styles.footerText}>
+      Before we get started, please enter a valid 
+      phone number and, if you’d like, your email address.
+      </Text>
 
       <View style={styles.inputContainer}>
         {/* Display Philippines flag and calling code */}
@@ -78,7 +85,7 @@ const MobileNumberScreen = () => {
           <TextInput
             style={styles.input}
             keyboardType="phone-pad"
-            maxLength={10}
+            maxLength={10} 
             value={phoneNumber}
             onFocus={handleFocus}
             onBlur={handleBlur}
@@ -86,10 +93,6 @@ const MobileNumberScreen = () => {
           />
         </View>
       </View>
-
-      <Text style={styles.footerText}>
-        We also use your number to allow bikers and customer service to contact you about your bookings.
-      </Text>
 
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Continue</Text>
@@ -103,13 +106,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    padding: 20,
+    padding: width * 0.05,
   },
   heading: {
-    fontSize: 22,
+    fontSize: width * 0.055,
     fontWeight: "bold",
     marginBottom: 5,
-    marginTop: 100,
+    marginTop: height * 0.1,
   },
   inputContainer: {
     flexDirection: "row",
@@ -118,7 +121,7 @@ const styles = StyleSheet.create({
   countryContainer: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 10,
+    padding: width * 0.025,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 20,
@@ -126,12 +129,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   flag: {
-    width: 30,
-    height: 17,
+    width: width * 0.075,
+    height: height * 0.025,
     marginRight: 5,
   },
   callingCode: {
-    fontSize: 20,
+    fontSize: width * 0.05,
     fontWeight: "bold",
   },
   numberInputContainer: {
@@ -150,27 +153,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   input: {
-    fontSize: 16,
+    fontSize: width * 0.04,
     fontWeight: "bold",
   },
   footerText: {
-    fontSize: 12,
+    fontSize: width * 0.05,
     color: "gray",
-    marginTop: 10,
+    marginTop: 5,
+    alignItems: "left",
   },
   button: {
-    height: 56,
+    height: height * 0.07,
     width: "100%",
     backgroundColor: "#0052CC",
-    borderRadius: 12,
+    borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-    marginTop: 20,
+    marginTop: height * 0.1,
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: 16,
+    fontSize: width * 0.04,
     fontWeight: "600",
     letterSpacing: 0.5,
   },

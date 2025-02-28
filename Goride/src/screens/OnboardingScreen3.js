@@ -9,7 +9,7 @@ const OnboardingScreen2 = ({ navigation }) => {
 
   const handleNext = () => {
     if (isChecked) {
-      navigation.navigate('Onboarding4');
+      navigation.navigate('login');
     }
   };
 
