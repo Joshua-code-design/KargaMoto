@@ -5,7 +5,7 @@ import OnboardingScreen1 from './screens/OnboardingScreen1';
 import OnboardingScreen2 from './screens/OnboardingScreen2';
 import OnboardingScreen3 from './screens/OnboardingScreen3';
 import login from './screens/login';
-import OnboardingScreen5 from './screens/OnboardingScreen5';
+import OtpScreen from './screens/OtpScreen';
 import register from './screens/register';
 
 const Stack = createStackNavigator();
@@ -18,7 +18,7 @@ export default function App() {
         <Stack.Screen name="Onboarding2" component={OnboardingScreen2} />
         <Stack.Screen name="Onboarding3" component={OnboardingScreen3} />
         <Stack.Screen name="login" component={login} />
-        <Stack.Screen name="Onboarding5" component={OnboardingScreen5} />
+        <Stack.Screen name="OtpScreen" component={OtpScreen} />
         <Stack.Screen name="register" component={register} />
       </Stack.Navigator>
     </NavigationContainer>

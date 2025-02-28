@@ -43,7 +43,7 @@ const MobileNumberScreen = () => {
 
   const handleChangeText = (text) => {
     if (text.startsWith("0")) return;
-    setPhoneNumber(text); // Removed formatting
+    setPhoneNumber(text);
   };
 
   const handleSubmit = async () => {
@@ -53,7 +53,7 @@ const MobileNumberScreen = () => {
       });
 
       if (response.status === 200) {
-        navigation.navigate(response.data.status === "1" ? "Onboarding5" : "Onboarding6");
+        navigation.navigate(response.data.status === "1" ? "OtpScreen" : "register");
       }
     } catch (error) {
       console.error("Error submitting phone number:", error);
