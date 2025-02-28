@@ -211,4 +211,5 @@ const styles = StyleSheet.create({
   },
 });
 
+
 export default OnboardingScreen2;
