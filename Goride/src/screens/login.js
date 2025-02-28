@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { useRoute } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -53,7 +54,9 @@ const MobileNumberScreen = () => {
       });
 
       if (response.status === 200) {
-        navigation.navigate(response.data.status === "1" ? "OtpScreen" : "register");
+        navigation.navigate(response.data.status === "1" ? "OtpScreen" : "register", {
+          phoneNumber: phoneNumber,
+        });
       }
     } catch (error) {
       console.error("Error submitting phone number:", error);
@@ -66,7 +69,7 @@ const MobileNumberScreen = () => {
       <Text style={styles.heading}>HI NEW USER WELCOME TO KARGAMOTO!!</Text>
       <Text style={styles.footerText}>
       Before we get started, please enter a valid 
-      phone number and, if you’d like, your email address.
+      phone number and, if you'd like, your email address.
       </Text>
 
       <View style={styles.inputContainer}>
