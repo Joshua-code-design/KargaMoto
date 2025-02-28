@@ -52,8 +52,7 @@ const RegisterForm = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.formContainer}>
-        <Text style={styles.titlePrimary}>Create Account</Text>
-        <Text style={styles.titleSecondary}>Join our community today</Text>
+        <Text style={styles.titlePrimary}>Welcome, new user! Please register now to enjoy the services offered by Karga Moto.</Text>
         
         <View style={styles.inputsContainer}>
           <TextInput
@@ -114,12 +113,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '700',
     color: '#1A1A1A',
-    marginBottom: 8,
-  },
-  titleSecondary: {
-    fontSize: 16,
-    color: '#666666',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   inputsContainer: {
     marginBottom: 32,
