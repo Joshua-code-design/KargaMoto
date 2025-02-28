@@ -6,38 +6,17 @@ import {
   TouchableOpacity,
   Animated,
   StyleSheet,
+  Image,
 } from "react-native";
-import CountryPicker from "react-native-country-picker-modal";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
-import { useNavigation } from '@react-navigation/native'; // Import useNavigation
+import { useNavigation } from "@react-navigation/native";
 
-const MobileNumberScreen = ({ countryCode = "PH", callingCode = "+63" }) => {
-  const navigation = useNavigation(); // Initialize navigation
+const MobileNumberScreen = () => {
+  const navigation = useNavigation();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isFocused, setIsFocused] = useState(false);
-  const [selectedCountryCode, setCountryCode] = useState(countryCode);
-  const [selectedCallingCode, setCallingCode] = useState(callingCode);
-
-  const handleSubmit = async () => {
-    try {
-      const response = await axios.post('http://192.168.1.18:5000/api/login', {
-        phone_number: phoneNumber
-      });
-  
-      if (response.status === 200 && response.data.status === "1") {
-        // Navigate to Onboarding5 on successful response
-        navigation.navigate('Onboarding5');
-      } else if (response.status === 200 && response.data.status === "0") {
-        navigation.navigate('Onboarding6');
-      }
-    } catch (error) {
-      console.error('Error submitting phone number:', error);
-      alert(error.response?.data?.error || 'An error occurred. Please try again.');
-    }
-  };
-
-  const animatedLabel = useRef(new Animated.Value(phoneNumber ? 1 : 0)).current;
+  const animatedLabel = useRef(new Animated.Value(0)).current;
 
   const handleFocus = () => {
     setIsFocused(true);
@@ -49,7 +28,7 @@ const MobileNumberScreen = ({ countryCode = "PH", callingCode = "+63" }) => {
   };
 
   const handleBlur = () => {
-    if (phoneNumber === "") {
+    if (!phoneNumber) {
       setIsFocused(false);
       Animated.timing(animatedLabel, {
         toValue: 0,
@@ -59,71 +38,47 @@ const MobileNumberScreen = ({ countryCode = "PH", callingCode = "+63" }) => {
     }
   };
 
-  const formatPhoneNumber = (text) => {
-    let cleaned = text.replace(/\D/g, "");
-    if (cleaned.length > 10) {
-      cleaned = cleaned.slice(0, 10);
-    }
-    let formatted = cleaned;
-    if (cleaned.length > 3 && cleaned.length <= 6) {
-      formatted = `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`;
-    } else if (cleaned.length > 6) {
-      formatted = `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
-    }
-    setPhoneNumber(formatted);
-  };
-
-  const labelStyle = {
-    top: animatedLabel.interpolate({
-      inputRange: [0, 1],
-      outputRange: [12, -10],
-    }),
-    fontSize: animatedLabel.interpolate({
-      inputRange: [0, 1],
-      outputRange: [16, 12],
-    }),
-    color: isFocused ? "#2196F3" : "#aaa",
-  };
-
   const handleChangeText = (text) => {
-    // Prevent input of '0' as the first character
-    if (text.length === 1 && text === '0') {
-      return;
+    if (text.startsWith("0")) return;
+    setPhoneNumber(text.replace(/\D/g, "").slice(0, 10));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post("http://192.168.1.18:5000/api/login", {
+        phone_number: phoneNumber,
+      });
+
+      if (response.status === 200) {
+        navigation.navigate(response.data.status === "1" ? "Onboarding5" : "Onboarding6");
+      }
+    } catch (error) {
+      console.error("Error submitting phone number:", error);
+      alert(error.response?.data?.error || "An error occurred. Please try again.");
     }
-    formatPhoneNumber(text);
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Hi! What's your mobile number?</Text>
-      <Text style={styles.subtext}>
-        With a valid number, you can access rides, deliveries, and other services.
-      </Text>
 
       <View style={styles.inputContainer}>
-        <TouchableOpacity style={styles.countryContainer}>
-          <CountryPicker
-            withFlag
-            withCallingCode
-            countryCode="PH" // Set to only show Philippines flag
-            onSelect={(country) => {
-              setCountryCode(country.cca2);
-              setCallingCode(`+${country.callingCode[0]}`);
-            }}
-            onClose={() => {}}
-            onOpen={() => {}}
-          />
-          <Text style={styles.callingCode}>{selectedCallingCode}</Text>
-        </TouchableOpacity>
+        {/* Display Philippines flag and calling code */}
+        <View style={styles.countryContainer}>
+          <Image source={require("../../assets/flag.jpg")} style={styles.flag} />
+          <Text style={styles.callingCode}>+63</Text>
+        </View>
 
         <View style={styles.numberInputContainer}>
-          <Animated.Text style={[styles.floatingLabel, labelStyle]}>
-            Mobile Number
-          </Animated.Text>
+          <Animated.Text style={[styles.floatingLabel, {
+            top: animatedLabel.interpolate({ inputRange: [0, 1], outputRange: [12, -10] }),
+            fontSize: animatedLabel.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
+            color: isFocused ? "#2196F3" : "#aaa",
+          }]}>Mobile Number</Animated.Text>
           <TextInput
             style={styles.input}
             keyboardType="phone-pad"
-            maxLength={12}
+            maxLength={10}
             value={phoneNumber}
             onFocus={handleFocus}
             onBlur={handleBlur}
@@ -136,10 +91,7 @@ const MobileNumberScreen = ({ countryCode = "PH", callingCode = "+63" }) => {
         We also use your number to allow bikers and customer service to contact you about your bookings.
       </Text>
 
-      <TouchableOpacity 
-        style={styles.button}
-        onPress={handleSubmit}
-      >
+      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Continue</Text>
         <Ionicons name="arrow-forward" size={20} color="#FFFFFF" style={styles.buttonIcon} />
       </TouchableOpacity>
@@ -152,17 +104,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     padding: 20,
-    justifyContent: "center",
   },
   heading: {
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 5,
-  },
-  subtext: {
-    fontSize: 14,
-    color: "gray",
-    marginBottom: 20,
+    marginTop: 100,
   },
   inputContainer: {
     flexDirection: "row",
@@ -176,6 +123,12 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 20,
     marginRight: 10,
+    marginTop: 20,
+  },
+  flag: {
+    width: 30,
+    height: 17,
+    marginRight: 5,
   },
   callingCode: {
     fontSize: 20,
@@ -186,8 +139,9 @@ const styles = StyleSheet.create({
     position: "relative",
     borderWidth: 1,
     borderColor: "#ccc",
-    padding: 10,
+    padding: 1,
     borderRadius: 20,
+    marginTop: 20,
   },
   floatingLabel: {
     position: "absolute",
@@ -205,33 +159,19 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   button: {
-    flexDirection: "row",
-    alignItems: "center",
+    height: 56,
+    width: "100%",
+    backgroundColor: "#0052CC",
+    borderRadius: 12,
     justifyContent: "center",
-    padding: 15,
-    borderRadius: 25,
+    alignItems: "center",
+    flexDirection: "row",
     marginTop: 20,
   },
-  buttonActive: {
-    backgroundColor: "#2196F3",
-  },
-  buttonDisabled: {
-    backgroundColor: "#B0BEC5",
-  },
-  
-  button: {
-    height: 56,
-    width: '100%',
-    backgroundColor: '#0052CC',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
   buttonText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     letterSpacing: 0.5,
   },
   buttonIcon: {
