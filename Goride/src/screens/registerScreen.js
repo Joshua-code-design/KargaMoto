@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useRoute, useNavigation } from '@react-navigation/native'; // Added useNavigation import
+
 import { 
   View, 
   TextInput, 
@@ -11,13 +13,15 @@ import {
 } from 'react-native';
 
 const RegisterForm = () => {
+  const route = useRoute(); 
+  const { phoneNumber } = route.params; 
   const [username, setUsername] = useState('');
   const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+  const navigation = useNavigation(); 
+
   const handleRegister = async () => {
-    if (!username || !lastName || !phone) {
+    if (!username || !lastName) {
       Alert.alert('Missing Information', 'Please fill in all fields to continue.');
       return;
     }
@@ -26,19 +30,19 @@ const RegisterForm = () => {
     
     try {
       const fullname = `${username} ${lastName}`;
-      const response = await axios.post('http://192.168.1.27:5000/api/register', {
+      const response = await axios.post('http://192.168.1.27:5000/api/register-user', {
         full_name: fullname,
-        phone_number: phone
+        phone_number: phoneNumber 
       });
-      
+
       setIsLoading(false);
       
       if (response.status === 200) {
         Alert.alert('Success', 'Your account has been created successfully!');
-        // Clear form after successful registration
+        
         setUsername('');
         setLastName('');
-        setPhone('');
+        navigation.navigate('loginScreen'); 
       }
     } catch (error) {
       setIsLoading(false);
@@ -49,7 +53,7 @@ const RegisterForm = () => {
     }
   };
 
-  return (
+  return ( // Fixed missing return statement
     <SafeAreaView style={styles.container}>
       <View style={styles.formContainer}>
         <Text style={styles.titlePrimary}>Welcome, new user! Please register now to enjoy the services offered by Karga Moto.</Text>
@@ -60,8 +64,8 @@ const RegisterForm = () => {
             placeholder="Phone Number"
             placeholderTextColor="#666666"
             keyboardType="phone-pad"
-            value={phone}
-            onChangeText={setPhone}
+            value={"+63" + phoneNumber} 
+            editable={false} 
           />
           <TextInput
             style={styles.input}
