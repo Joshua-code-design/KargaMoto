@@ -54,7 +54,7 @@ const MobileNumberScreen = () => {
       });
 
       if (response.status === 200) {
-        navigation.navigate(response.data.status === "1" ? "OtpScreen" : "register", {
+        navigation.navigate(response.data.status === "1" ? "OtpScreen" : "registerScreen", {
           phoneNumber: phoneNumber,
         });
       }
@@ -66,6 +66,11 @@ const MobileNumberScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Image
+        source={require('../../assets/Habalaaa.png')}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      />
       <Text style={styles.heading}>HI NEW USER WELCOME TO KARGAMOTO!!</Text>
       <Text style={styles.footerText}>
       Before we get started, please enter a valid 
@@ -79,11 +84,12 @@ const MobileNumberScreen = () => {
           <Text style={styles.callingCode}>+63</Text>
         </View>
 
-        <View style={styles.numberInputContainer}>
+        <View style={[styles.numberInputContainer, isFocused && styles.focusedInput]}>
           <Animated.Text style={[styles.floatingLabel, {
             top: animatedLabel.interpolate({ inputRange: [0, 1], outputRange: [12, -10] }),
             fontSize: animatedLabel.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
-            color: isFocused ? "#2196F3" : "#aaa",
+            color: isFocused ? "#000000" : "#333333",
+            fontWeight: isFocused ? "600" : "normal",
           }]}>Mobile Number</Animated.Text>
           <TextInput
             style={styles.input}
@@ -93,6 +99,7 @@ const MobileNumberScreen = () => {
             onFocus={handleFocus}
             onBlur={handleBlur}
             onChangeText={handleChangeText}
+            placeholderTextColor="#666666"
           />
         </View>
       </View>
@@ -108,76 +115,114 @@ const MobileNumberScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
     padding: width * 0.05,
+    backgroundColor: "#FFFFFF",
+  },
+  backgroundImage: {
+    position: 'absolute',
+    width: width,
+    height: height,
+    opacity: 0.6,
   },
   heading: {
     fontSize: width * 0.055,
     fontWeight: "bold",
     marginBottom: 5,
     marginTop: height * 0.1,
+    color: "#000000",
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
+    marginTop: height * 0.05,
   },
   countryContainer: {
     flexDirection: "row",
     alignItems: "center",
     padding: width * 0.025,
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 20,
+    borderColor: "#E0E0E0",
+    borderRadius: 12,
     marginRight: 10,
-    marginTop: 20,
+    backgroundColor: "#F8F8F8",
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
   },
   flag: {
     width: width * 0.075,
     height: height * 0.025,
     marginRight: 5,
+    borderRadius: 2,
   },
   callingCode: {
     fontSize: width * 0.05,
     fontWeight: "bold",
+    color: "#000000",
   },
   numberInputContainer: {
     flex: 1,
     position: "relative",
     borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 1,
-    borderRadius: 20,
-    marginTop: 20,
+    borderColor: "#E0E0E0",
+    borderRadius: 12,
+    paddingHorizontal: width * 0.03,
+    paddingVertical: width * 0.025,
+    backgroundColor: "#FFFFFF",
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+  },
+  focusedInput: {
+    borderColor: "black",
+    borderWidth: 1.8,
   },
   floatingLabel: {
     position: "absolute",
     left: 10,
-    backgroundColor: "white",
-    paddingHorizontal: 5,
+    color: "#000000",
+    paddingHorizontal: 8,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 4,
+    marginTop: 4,
+    zIndex: 1,
+    letterSpacing: 0.3,
   },
   input: {
-    fontSize: width * 0.04,
-    fontWeight: "bold",
+    fontSize: width * 0.045,
+    fontWeight: "500",
+    color: "#000000",
+    paddingVertical: 2,
   },
   footerText: {
-    fontSize: width * 0.05,
-    color: "gray",
+    fontSize: width * 0.050,
+    backgroundColor:'white',
+    color: "#555555",
     marginTop: 5,
-    alignItems: "left",
+    lineHeight: width * 0.06,
   },
   button: {
     height: height * 0.07,
     width: "100%",
     backgroundColor: "#0052CC",
-    borderRadius: 30,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-    marginTop: height * 0.1,
+    marginTop: 500,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: width * 0.04,
+    fontSize: width * 0.045,
     fontWeight: "600",
     letterSpacing: 0.5,
   },

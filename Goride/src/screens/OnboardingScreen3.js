@@ -9,7 +9,7 @@ const OnboardingScreen2 = ({ navigation }) => {
 
   const handleNext = () => {
     if (isChecked) {
-      navigation.navigate('login');
+      navigation.navigate('loginScreen');
     }
   };
 
@@ -113,15 +113,15 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     position: 'absolute',
-    width: width,
-    height: height,
+    width: '100%',
+    height: '100%',
     opacity: 0.6,
   },
   termsContainer: {
     flex: 1,
-    padding: 20,
-    marginBottom: 180,
-    marginTop: 50,
+    padding: '5%',
+    marginBottom: '20%',
+    marginTop: '5%',
   },
   termsTitle: {
     fontSize: 32,
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: 24,
-    padding: 32,
+    padding: '8%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     lineHeight: 24,
-    color: '#374151]',
+    color: '#374151',
     fontWeight: '500',
   },
   checkboxContainer: {
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 24,
     backgroundColor: 'rgba(255, 255, 255, 0.98)',
-    padding: 20,
+    padding: '5%',
     borderRadius: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   },
   radioContainer: {
     position: 'absolute',
-    bottom: 120,
+    bottom: '15%',
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -248,9 +248,9 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     position: 'absolute',
-    bottom: 40,
-    left: 24,
-    right: 24,
+    bottom: '10%',
+    left: '5%',
+    right: '5%',
   },
   button: {
     height: 56,

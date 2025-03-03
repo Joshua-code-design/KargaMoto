@@ -65,7 +65,7 @@ const OnboardingScreen2 = ({ navigation }) => {
       
 
       <LinearGradient
-        colors={['transparent', 'rgba(0,0,0,0.8)', 'rgba(0,0,0,0.95)']}
+        colors={['transparent', 'rgba(250, 250, 250, 0.8)', 'rgba(250, 250, 250, 0.8)']}
         style={styles.gradient}
       />
       <Animated.View style={[styles.contentContainer, {
@@ -76,7 +76,16 @@ const OnboardingScreen2 = ({ navigation }) => {
           <Animated.View style={[styles.lottieContainer, {
             transform: [{ translateX: lottieSlideAnim }]
           }]}>
-            <Text style={styles.welcomeText}>KARGA MOTO</Text>
+            <Animated.View
+        style={[
+          styles.logoContainer,
+          {
+            opacity: fadeAnim,
+          },
+        ]}
+      >
+        <Text style={styles.logoText}>KARGA MOTO</Text>
+      </Animated.View>
             <LottieView
               source={{ uri: 'https://lottie.host/7e9c099d-8dc4-4129-ba4d-20fd0ead33cf/NqN84LP2cn.lottie' }}
               autoPlay
@@ -118,7 +127,7 @@ const OnboardingScreen2 = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: 'white',
   },
   gradient: {
     ...StyleSheet.absoluteFillObject,
@@ -182,12 +191,12 @@ const styles = StyleSheet.create({
     shadowColor: 'white',
     shadowOpacity: 0.3,
     shadowRadius: 12,
-    backgroundColor: 'white',
+    backgroundColor: '#000000',
     padding: 20,
     transform: [{ perspective: 1000 }],
   },
   ctaText: {
-    color: 'black',
+    color: 'rgba(250, 250, 250, 0.8)',
     fontSize: 20,
     fontWeight: '700',
     textAlign: 'center',
@@ -202,12 +211,20 @@ const styles = StyleSheet.create({
   
   welcomeText: {
     fontSize: 60,
-    color: '#E5E7EB',
+    color: '#000000',
     marginBottom: 8,
     fontWeight: '600',
     letterSpacing: 4,
     textTransform: 'uppercase',
-    fontFamily: 'Arial, sans-serif',
+  },
+  logoContainer: {
+    marginBottom: 40,
+  },
+  logoText: {
+    fontSize: 50,
+    fontWeight: 'bold',
+    letterSpacing: 4,
+    color: '#2c3e50',
   },
 });
 

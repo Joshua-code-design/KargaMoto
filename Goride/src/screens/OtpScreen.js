@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, SafeAreaView, TextInput, Keyboard, Alert } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const OtpScreen = ({ navigation, route }) => {
   const { phoneNumber } = route.params; // Get phoneNumber from route params
@@ -55,14 +56,18 @@ const OtpScreen = ({ navigation, route }) => {
         otp: otpInteger
       });
 
-      if (response.status === 200 && response.data.user_type === "passenger") {
-      Alert.alert("User Type: ",response.data.user_type);
-        //add function to navigate to the passenger screen
-      }else if (response.status === 200 && response.data.user_type === "driver") {
-        Alert.alert("User Type: ",response.data.user_type);
-        //add function to navigate to the driver screen
-      }else{
-        Alert.alert("Error On Logging In Please try again Later");
+      if (response.status === 200) {
+        await AsyncStorage.setItem('token', response.data.token);
+        
+        if (response.data.user_type === "passenger") {
+          navigation.navigate('LandingPageScreen');
+          //add function to navigate to the passenger screen
+        } else if (response.data.user_type === "driver") {
+          navigation.navigate('LandingPageScreen');
+          //add function to navigate to the driver screen
+        } else {
+          Alert.alert("Error On Logging In Please try again Later");
+        }
       }
 
 
