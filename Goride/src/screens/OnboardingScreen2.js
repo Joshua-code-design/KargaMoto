@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Image, StyleSheet, TouchableOpacity, Text, SafeAreaView } from 'react-native';
+import { View, Image, StyleSheet, TouchableOpacity, Text, SafeAreaView, Dimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 const OnboardingScreen1 = ({ navigation }) => {
-
 
   const handleNext = () => {
     navigation.navigate('Onboarding3');
@@ -56,72 +57,72 @@ const styles = StyleSheet.create({
   contentContainer: {
     position: 'absolute',
     top: '62%',
-    paddingHorizontal: 24,
+    paddingHorizontal: width * 0.06,
     width: '100%',
   },
   title: {
-    fontSize: 32,
+    fontSize: width * 0.08,
     fontWeight: 'bold',
     color: 'white',
-    marginBottom: 12,
+    marginBottom: height * 0.015,
     textAlign: 'center',
   },
   description: {
-    fontSize: 16,
+    fontSize: width * 0.04,
     color: '#CCCCCC',
     textAlign: 'center',
-    lineHeight: 24,
-    paddingHorizontal: 20,
+    lineHeight: width * 0.06,
+    paddingHorizontal: width * 0.05,
   },
   radioContainer: {
     position: 'absolute',
-    bottom: 120,
+    bottom: height * 0.15,
     left: 0,
     right: 0,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
+    gap: width * 0.02,
   },
   radioButton: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: width * 0.02,
+    height: width * 0.02,
+    borderRadius: width * 0.01,
     backgroundColor: '#666666',
-    margin: 4,
+    margin: width * 0.01,
   },
   radioButtonActive: {
     backgroundColor: 'black',
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: width * 0.025,
+    height: width * 0.025,
+    borderRadius: width * 0.0125,
   },
   buttonContainer: {
     position: 'absolute',
-    bottom: 40,
+    bottom: height * 0.05,
     left: 0,
     right: 0,
     flexDirection: 'row',
-    paddingHorizontal: 24,
+    paddingHorizontal: width * 0.06,
     justifyContent: 'center',
   },
   button: {
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 25,
+    paddingVertical: height * 0.02,
+    paddingHorizontal: width * 0.08,
+    borderRadius: width * 0.06,
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    minWidth: 120,
+    minWidth: width * 0.3,
   },
   nextButton: {
     backgroundColor: '#141010',
   },
   nextButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: width * 0.04,
     fontWeight: '600',
     textAlign: 'center',
   },

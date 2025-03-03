@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Image,
   Dimensions,
+  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
@@ -65,58 +66,67 @@ const MobileNumberScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Image
-        source={require('../../assets/Habalaaa.png')}
-        style={styles.backgroundImage}
-        resizeMode="cover"
-      />
-      <Text style={styles.heading}>HI NEW USER WELCOME TO KARGAMOTO!!</Text>
-      <Text style={styles.footerText}>
-      Before we get started, please enter a valid 
-      phone number and, if you'd like, your email address.
-      </Text>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Image
+          source={require('../../assets/Habalaaa.png')}
+          style={styles.backgroundImage}
+          resizeMode="cover"
+        />
+        <Text style={styles.heading}>HI NEW USER WELCOME TO KARGAMOTO!!</Text>
+        <Text style={styles.footerText}>
+        Before we get started, please enter a valid 
+        phone number and, if you'd like, your email address.
+        </Text>
 
-      <View style={styles.inputContainer}>
-        {/* Display Philippines flag and calling code */}
-        <View style={styles.countryContainer}>
-          <Image source={require("../../assets/flag.jpg")} style={styles.flag} />
-          <Text style={styles.callingCode}>+63</Text>
+        <View style={styles.inputContainer}>
+          {/* Display Philippines flag and calling code */}
+          <View style={styles.countryContainer}>
+            <Image source={require("../../assets/flags.png")} style={styles.flag} />
+            <Text style={styles.callingCode}>+63</Text>
+          </View>
+
+          <View style={[styles.numberInputContainer, isFocused && styles.focusedInput]}>
+            <Animated.Text style={[styles.floatingLabel, {
+              top: animatedLabel.interpolate({ inputRange: [0, 1], outputRange: [12, -10] }),
+              fontSize: animatedLabel.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
+              color: isFocused ? "#000000" : "#333333",
+              fontWeight: isFocused ? "600" : "normal",
+            }]}>Mobile Number</Animated.Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="phone-pad"
+              maxLength={10} 
+              value={phoneNumber}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              onChangeText={handleChangeText}
+              placeholderTextColor="#666666"
+            />
+          </View>
         </View>
 
-        <View style={[styles.numberInputContainer, isFocused && styles.focusedInput]}>
-          <Animated.Text style={[styles.floatingLabel, {
-            top: animatedLabel.interpolate({ inputRange: [0, 1], outputRange: [12, -10] }),
-            fontSize: animatedLabel.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
-            color: isFocused ? "#000000" : "#333333",
-            fontWeight: isFocused ? "600" : "normal",
-          }]}>Mobile Number</Animated.Text>
-          <TextInput
-            style={styles.input}
-            keyboardType="phone-pad"
-            maxLength={10} 
-            value={phoneNumber}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onChangeText={handleChangeText}
-            placeholderTextColor="#666666"
-          />
-        </View>
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Continue</Text>
+          <Ionicons name="arrow-forward" size={20} color="#FFFFFF" style={styles.buttonIcon} />
+        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Continue</Text>
-        <Ionicons name="arrow-forward" size={20} color="#FFFFFF" style={styles.buttonIcon} />
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
     padding: width * 0.05,
     backgroundColor: "#FFFFFF",
+    width: '100%',
+    alignItems: 'center',
   },
   backgroundImage: {
     position: 'absolute',
@@ -130,11 +140,13 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     marginTop: height * 0.1,
     color: "#000000",
+    textAlign: 'center',
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: height * 0.05,
+    width: '100%',
   },
   countryContainer: {
     flexDirection: "row",
@@ -204,6 +216,7 @@ const styles = StyleSheet.create({
     color: "#555555",
     marginTop: 5,
     lineHeight: width * 0.06,
+    textAlign: 'center',
   },
   button: {
     height: height * 0.07,
@@ -213,7 +226,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-    marginTop: 500,
+    marginTop: height * 0.05,
     elevation: 2,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
