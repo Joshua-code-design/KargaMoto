@@ -49,31 +49,23 @@ const OtpScreen = ({ navigation, route }) => {
 
   const handleVerifyOTP = async () => {
     try {
-      const otpString = otp.join('');
-      const response = await axios.post('http://192.168.1.18:5000/api/verify-otp', {
+      const otpInteger = parseInt(otp.join(''), 10);
+      const response = await axios.post('http://192.168.1.27:5000/api/verify-otp', {
         phone_number: phoneNumber,
-        otp: otpString
+        otp: otpInteger
       });
 
+      if (response.status === 200 && response.data.user_type === "passenger") {
+      Alert.alert("User Type: ",response.data.user_type);
+        //add function to navigate to the passenger screen
+      }else if (response.status === 200 && response.data.user_type === "driver") {
+        Alert.alert("User Type: ",response.data.user_type);
+        //add function to navigate to the driver screen
+      }else{
+        Alert.alert("Error On Logging In Please try again Later");
+      }
 
-      //change to the code we have in 1 or 0
 
-      // if (response.status === 200) {
-      //   const message = response.data.user_type === 'passenger' ? 
-      //     'Welcome passenger! OTP verified successfully.' :
-      //     response.data.user_type === 'driver' ?
-      //     'Welcome driver! OTP verified successfully.' :
-      //     'OTP verified successfully!';
-          
-      //   Alert.alert('Success', message);
-      //   setPhoneNumber('');
-      //   setOtp(['', '', '', '', '', '']);
-      //   setShowOtpInput(false);
-      //   navigation.navigate(response.data.status === "1" ? "OtpScreen" : "register", {
-      //     phoneNumber: phoneNumber,
-      //   });
-      // }
-      
     } catch (error) {
       console.error('Error verifying OTP:', error);
       Alert.alert('Error', error.response?.data?.error || 'Failed to verify OTP');

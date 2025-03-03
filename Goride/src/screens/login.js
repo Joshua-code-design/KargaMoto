@@ -49,7 +49,7 @@ const MobileNumberScreen = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post("http://192.168.1.18:5000/api/login", {
+      const response = await axios.post("http://192.168.1.27:5000/api/login", {
         phone_number: phoneNumber,
       });
 

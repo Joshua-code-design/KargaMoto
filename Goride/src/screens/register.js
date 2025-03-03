@@ -26,7 +26,7 @@ const RegisterForm = () => {
     
     try {
       const fullname = `${username} ${lastName}`;
-      const response = await axios.post('http://192.168.1.26:5000/api/register', {
+      const response = await axios.post('http://192.168.1.27:5000/api/register', {
         full_name: fullname,
         phone_number: phone
       });
