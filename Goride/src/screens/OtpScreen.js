@@ -2,7 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, SafeAreaView, TextInput, Keyboard, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { verifyOtp,loginUser } from '../services/Loginapi'; // Import the new API function
+import axios from 'axios';
+import { verifyOTP } from '../services/Loginapi';
+
 
 // Toast Component
 const Toast = ({ visible, message, type, onHide }) => {
@@ -119,57 +121,8 @@ const OtpScreen = ({ navigation, route }) => {
     }
   };
 
-  const handleVerifyOTP = async () => {
-    try {
-      const otpInteger = parseInt(otp.join(''), 10);
-      const response = await handleVerifyOTP(otpInteger, phoneNumber, showToast, navigation, setInputStatus); // Use the new API function
-
-      if (response.status === 200) {
-        await AsyncStorage.setItem('token', response.data.token);
-        
-        setInputStatus('success');
-        showToast('OTP verified successfully!');
-        
-        // Navigate after toast is shown (with a slight delay)
-        setTimeout(() => {
-          navigation.navigate('LandingPageScreen');
-        }, 1500);
-      }
-      
-    } catch (error) {
-      console.error('Error verifying OTP:', error);
-      setInputStatus('error');
-      showToast(error.response?.data?.error || 'Failed to verify OTP', 'error');
-      
-      // Shake animation for wrong OTP (optional)
-      inputRefs.current.forEach(ref => {
-        if (ref) {
-          const shake = Animated.sequence([
-            Animated.timing(new Animated.Value(0), {
-              toValue: 10,
-              duration: 50,
-              useNativeDriver: true
-            }),
-            Animated.timing(new Animated.Value(0), {
-              toValue: -10,
-              duration: 50,
-              useNativeDriver: true
-            }),
-            Animated.timing(new Animated.Value(0), {
-              toValue: 10,
-              duration: 50,
-              useNativeDriver: true
-            }),
-            Animated.timing(new Animated.Value(0), {
-              toValue: 0,
-              duration: 50,
-              useNativeDriver: true
-            })
-          ]);
-          shake.start();
-        }
-      });
-    }
+  const handleVerifyOTP = () => {
+    verifyOTP(phoneNumber, otp, navigation, inputRefs, setInputStatus, showToast);
   };
 
   const handleResendCode = () => {
