@@ -2,7 +2,8 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Animated } from 'react-native';
 
-const API_URL = "https://kargamotoapi.onrender.com/api";
+// const API_URL = "https://kargamotoapi.onrender.com/api";
+const API_URL = "http://192.168.1.27:5000/api";
 
 export const loginUser = async (phoneNumber, showToast, navigation, setLoading) => {
   setLoading(true);
@@ -36,7 +37,7 @@ export const loginUser = async (phoneNumber, showToast, navigation, setLoading) 
 export const verifyOTP = async (phoneNumber, otp, navigation, inputRefs, setInputStatus, showToast) => {
   try {
     const otpInteger = parseInt(otp.join(''), 10);
-    const response = await axios.post('https://kargamotoapi.onrender.com/api/verify-otp', {
+    const response = await axios.post(`${API_URL}/verify-otp`, {
       phone_number: phoneNumber,
       otp: otpInteger
     });
