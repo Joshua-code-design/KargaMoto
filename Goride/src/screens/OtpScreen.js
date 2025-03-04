@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, SafeAreaView, TextInput, Keyboard, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { verifyOtp,loginUser } from '../services/Loginapi'; // Import the new API function
 
 // Toast Component
 const Toast = ({ visible, message, type, onHide }) => {
@@ -122,10 +122,7 @@ const OtpScreen = ({ navigation, route }) => {
   const handleVerifyOTP = async () => {
     try {
       const otpInteger = parseInt(otp.join(''), 10);
-      const response = await axios.post('https://kargamotoapi.onrender.com/api/verify-otp', {
-        phone_number: phoneNumber,
-        otp: otpInteger
-      });
+      const response = await handleVerifyOTP(otpInteger, phoneNumber, showToast, navigation, setInputStatus); // Use the new API function
 
       if (response.status === 200) {
         await AsyncStorage.setItem('token', response.data.token);
@@ -135,13 +132,10 @@ const OtpScreen = ({ navigation, route }) => {
         
         // Navigate after toast is shown (with a slight delay)
         setTimeout(() => {
-          if (response.data.user_type === "passenger") {
-            navigation.navigate('LandingPageScreen');
-          } else if (response.data.user_type === "driver") {
-            navigation.navigate('LandingPageScreen');
-          }
+          navigation.navigate('LandingPageScreen');
         }, 1500);
       }
+      
     } catch (error) {
       console.error('Error verifying OTP:', error);
       setInputStatus('error');
