@@ -1,15 +1,72 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, SafeAreaView, TextInput, Keyboard, Alert } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, SafeAreaView, TextInput, Keyboard, Animated } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Toast Component
+const Toast = ({ visible, message, type, onHide }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  
+  useEffect(() => {
+    if (visible) {
+      Animated.sequence([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.delay(2000),
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        })
+      ]).start(() => {
+        onHide && onHide();
+      });
+    }
+  }, [visible]);
+
+  if (!visible) return null;
+
+  return (
+    <Animated.View 
+      style={[
+        styles.toastContainer, 
+        { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [-20, 0]
+        })}] 
+      }]}
+    >
+      <View style={styles.toastContent}>
+        {type === 'success' && (
+          <View style={styles.iconContainer}>
+            <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />
+          </View>
+        )}
+        {type === 'error' && (
+          <View style={styles.iconContainer}>
+            <Ionicons name="close-circle" size={24} color="#F44336" />
+          </View>
+        )}
+        <Text style={styles.toastMessage}>{message}</Text>
+      </View>
+    </Animated.View>
+  );
+};
+
 const OtpScreen = ({ navigation, route }) => {
-  const { phoneNumber } = route.params; // Get phoneNumber from route params
-  const [otp, setOtp] = useState(['', '', '', '', '', '']); 
+  const { phoneNumber } = route.params;
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(60);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
+  const [inputStatus, setInputStatus] = useState('default'); // 'default', 'success', 'error'
   const inputRefs = useRef([]);
   
-  // Focus on first input when component mounts
   useEffect(() => {
     if (inputRefs.current[0]) {
       inputRefs.current[0].focus();
@@ -27,14 +84,29 @@ const OtpScreen = ({ navigation, route }) => {
     return () => clearInterval(countdown);
   }, []);
 
+  // Reset input status if user modifies the OTP after validation
+  useEffect(() => {
+    if (inputStatus !== 'default') {
+      setInputStatus('default');
+    }
+  }, [otp]);
+
+  const showToast = (message, type = 'success') => {
+    setToastMessage(message);
+    setToastType(type);
+    setToastVisible(true);
+  };
+
+  const hideToast = () => {
+    setToastVisible(false);
+  };
+
   const handleOtpChange = (value, index) => {
-    // Only allow numbers
     if (/^\d*$/.test(value)) {
       const newOtp = [...otp];
       newOtp[index] = value;
       setOtp(newOtp);
       
-      // Auto-focus to next input if current input is filled
       if (value && index < 5) {
         inputRefs.current[index + 1].focus();
       }
@@ -42,7 +114,6 @@ const OtpScreen = ({ navigation, route }) => {
   };
 
   const handleKeyPress = (e, index) => {
-    // Move to previous input on backspace if current input is empty
     if (e.nativeEvent.key === 'Backspace' && index > 0 && otp[index] === '') {
       inputRefs.current[index - 1].focus();
     }
@@ -51,7 +122,7 @@ const OtpScreen = ({ navigation, route }) => {
   const handleVerifyOTP = async () => {
     try {
       const otpInteger = parseInt(otp.join(''), 10);
-      const response = await axios.post('http://192.168.1.27:5000/api/verify-otp', {
+      const response = await axios.post('https://kargamotoapi.onrender.com/api/verify-otp', {
         phone_number: phoneNumber,
         otp: otpInteger
       });
@@ -59,51 +130,104 @@ const OtpScreen = ({ navigation, route }) => {
       if (response.status === 200) {
         await AsyncStorage.setItem('token', response.data.token);
         
-        if (response.data.user_type === "passenger") {
-          navigation.navigate('LandingPageScreen');
-          //add function to navigate to the passenger screen
-        } else if (response.data.user_type === "driver") {
-          navigation.navigate('LandingPageScreen');
-          //add function to navigate to the driver screen
-        } else {
-          Alert.alert("Error On Logging In Please try again Later");
-        }
+        setInputStatus('success');
+        showToast('OTP verified successfully!');
+        
+        // Navigate after toast is shown (with a slight delay)
+        setTimeout(() => {
+          if (response.data.user_type === "passenger") {
+            navigation.navigate('LandingPageScreen');
+          } else if (response.data.user_type === "driver") {
+            navigation.navigate('LandingPageScreen');
+          }
+        }, 1500);
       }
-
-
     } catch (error) {
       console.error('Error verifying OTP:', error);
-      Alert.alert('Error', error.response?.data?.error || 'Failed to verify OTP');
+      setInputStatus('error');
+      showToast(error.response?.data?.error || 'Failed to verify OTP', 'error');
+      
+      // Shake animation for wrong OTP (optional)
+      inputRefs.current.forEach(ref => {
+        if (ref) {
+          const shake = Animated.sequence([
+            Animated.timing(new Animated.Value(0), {
+              toValue: 10,
+              duration: 50,
+              useNativeDriver: true
+            }),
+            Animated.timing(new Animated.Value(0), {
+              toValue: -10,
+              duration: 50,
+              useNativeDriver: true
+            }),
+            Animated.timing(new Animated.Value(0), {
+              toValue: 10,
+              duration: 50,
+              useNativeDriver: true
+            }),
+            Animated.timing(new Animated.Value(0), {
+              toValue: 0,
+              duration: 50,
+              useNativeDriver: true
+            })
+          ]);
+          shake.start();
+        }
+      });
     }
   };
 
-
   const handleResendCode = () => {
-    // Allow resend when timer is done
     if (timer === 0) {
-      // Logic to resend the OTP code
       setOtp(['', '', '', '', '', '']);
-      setTimer(30); // Reset timer
+      setTimer(30);
+      setInputStatus('default');
+      showToast('Verification code resent');
+      // Add API call to resend OTP here
+      
+      // Focus on first input after resend
+      if (inputRefs.current[0]) {
+        inputRefs.current[0].focus();
+      }
     } else {
-      Alert.alert('Wait', 'Please wait for the timer to expire before resending the code.');
+      showToast(`Please wait ${timer} seconds before resending`, 'error');
+    }
+  };
+
+  // Function to get the proper box style based on current input status
+  const getInputBoxStyle = () => {
+    switch (inputStatus) {
+      case 'success':
+        return styles.otpBoxSuccess;
+      case 'error':
+        return styles.otpBoxError;
+      default:
+        return styles.otpBox;
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      <Toast 
+        visible={toastVisible}
+        message={toastMessage}
+        type={toastType}
+        onHide={hideToast}
+      />
+      
       <View style={styles.contentContainer}>
         <Text style={styles.title}>Enter code</Text>
         <Text style={styles.description}>
-          We've sent an SMS with an activation code to your phone +91 9318305392.
+          We've sent an SMS with an activation code to your phone
         </Text>
         
-        {/* OTP Input Boxes */}
         <View style={styles.otpContainer}>
           {otp.map((digit, index) => (
             <TextInput
               key={index}
               ref={ref => (inputRefs.current[index] = ref)}
-              style={styles.otpBox}
+              style={[getInputBoxStyle()]}
               keyboardType="numeric"
               maxLength={1}
               value={digit}
@@ -114,7 +238,7 @@ const OtpScreen = ({ navigation, route }) => {
           ))}
         </View>
         <TouchableOpacity onPress={handleResendCode} disabled={timer > 0}>
-          <Text style={styles.resendText}>
+          <Text style={[styles.resendText, timer > 0 && styles.disabledText]}>
             {timer > 0 ? `Resend code in ${timer}s` : 'Resend code'}
           </Text>
         </TouchableOpacity>
@@ -177,10 +301,37 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     color: '#000',
   },
+  otpBoxSuccess: {
+    width: 45,
+    height: 45,
+    borderWidth: 1,
+    borderColor: '#4CAF50',
+    borderRadius: 8,
+    textAlign: 'center',
+    fontSize: 20,
+    marginHorizontal: 6,
+    backgroundColor: 'rgba(76, 175, 80, 0.05)',
+    color: '#4CAF50',
+  },
+  otpBoxError: {
+    width: 45,
+    height: 45,
+    borderWidth: 1,
+    borderColor: '#F44336',
+    borderRadius: 8,
+    textAlign: 'center',
+    fontSize: 20,
+    marginHorizontal: 6,
+    backgroundColor: 'rgba(244, 67, 54, 0.05)',
+    color: '#F44336',
+  },
   resendText: {
     color: '#1E88E5',
     marginTop: 20,
     textAlign: 'center',
+  },
+  disabledText: {
+    color: '#9E9E9E',
   },
   buttonContainer: {
     position: 'absolute',
@@ -211,6 +362,39 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
+  // Toast styles
+  toastContainer: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    right: 20,
+    zIndex: 9999,
+    alignItems: 'center',
+  },
+  toastContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    minWidth: '80%',
+    maxWidth: '90%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 4,
+  },
+  iconContainer: {
+    marginRight: 12,
+  },
+  toastMessage: {
+    fontSize: 14,
+    color: '#333',
+    flex: 1,
+    fontWeight: '500',
+  }
 });
 
 export default OtpScreen;
