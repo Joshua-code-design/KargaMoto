@@ -1,14 +1,34 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ModernButton from '../components/ModernButton';
 import PopupModal from '../components/PopupModal';
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ProfileScreen() {
   const [profileImage, setProfileImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState("");
+  const [userName, setUserName] = useState("Loading...");
+  const [gender, setGender] = useState("Loading...");
+  const [mobileNumber, setMobileNumber] = useState("Loading...");
+  const [userType, setUserType] = useState("Loading...");
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      const userDetails = await AsyncStorage.getItem('userDetails');
+      if (userDetails !== null) { 
+        const parsedDetails = JSON.parse(userDetails);
+        console.log("parsedDetails:",parsedDetails);
+        setUserName(parsedDetails.full_name);
+        setGender(parsedDetails.gender);
+        setMobileNumber(parsedDetails.phone_number);
+        setUserType(parsedDetails.user_type);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
 
   // Show modal with correct message
   const handleShowModal = (type) => {
@@ -57,13 +77,12 @@ export default function ProfileScreen() {
         </View>
 
         <Text style={styles.label}>Name</Text>
-        <Text style={styles.value}>Firstname Lastname</Text>
+        <Text style={styles.value}>{userName}</Text>
 
         <Text style={styles.label}>Sex</Text>
-        <Text style={styles.value}>Not Specified</Text>
+        <Text style={styles.value}>{gender}</Text>
 
-        <Text style={styles.label}>Weight</Text>
-        <Text style={styles.value}>Not Specified</Text>
+
       </View>
 
       {/* Contact Information Section */}
@@ -71,7 +90,10 @@ export default function ProfileScreen() {
         <Text style={styles.sectionTitle}>Contact Information</Text>
 
         <Text style={styles.label}>Mobile Number</Text>
-        <Text style={styles.value}>+639622137451</Text>
+        <Text style={styles.value}>{mobileNumber}</Text>
+
+        <Text style={styles.label}>User Type</Text>
+        <Text style={styles.value}>{userType}</Text>
 
         <View style={styles.rowBetween}>
           <View>

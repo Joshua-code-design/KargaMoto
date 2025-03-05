@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   StatusBar,
   StyleSheet,
@@ -26,6 +27,27 @@ const SettingsOption = ({ icon, title, toggleSwitch, isSwitch }) => {
 };
 
 export default function ProfileSettings({ navigation }) {
+  const [userName, setUserName] = useState("Loading...");
+
+  useEffect(() => {
+  const fetchUserDetails = async () => {
+    try {
+      const userDetails = await AsyncStorage.getItem('userDetails');
+      // console.log("userDetails:",userDetails);
+      if (userDetails !== null) {
+        const parsedDetails = JSON.parse(userDetails);
+        setUserName(parsedDetails.full_name);
+      }
+    } catch (error) {
+      console.error("Failed to load user details:", error);
+    }
+  };
+
+  fetchUserDetails();
+
+  
+  }, []);   
+
   return (
     <View style={styles.container}>
       {/* Header Section */}
@@ -44,7 +66,7 @@ export default function ProfileSettings({ navigation }) {
         <View style={styles.profileContainer}>
           <Ionicons name="person-circle" size={50} color="black" />
           <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>FirstName LastName</Text>
+            <Text style={styles.profileName}>{userName}</Text>
             <TouchableOpacity onPress={() => navigation.navigate("ProfileScreen")}>
               <Text style={styles.viewProfile}>View Profile</Text>
             </TouchableOpacity>

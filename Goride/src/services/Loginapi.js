@@ -2,8 +2,8 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Animated } from 'react-native';
 
-  const API_URL = "https://kargamotoapi.onrender.com/api";
-// const API_URL = "http://192.168.1.27:5000/api";
+  // const API_URL = "https://kargamotoapi.onrender.com/api";
+const API_URL = "http://192.168.1.27:5000/api";
 
 export const loginUser = async (phoneNumber, showToast, navigation, setLoading) => {
   setLoading(true);
@@ -37,17 +37,38 @@ export const loginUser = async (phoneNumber, showToast, navigation, setLoading) 
 export const verifyOTP = async (phoneNumber, otp, navigation, inputRefs, setInputStatus, showToast) => {
   try {
     const otpInteger = parseInt(otp.join(''), 10);
+
+    //verify otp
     const response = await axios.post(`${API_URL}/verify-otp`, {
       phone_number: phoneNumber,
       otp: otpInteger
     });
 
+
+    //if status is okay proceed to get user details
     if (response.status === 200) {
+
+      //stores token in async storage
       await AsyncStorage.setItem('token', response.data.token);
+
+      //gets token from async storage
+      const token = await AsyncStorage.getItem('token');
+
+      //gets user details from API
+      const getUserDetails = await axios.get(`${API_URL}/get-user-details`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
       
-      if (response.data.user_type === "passenger") {
+      if (response.data.user_type === "Passenger") {
+
+        await AsyncStorage.setItem('userDetails', JSON.stringify(getUserDetails.data.user));
         navigation.navigate('LandingPageScreen');
-      } else if (response.data.user_type === "driver") {
+      } else if (response.data.user_type === "Driver" ) {
+        await AsyncStorage.setItem('userDetails', JSON.stringify(getUserDetails.data.user));
+        await AsyncStorage.setItem('driverDetails', JSON.stringify(getUserDetails.data.driver));
         navigation.navigate('LandingPageScreen');
       } else {
         Alert.alert("Error On Logging In Please try again Later");
@@ -88,5 +109,7 @@ export const verifyOTP = async (phoneNumber, otp, navigation, inputRefs, setInpu
     });
   }
 };
+
+
 
 
