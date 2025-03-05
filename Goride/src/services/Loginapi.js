@@ -2,8 +2,8 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Animated } from 'react-native';
 
-// const API_URL = "https://kargamotoapi.onrender.com/api";
-const API_URL = "http://192.168.1.27:5000/api";
+  const API_URL = "https://kargamotoapi.onrender.com/api";
+// const API_URL = "http://192.168.1.27:5000/api";
 
 export const loginUser = async (phoneNumber, showToast, navigation, setLoading) => {
   setLoading(true);
@@ -54,9 +54,9 @@ export const verifyOTP = async (phoneNumber, otp, navigation, inputRefs, setInpu
       }
     }
   } catch (error) {
-    console.error('Error verifying OTP:', error);
+    // console.error('Error verifying OTP:', error);
     setInputStatus('error');
-    showToast(error.response?.data?.error || 'Failed to verify OTP', 'error');
+    showToast('Failed to verify OTP');
     
     // Shake animation for wrong OTP
     inputRefs.current.forEach(ref => {

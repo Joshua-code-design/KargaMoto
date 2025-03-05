@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import { View, StyleSheet,  } from 'react-native';
 import MapView, { Marker } from 'react-native-maps'; // Importing MapView
 import FooterBar from '../components/FooterBar';
 
 const LandingPageScreen = ({ navigation }) => {
-  const [activeTab, setActiveTab] = useState('home'); // Default active tab
+  const [activeTab, setActiveTab] = useState('home'); 
 
   const onTabPress = (tab) => {
     if (tab === 'profile') {
-      navigation.navigate('Profile');
+      navigation.navigate('ProfileScreen');
     } else {
       setActiveTab(tab);
     }
