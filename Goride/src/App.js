@@ -8,6 +8,7 @@ import LoginScreen from './screens/LoginScreen';
 import OtpScreen from './screens/OtpScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import LandingPageScreen from './screens/LandingPageScreen';
+import ProfilesettingScreen from './screens/ProfilesettingScreen';
 import ProfileScreen from './screens/ProfileScreen';
 const Stack = createStackNavigator();
 
@@ -22,6 +23,7 @@ export default function App() {
         <Stack.Screen name="OtpScreen" component={OtpScreen} />
         <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
         <Stack.Screen name="LandingPageScreen" component={LandingPageScreen} />
+        <Stack.Screen name="ProfilesettingScreen" component={ProfilesettingScreen} />
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>

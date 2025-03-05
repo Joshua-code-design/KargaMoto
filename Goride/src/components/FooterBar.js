@@ -30,7 +30,7 @@ const FooterBar = ({ onTabPress, activeTab }) => {
         ? require('../../assets/services.png') 
         : require('../../assets/services.png')
     }
-    style={{ width: 30, height: 40 }}
+    style={{ width: 100, height: 39, }}
     resizeMode="contain"
   />
 </TouchableOpacity>

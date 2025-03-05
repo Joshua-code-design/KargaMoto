@@ -1,191 +1,178 @@
-import React from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  Image, 
-  SafeAreaView, 
-  ScrollView, 
-  TouchableOpacity 
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import ModernButton from '../components/ModernButton';
+import PopupModal from '../components/PopupModal';
 
-const Profile = () => {
+
+export default function ProfileScreen() {
+  const [profileImage, setProfileImage] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState("");
+
+  // Show modal with correct message
+  const handleShowModal = (type) => {
+    setModalType(type);
+    setModalVisible(true);
+  };
+
+  // Handle Confirm action
+  const handleConfirm = () => {
+    setModalVisible(false);
+    if (modalType === "delete") {
+      console.log("Account Deleted!");
+      // Add delete account logic
+    } else if (modalType === "logout") {
+      console.log("Logged Out!");
+      // Add logout logic
+    }
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Profile Header */}
-        <View style={styles.headerContainer}>
-          <View style={styles.profileImageContainer}>
-            <Image 
-              source={{uri: 'https://example.com/profile-placeholder.jpg'}} 
-              style={styles.profileImage}
-            />
-            <TouchableOpacity style={styles.editImageButton}>
-              <Ionicons name="camera" size={20} color="white" />
-            </TouchableOpacity>
-          </View>
-          
-          <Text style={styles.nameText}>John Doe</Text>
-          <Text style={styles.positionText}>Senior Software Engineer</Text>
+    <View style={styles.container}>
+      {/* Cover Photo */}
+      <View style={styles.coverContainer} />
+
+      {/* Profile Section */}
+      <View style={styles.profileContainer}>
+        <View style={styles.profileIconContainer}>
+          {profileImage ? (
+            <Image source={{ uri: profileImage }} style={styles.profileImage} />
+          ) : (
+            <Icon name="account-circle" size={100} color="#ccc" />
+          )}
+          <TouchableOpacity style={styles.editProfileIcon}>
+            <Icon name="pencil" size={20} color="#000" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Personal Information Section */}
+      <View style={styles.infoContainer}>
+        <View style={styles.rowBetween}>
+          <Text style={styles.sectionTitle}>Personal Information</Text>
+          <TouchableOpacity>
+            <Icon name="pencil" size={20} color="#777" />
+          </TouchableOpacity>
         </View>
 
-        {/* Profile Details */}
-        <View style={styles.detailsContainer}>
-          {/* Contact Information */}
-          <View style={styles.detailSection}>
-            <View style={styles.detailItem}>
-              <Ionicons name="mail" size={24} color="#4A90E2" style={styles.icon} />
-              <View style={styles.detailTextContainer}>
-                <Text style={styles.detailLabel}>Email</Text>
-                <Text style={styles.detailValue}>johndoe@example.com</Text>
-              </View>
-            </View>
+        <Text style={styles.label}>Name</Text>
+        <Text style={styles.value}>Firstname Lastname</Text>
 
-            <View style={styles.divider} />
+        <Text style={styles.label}>Sex</Text>
+        <Text style={styles.value}>Not Specified</Text>
 
-            <View style={styles.detailItem}>
-              <Ionicons name="call" size={24} color="#4A90E2" style={styles.icon} />
-              <View style={styles.detailTextContainer}>
-                <Text style={styles.detailLabel}>Phone</Text>
-                <Text style={styles.detailValue}>+1 (234) 567-8900</Text>
-              </View>
-            </View>
+        <Text style={styles.label}>Weight</Text>
+        <Text style={styles.value}>Not Specified</Text>
+      </View>
 
-            <View style={styles.divider} />
+      {/* Contact Information Section */}
+      <View style={styles.infoContainer}>
+        <Text style={styles.sectionTitle}>Contact Information</Text>
 
-            <View style={styles.detailItem}>
-              <Ionicons name="briefcase" size={24} color="#4A90E2" style={styles.icon} />
-              <View style={styles.detailTextContainer}>
-                <Text style={styles.detailLabel}>Company</Text>
-                <Text style={styles.detailValue}>Tech Innovations Inc.</Text>
-              </View>
-            </View>
+        <Text style={styles.label}>Mobile Number</Text>
+        <Text style={styles.value}>+639622137451</Text>
 
-            <View style={styles.divider} />
-
-            <View style={styles.detailItem}>
-              <Ionicons name="location" size={24} color="#4A90E2" style={styles.icon} />
-              <View style={styles.detailTextContainer}>
-                <Text style={styles.detailLabel}>Location</Text>
-                <Text style={styles.detailValue}>San Francisco, CA</Text>
-              </View>
-            </View>
+        <View style={styles.rowBetween}>
+          <View>
+            <Text style={styles.label}>Email Address</Text>
+            <Text style={[styles.value, { color: "black" }]}>Add Email</Text>
           </View>
+          <TouchableOpacity>
+            <Icon name="plus-circle" size={20} color="black" />
+          </TouchableOpacity>
         </View>
+      </View>
 
-        {/* Edit Profile Button */}
-        <TouchableOpacity style={styles.editProfileButton}>
-          <Text style={styles.editProfileButtonText}>Edit Profile</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </SafeAreaView>
+      {/* Account Settings */}
+      <View style={styles.infoContainer}>
+        <Text style={styles.accountSetting}>Account Settings</Text>
+
+        <ModernButton
+          title="Delete Account"
+          onPress={() => handleShowModal("delete")}
+          color="red"
+        />
+        <ModernButton
+          title="Logout"
+          onPress={() => handleShowModal("logout")}
+          color="black"
+        />
+      </View>
+
+      {/* Popup Modal */}
+      <PopupModal
+        visible={modalVisible}
+        title={modalType === "delete" ? "Delete Account" : "Logout"}
+        message={
+          modalType === "delete"
+            ? "Are you sure you want to delete your account? This action cannot be undone."
+            : "Are you sure you want to logout?"
+        }
+        onCancel={() => setModalVisible(false)}
+        onConfirm={handleConfirm}
+      />
+    </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F9FC',
+    backgroundColor: "#fff",
   },
-  scrollContainer: {
-    flexGrow: 1,
-    paddingVertical: 20,
-    paddingHorizontal: 15,
+  coverContainer: {
+    width: "100%",
+    height: 100,
+    backgroundColor: "#000",
   },
-  headerContainer: {
-    alignItems: 'center',
-    marginBottom: 30,
+  profileContainer: {
+    alignItems: "center",
+    marginTop: -50,
   },
-  profileImageContainer: {
-    position: 'relative',
-    marginBottom: 15,
+  profileIconContainer: {
+    position: "relative",
   },
   profileImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    borderWidth: 3,
-    borderColor: '#4A90E2',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
-  editImageButton: {
-    position: 'absolute',
+  editProfileIcon: {
+    position: "absolute",
     bottom: 0,
     right: 0,
-    backgroundColor: '#4A90E2',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  nameText: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#333',
-    marginBottom: 5,
-  },
-  positionText: {
-    fontSize: 18,
-    color: '#666',
-    fontWeight: '500',
-  },
-  detailsContainer: {
-    backgroundColor: 'white',
+    backgroundColor: "#fff",
+    padding: 5,
     borderRadius: 15,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    elevation: 3,
   },
-  detailSection: {
-    width: '100%',
+  infoContainer: {
+    marginTop: 20,
+    paddingHorizontal: 20,
   },
-  detailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
+  rowBetween: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
-  icon: {
-    marginRight: 15,
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
   },
-  detailTextContainer: {
-    flex: 1,
-  },
-  detailLabel: {
+  label: {
     fontSize: 14,
-    color: '#777',
-    marginBottom: 3,
+    color: "#888",
+    marginTop: 10,
   },
-  detailValue: {
+  value: {
     fontSize: 16,
-    color: '#333',
-    fontWeight: '500',
+    fontWeight: "500",
   },
-  divider: {
-    height: 1,
-    backgroundColor: '#E0E0E0',
-    marginVertical: 10,
-  },
-  editProfileButton: {
-    marginTop: 30,
-    backgroundColor: '#4A90E2',
-    paddingVertical: 15,
-    borderRadius: 25,
-    alignItems: 'center',
-    shadowColor: '#4A90E2',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  editProfileButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
+  accountSetting: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 20,
+    marginBottom: 10,
   },
 });
-
-export default Profile;

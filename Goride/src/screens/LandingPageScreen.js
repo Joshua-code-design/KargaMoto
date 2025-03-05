@@ -8,7 +8,7 @@ const LandingPageScreen = ({ navigation }) => {
 
   const onTabPress = (tab) => {
     if (tab === 'profile') {
-      navigation.navigate('ProfileScreen');
+      navigation.navigate('ProfilesettingScreen');
     } else {
       setActiveTab(tab);
     }
