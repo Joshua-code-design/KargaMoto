@@ -1,11 +1,14 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ModernButton from '../components/ModernButton';
 import PopupModal from '../components/PopupModal';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from '@react-navigation/native';
+import { logoutUser } from '../services/Loginapi';
 
 export default function ProfileScreen() {
+  const navigation = useNavigation();
   const [profileImage, setProfileImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState("");
@@ -38,13 +41,15 @@ export default function ProfileScreen() {
 
   // Handle Confirm action
   const handleConfirm = () => {
+ 
+
     setModalVisible(false);
     if (modalType === "delete") {
       console.log("Account Deleted!");
       // Add delete account logic
     } else if (modalType === "logout") {
       console.log("Logged Out!");
-      // Add logout logic
+      logoutUser(navigation);
     }
   };
 

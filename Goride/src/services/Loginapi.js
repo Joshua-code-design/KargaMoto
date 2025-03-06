@@ -20,7 +20,7 @@ export const loginUser = async (phoneNumber, showToast, navigation, setLoading) 
       } else {
         showToast("Welcome! Let's set up your account", true);
         setTimeout(() => {
-          navigation.navigate("registerScreen", { phoneNumber });
+          navigation.navigate("RegisterScreen", { phoneNumber });
         }, 2000);
       }
     }
@@ -61,14 +61,16 @@ export const verifyOTP = async (phoneNumber, otp, navigation, inputRefs, setInpu
         }
       });
 
-      
+      console.log("User Details Response:", getUserDetails.data);
       if (response.data.user_type === "Passenger") {
 
         await AsyncStorage.setItem('userDetails', JSON.stringify(getUserDetails.data.user));
         navigation.navigate('LandingPageScreen');
-      } else if (response.data.user_type === "Driver" ) {
+      } else if (response.data.user_type === "Driver") {
         await AsyncStorage.setItem('userDetails', JSON.stringify(getUserDetails.data.user));
+      
         await AsyncStorage.setItem('driverDetails', JSON.stringify(getUserDetails.data.driver));
+
         navigation.navigate('LandingPageScreen');
       } else {
         Alert.alert("Error On Logging In Please try again Later");
@@ -77,6 +79,7 @@ export const verifyOTP = async (phoneNumber, otp, navigation, inputRefs, setInpu
   } catch (error) {
     // console.error('Error verifying OTP:', error);
     setInputStatus('error');
+    console.error("error is: ", error);
     showToast('Failed to verify OTP');
     
     // Shake animation for wrong OTP
@@ -109,6 +112,19 @@ export const verifyOTP = async (phoneNumber, otp, navigation, inputRefs, setInpu
     });
   }
 };
+
+export const logoutUser = async (navigation) => {
+  try {
+    const response = await axios.post(`${API_URL}/logout`);
+    if (response.status === 200) {
+      await AsyncStorage.removeItem('token');
+      await AsyncStorage.removeItem('userDetails');
+      navigation.navigate('LoginScreen');
+    }
+  } catch (error) {
+    console.error("error is: ", error);
+  }
+}
 
 
 
