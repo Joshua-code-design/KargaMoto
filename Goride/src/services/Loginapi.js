@@ -1,6 +1,6 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Animated } from 'react-native';
+import { Alert, Animated } from 'react-native';
 
   // const API_URL = "https://kargamotoapi.onrender.com/api";
 const API_URL = "http://192.168.1.27:5000/api";
@@ -33,28 +33,32 @@ export const loginUser = async (phoneNumber, showToast, navigation, setLoading) 
 };
 
 
-
 export const verifyOTP = async (phoneNumber, otp, navigation, inputRefs, setInputStatus, showToast) => {
   try {
     const otpInteger = parseInt(otp.join(''), 10);
 
-    //verify otp
+    // Verify OTP
     const response = await axios.post(`${API_URL}/verify-otp`, {
       phone_number: phoneNumber,
       otp: otpInteger
     });
 
-
-    //if status is okay proceed to get user details
+    // If OTP is correct
     if (response.status === 200) {
 
-      //stores token in async storage
+      // Set input status to success (for green color)
+      setInputStatus('success');
+
+      // Show success toast with green color
+      showToast('OTP Verified Successfully!', 'success');
+
+      // Store token in AsyncStorage
       await AsyncStorage.setItem('token', response.data.token);
 
-      //gets token from async storage
+      // Get token from AsyncStorage
       const token = await AsyncStorage.getItem('token');
 
-      //gets user details from API
+      // Get user details from API
       const getUserDetails = await axios.get(`${API_URL}/get-user-details`, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -62,56 +66,39 @@ export const verifyOTP = async (phoneNumber, otp, navigation, inputRefs, setInpu
       });
 
       console.log("User Details Response:", getUserDetails.data);
-      if (response.data.user_type === "Passenger") {
 
+      // Delay before navigating to LandingPageScreen
+      setTimeout(async () => {
         await AsyncStorage.setItem('userDetails', JSON.stringify(getUserDetails.data.user));
-        navigation.navigate('LandingPageScreen');
-      } else if (response.data.user_type === "Driver") {
-        await AsyncStorage.setItem('userDetails', JSON.stringify(getUserDetails.data.user));
-      
-        await AsyncStorage.setItem('driverDetails', JSON.stringify(getUserDetails.data.driver));
+
+        if (response.data.user_type === "Driver") {
+          await AsyncStorage.setItem('driverDetails', JSON.stringify(getUserDetails.data.driver));
+        }
 
         navigation.navigate('LandingPageScreen');
-      } else {
-        Alert.alert("Error On Logging In Please try again Later");
-      }
+      }, 1500); // Delay for 1.5 seconds
     }
   } catch (error) {
-    // console.error('Error verifying OTP:', error);
     setInputStatus('error');
-    console.error("error is: ", error);
-    showToast('Failed to verify OTP');
-    
-    // Shake animation for wrong OTP
+    // console.error("Error is: ", error);
+    showToast('Failed to verify OTP', 'error'); // Show error toast
+
+    // Shake animation for incorrect OTP
     inputRefs.current.forEach(ref => {
       if (ref) {
         const shake = Animated.sequence([
-          Animated.timing(new Animated.Value(0), {
-            toValue: 10,
-            duration: 50,
-            useNativeDriver: true
-          }),
-          Animated.timing(new Animated.Value(0), {
-            toValue: -10,
-            duration: 50,
-            useNativeDriver: true
-          }),
-          Animated.timing(new Animated.Value(0), {
-            toValue: 10,
-            duration: 50,
-            useNativeDriver: true
-          }),
-          Animated.timing(new Animated.Value(0), {
-            toValue: 0,
-            duration: 50,
-            useNativeDriver: true
-          })
+          Animated.timing(new Animated.Value(0), { toValue: 10, duration: 50, useNativeDriver: true }),
+          Animated.timing(new Animated.Value(0), { toValue: -10, duration: 50, useNativeDriver: true }),
+          Animated.timing(new Animated.Value(0), { toValue: 10, duration: 50, useNativeDriver: true }),
+          Animated.timing(new Animated.Value(0), { toValue: 0, duration: 50, useNativeDriver: true })
         ]);
         shake.start();
       }
     });
   }
 };
+
+
 
 export const logoutUser = async (navigation) => {
   try {
