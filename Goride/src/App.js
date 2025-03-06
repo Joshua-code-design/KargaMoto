@@ -10,6 +10,8 @@ import RegisterScreen from './screens/RegisterScreen';
 import LandingPageScreen from './screens/LandingPageScreen';
 import ProfilesettingScreen from './screens/ProfilesettingScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import HistoryScreen from './screens/HistoryScreen';
+import AddressScreen from './screens/AddressScreen';
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -25,6 +27,8 @@ export default function App() {
         <Stack.Screen name="LandingPageScreen" component={LandingPageScreen} />
         <Stack.Screen name="ProfilesettingScreen" component={ProfilesettingScreen} />
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="HistoryScreen" component={HistoryScreen} />
+        <Stack.Screen name="AddressScreen" component={AddressScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

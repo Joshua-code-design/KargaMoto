@@ -6,6 +6,7 @@ import PopupModal from '../components/PopupModal';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from '@react-navigation/native';
 import { logoutUser } from '../services/Loginapi';
+import styles from '../styles/pofilescreen.js';
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
@@ -20,9 +21,9 @@ export default function ProfileScreen() {
   useEffect(() => {
     const fetchUserDetails = async () => {
       const userDetails = await AsyncStorage.getItem('userDetails');
-      if (userDetails !== null) { 
+      if (userDetails !== null) {
         const parsedDetails = JSON.parse(userDetails);
-        console.log("parsedDetails:",parsedDetails);
+        console.log("parsedDetails:", parsedDetails);
         setUserName(parsedDetails.full_name);
         setGender(parsedDetails.gender);
         setMobileNumber(parsedDetails.phone_number);
@@ -41,8 +42,6 @@ export default function ProfileScreen() {
 
   // Handle Confirm action
   const handleConfirm = () => {
- 
-
     setModalVisible(false);
     if (modalType === "delete") {
       console.log("Account Deleted!");
@@ -86,8 +85,6 @@ export default function ProfileScreen() {
 
         <Text style={styles.label}>Sex</Text>
         <Text style={styles.value}>{gender}</Text>
-
-
       </View>
 
       {/* Contact Information Section */}
@@ -142,64 +139,3 @@ export default function ProfileScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  coverContainer: {
-    width: "100%",
-    height: 100,
-    backgroundColor: "#000",
-  },
-  profileContainer: {
-    alignItems: "center",
-    marginTop: -50,
-  },
-  profileIconContainer: {
-    position: "relative",
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-  },
-  editProfileIcon: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    backgroundColor: "#fff",
-    padding: 5,
-    borderRadius: 15,
-    elevation: 3,
-  },
-  infoContainer: {
-    marginTop: 20,
-    paddingHorizontal: 20,
-  },
-  rowBetween: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  label: {
-    fontSize: 14,
-    color: "#888",
-    marginTop: 10,
-  },
-  value: {
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  accountSetting: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 20,
-    marginBottom: 10,
-  },
-});
