@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
-import { View, StyleSheet,  } from 'react-native';
-import MapView, { Marker } from 'react-native-maps'; // Importing MapView
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import FooterBar from '../components/FooterBar';
+import * as Location from 'expo-location';
 
 const LandingPageScreen = ({ navigation }) => {
-  const [activeTab, setActiveTab] = useState('home'); 
+  const [activeTab, setActiveTab] = useState('home');
+  const [location, setLocation] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const onTabPress = (tab) => {
     if (tab === 'profile') {
@@ -14,24 +17,64 @@ const LandingPageScreen = ({ navigation }) => {
     }
   };
 
+  useEffect(() => {
+    let locationSubscription;
+
+    const getLocation = async () => {
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Location Permission', 'Permission to access location was denied.');
+          setLoading(false);
+          return;
+        }
+
+        // Start watching position changes
+        locationSubscription = await Location.watchPositionAsync(
+          {
+            accuracy: Location.Accuracy.High,
+            timeInterval: 2000, // Update every 2 seconds
+            distanceInterval: 1, // Update every 1 meter
+          },
+          (newLocation) => {
+            setLocation(newLocation.coords);
+            setLoading(false);
+          }
+        );
+      } catch (error) {
+        console.error('Error getting location:', error);
+        Alert.alert('Error', 'Unable to fetch location. Please try again.');
+        setLoading(false);
+      }
+    };
+
+    getLocation();
+
+    return () => {
+      if (locationSubscription) {
+        locationSubscription.remove(); // Stop watching location on unmount
+      }
+    };
+  }, []);
+
   return (
     <View style={styles.container}>
-      {/* Google Map for Bacolod City */}
-      <MapView
-        style={styles.map}
-        initialRegion={{
-          latitude: 10.6761, 
-          longitude: 122.9568,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }}
-      >
-        <Marker
-          coordinate={{ latitude: 10.6761, longitude: 122.9568 }}
-          title={"Bacolod City"}
-          description={"This is Bacolod City"}
+      {loading ? (
+        <ActivityIndicator size="large" color="blue" style={styles.loader} />
+      ) : (
+        <MapView
+          provider={PROVIDER_GOOGLE}
+          style={styles.map}
+          showsUserLocation={true} // Enables the blue dot
+          followsUserLocation={true} // Centers map on user
+          initialRegion={{
+            latitude: location ? location.latitude : 10.640739, // Default to Bacolod City
+            longitude: location ? location.longitude : 122.968956,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          }}
         />
-      </MapView>
+      )}
 
       <FooterBar onTabPress={onTabPress} activeTab={activeTab} />
     </View>
@@ -47,40 +90,13 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0, // Full screen height for the map
-  },
-  footerBar: {
-    backgroundColor: 'black',
-    height: 50,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '90%',
-    borderRadius: 50,
-    margin: 20,
-    position: 'absolute',
     bottom: 0,
   },
-  iconContainer: {
-    paddingHorizontal: 20,
-    marginLeft: 20,
-    marginRight: 20,
-  },
-  centerLogoContainer: {
-    position: 'absolute',
-    left: '50%',
-    transform: [{ translateX: -30 }], 
-    backgroundColor: 'black',
-    borderRadius: 50,
-    width: 60,
-    height: 60,
+  loader: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 3,
-    borderColor: 'white',
-    top: -20,
   },
- 
 });
 
 export default LandingPageScreen;
