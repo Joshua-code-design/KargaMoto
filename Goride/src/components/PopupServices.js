@@ -1,40 +1,58 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import LocationModal from './LocationModal'; // Import the LocationModal
 
 const PopupModal = ({ visible, onCancel, onSelect }) => {
-  return (
-    <Modal transparent={true} visible={visible} animationType="fade">
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Select Service</Text>
-          
-          <View style={styles.buttonContainer}>
-            {/* Ride Button */}
-            <TouchableOpacity 
-              style={styles.optionButton} 
-              onPress={() => onSelect('ride')}
-            >
-              <Image source={require('../../assets/ride.png')} style={styles.icon} />
-              <Text style={styles.optionText}>Ride</Text>
-            </TouchableOpacity>
+  const [locationModalVisible, setLocationModalVisible] = useState(false);
 
-            {/* Delivery Button */}
-            <TouchableOpacity 
-              style={styles.optionButton} 
-              onPress={() => onSelect('delivery')}
-            >
-              <Image source={require('../../assets/deliver.png')} style={styles.icon} />
-              <Text style={styles.optionText}>Delivery</Text>
+  const handleRideSelect = () => {
+    setLocationModalVisible(true); // Show the LocationModal when Ride is selected
+  };
+
+  return (
+    <>
+      <Modal transparent={true} visible={visible} animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Select Service</Text>
+            
+            <View style={styles.buttonContainer}>
+              {/* Ride Button */}
+              <TouchableOpacity 
+                style={styles.optionButton} 
+                onPress={handleRideSelect} // Open LocationModal instead of alert
+              >
+                <Image source={require('../../assets/ride.png')} style={styles.icon} />
+                <Text style={styles.optionText}></Text>
+              </TouchableOpacity>
+
+              {/* Delivery Button */}
+              <TouchableOpacity 
+                style={styles.optionButton} 
+                onPress={() => {
+                  onSelect('delivery');
+                  alert('Delivery selected!'); // Show modal for delivery selection
+                }}
+              >
+                <Image source={require('../../assets/deliver.png')} style={styles.icon} />
+                <Text style={styles.optionText}></Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Close Button */}
+            <TouchableOpacity style={styles.closeButton} onPress={onCancel}>
+              <Text style={styles.closeText}>Cancel</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Close Button */}
-          <TouchableOpacity style={styles.closeButton} onPress={onCancel}>
-            <Text style={styles.closeText}>Cancel</Text>
-          </TouchableOpacity>
         </View>
-      </View>
-    </Modal>
+      </Modal>
+
+      {/* Location Modal */}
+      <LocationModal visible={locationModalVisible} onClose={() => setLocationModalVisible(false)} onSelectLocation={(location) => {
+        onSelect('ride', location); // Pass the selected location back
+        setLocationModalVisible(false); // Close the LocationModal
+      }} />
+    </>
   );
 };
 
@@ -45,7 +63,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContainer: {
-    width:400,
+    width: 400,
     backgroundColor: 'white',
     borderRadius: 50,
     padding: 20,
@@ -63,14 +81,14 @@ const styles = StyleSheet.create({
   },
   optionButton: {
     backgroundColor: 'black',
-    padding: 30,
+    padding: 20,
     borderRadius: 20,
     alignItems: 'center',
     marginHorizontal: 30,
   },
   icon: {
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
     marginBottom: 5,
   },
   optionText: {
@@ -80,10 +98,13 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     marginTop: 15,
+    backgroundColor: 'black',
+    padding: 10,
+    borderRadius: 10,
   },
   closeText: {
-    color: 'red',
-    fontSize: 16,
+    color: 'white',
+    fontSize: 20,
     fontWeight: 'bold',
   },
 });
