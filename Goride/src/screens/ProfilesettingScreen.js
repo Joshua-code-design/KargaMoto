@@ -57,9 +57,6 @@ export default function ProfileSettings({ navigation }) {
           <TouchableOpacity onPress={() => alert("Notifications pressed")}>
             <Ionicons name="notifications" size={24} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => alert("Logout pressed")}>
-            <Ionicons name="log-out" size={24} color="black" />
-          </TouchableOpacity>
         </View>
 
         {/* Profile Section */}

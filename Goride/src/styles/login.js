@@ -1,202 +1,296 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions, Platform } from 'react-native';
 
+// Get device dimensions
 const { width, height } = Dimensions.get('window');
 
+// Responsive sizing helper functions
+const wp = (percentage) => {
+  return width * (percentage / 100);
+};
+
+const hp = (percentage) => {
+  return height * (percentage / 100);
+};
+
+// Design system constants
+const COLORS = {
+  primary: '#2C3E50',
+  secondary: '#3498DB',
+  background: '#FFFFFF',
+  inputBg: '#F8F8F8',
+  inputBorder: '#E0E0E0',
+  inputBorderFocused: '#3498DB',
+  text: '#333333',
+  textLight: '#777777',
+  buttonGradientStart: '#3498DB',
+  buttonGradientEnd: '#2C3E50',
+  success: '#2ECC71',
+  error: '#E74C3C',
+};
+
+const SPACING = {
+  xs: wp(2),
+  sm: wp(3),
+  md: wp(4),
+  lg: wp(5),
+  xl: wp(7),
+};
+
+const FONT_SIZE = {
+  xs: wp(3),
+  sm: wp(3.5),
+  md: wp(4),
+  lg: wp(4.5),
+  xl: wp(5),
+  xxl: wp(7),
+};
+
 const styles = StyleSheet.create({
-    scrollContainer: {
-      flexGrow: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    container: {
-      flex: 1,
-      padding: width * 0.05,
-      backgroundColor: "#FFFFFF",
-      width: '100%',
-      
-    },
-    backgroundImage: {
-      position: 'absolute',
-      width: width,
-      height: height,
-      opacity: 0.6,
-    },
-    logoText: {
-      marginTop: 80,
-      fontSize: 50,
-      fontWeight: 'bold',
-      letterSpacing: 4,
-      color: '#2c3e50',
-      alignItems: 'left',
-    },
-    inputContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginTop: height * 0.05,
-      width: '100%',
-    },
-    countryContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      padding: width * 0.025,
-      borderWidth: 1,
-      borderColor: "#E0E0E0",
-      borderRadius: 12,
-      marginRight: 10,
-      backgroundColor: "#F8F8F8",
-      elevation: 1,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.1,
-      shadowRadius: 1,
-    },
-    flag: {
-      width: width * 0.070,
-      height: height * 0.023,
-      marginRight: 5,
-      borderRadius: 2,
-    },
-    callingCode: {
-      fontSize: width * 0.04,
-      fontWeight: "bold",
-      color: "#000000",
-    },
-    numberInputContainer: {
-      flex: 1,
-      position: "relative",
-      borderWidth: 1,
-      borderColor: "#E0E0E0",
-      borderRadius: 12,
-      paddingHorizontal: width * 0.03,
-      paddingVertical: width * 0.025,
-      backgroundColor: "#FFFFFF",
-      elevation: 1,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.1,
-      shadowRadius: 1,
-    },
-    focusedInput: {
-      borderColor: "black",
-      borderWidth: 1.8,
-    },
-    floatingLabel: {
-      position: "absolute",
-      left: 10,
-      color: "#000000",
-      paddingHorizontal: 8,
-      backgroundColor: "#FFFFFF",
-      borderRadius: 4,
-      marginTop: 4,
-      zIndex: 1,
-      letterSpacing: 0.3,
-    },
-    input: {
-      fontSize: width * 0.045,
-      fontWeight: "500",
-      color: "#000000",
-      paddingVertical: 2,
-    },
-    footerText: {
-      fontSize: width * 0.050,
-      backgroundColor:'white',
-      color: "#555555",
-      marginTop: 5,
-      lineHeight: width * 0.06,
-      textAlign: 'left',
-    },
-    button: {
-      height: height * 0.07,
-      width: "100%",
-      backgroundColor: "black",
-      borderRadius: 50, 
-      justifyContent: "center",
-      alignItems: "center",
-      flexDirection: "row",
-      marginTop: height * 0.05,
-      elevation: 2,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.2,
-      shadowRadius: 2,
-    },
-    buttonLoading: {
-      backgroundColor: "#333333",
-    },
-    buttonText: {
-      color: "#FFFFFF",
-      fontSize: width * 0.045,
-      fontWeight: "600",
-      letterSpacing: 0.5,
-    },
-    buttonIcon: {
-      marginLeft: 8,
-    },
-    loadingDots: {
-      flexDirection: 'row',
-      marginLeft: 8,
-      alignItems: 'center',
-    },
-    dot: {
-      width: 4,
-      height: 4,
-      borderRadius: 2,
-      backgroundColor: '#FFFFFF',
-      marginHorizontal: 2,
-    },
-    dot1: {
-      opacity: 0.6,
-    },
-    dot2: {
-      opacity: 0.8,
-    },
-    dot3: {
-      opacity: 1,
-    },
-    toast: {
-      position: 'absolute',
-      top: height * 0.05,
-      alignSelf: 'center',
-      zIndex: 9999,
-      width: '90%',
-    },
-    toastContent: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: 'white',
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      borderRadius: 12,
-      shadowColor: "#000",
-      shadowOffset: {
-        width: 0,
-        height: 3,
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  container: {
+    flex: 1,
+    padding: SPACING.lg,
+    backgroundColor: COLORS.background,
+    width: '100%',
+  },
+  backgroundImage: {
+    position: 'absolute',
+    width: width,
+    height: height,
+    opacity: 0.6,
+  },
+  logoText: {
+    marginTop: hp(8),
+    fontSize: FONT_SIZE.xxl,
+    fontWeight: 'bold',
+    letterSpacing: 4,
+    color: COLORS.primary,
+    textAlign: 'left',
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: hp(5),
+    width: '100%',
+  },
+  countryContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: SPACING.sm,
+    borderWidth: 1,
+    height: hp(8),
+    width: wp(20),
+    borderColor: COLORS.inputBorder,
+    borderRadius: 20,
+    marginRight: SPACING.sm,
+    backgroundColor: COLORS.inputBg,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
       },
-      shadowOpacity: 0.15,
-      shadowRadius: 5,
-      elevation: 6,
-    },
-    iconContainer: {
-      width: 28,
-      height: 28,
-      borderRadius: 14,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginRight: 10,
-    },
-    successIcon: {
-      backgroundColor: '#4CAF50',
-    },
-    errorIcon: {
-      backgroundColor: '#F44336',
-    },
-    toastMessage: {
-      fontSize: 18,
-      fontWeight: '500',
-      color: '#333333',
-      flex: 1,
-    }
-  });
-  
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  flag: {
+    width: wp(7),
+    height: hp(2.3),
+    marginRight: SPACING.xs,
+    borderRadius: 2,
+  },
+  callingCode: {
+    fontSize: FONT_SIZE.md,
+    fontWeight: "bold",
+    color: COLORS.text,
+  },
+  numberInputContainer: {
+    flex: 1,
+    position: "relative",
+    borderWidth: 1.5,
+    borderColor: COLORS.inputBorder,
+    borderRadius: 20,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.md,
+    backgroundColor: COLORS.background,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  focusedInput: {
+    borderColor: COLORS.inputBorderFocused,
+    borderWidth: 1.5,
+  },
+  // Improved floating label
+  floatingLabel: {
+    position: "absolute",
+    left: SPACING.sm,
+    top: -SPACING.xs,
+    color: COLORS.textLight,
+    fontSize: FONT_SIZE.xs,
+    paddingHorizontal: SPACING.xs,
+    backgroundColor: COLORS.background,
+    borderRadius: 20,
+    zIndex: 1,
+    letterSpacing: 0.5,
+    fontWeight: '500',
+    transform: [{ translateY: hp(0.6) }] 
+  },
+  floatingLabelFocused: {
+    color: COLORS.inputBorderFocused,
+    fontWeight: '600',
+  },
+  input: {
+    fontSize: FONT_SIZE.md,
+    fontWeight: "600",
+    color: COLORS.text,
+    paddingVertical: SPACING.xs,
+    paddingTop: SPACING.sm, // Add padding to accommodate the floating label
+  },
+  footerText: {
+    fontSize: FONT_SIZE.sm,
+    backgroundColor: 'transparent',
+    color: COLORS.textLight,
+    marginTop: SPACING.xs,
+    lineHeight: FONT_SIZE.lg,
+    textAlign: 'left',
+  },
+  // Improved button design
+  button: {
+    height: hp(6.5),
+    width: "100%",
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    marginTop: hp(4),
+    backgroundColor: COLORS.primary,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  buttonGradient: {
+    borderRadius: 12,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  buttonLoading: {
+    opacity: 0.8,
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: FONT_SIZE.md,
+    fontWeight: "600",
+    letterSpacing: 0.5,
+  },
+  buttonIcon: {
+    marginLeft: SPACING.sm,
+  },
+  loadingDots: {
+    flexDirection: 'row',
+    marginLeft: SPACING.sm,
+    alignItems: 'center',
+  },
+  dot: {
+    width: wp(1),
+    height: wp(1),
+    borderRadius: wp(0.5),
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 2,
+  },
+  dot1: {
+    opacity: 0.6,
+    animationName: 'dotAnimation',
+    animationDuration: '1s',
+    animationIterationCount: 'infinite',
+    animationDelay: '0s',
+  },
+  dot2: {
+    opacity: 0.8,
+    animationName: 'dotAnimation',
+    animationDuration: '1s',
+    animationIterationCount: 'infinite',
+    animationDelay: '0.2s',
+  },
+  dot3: {
+    opacity: 1,
+    animationName: 'dotAnimation',
+    animationDuration: '1s',
+    animationIterationCount: 'infinite',
+    animationDelay: '0.4s',
+  },
+  toast: {
+    position: 'absolute',
+    top: hp(5),
+    alignSelf: 'center',
+    zIndex: 9999,
+    width: '90%',
+  },
+  toastContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.background,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: 12,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.15,
+        shadowRadius: 5,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
+  },
+  iconContainer: {
+    width: wp(7),
+    height: wp(7),
+    borderRadius: wp(3.5),
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SPACING.sm,
+  },
+  successIcon: {
+    backgroundColor: COLORS.success,
+  },
+  errorIcon: {
+    backgroundColor: COLORS.error,
+  },
+  toastMessage: {
+    fontSize: FONT_SIZE.md,
+    fontWeight: '500',
+    color: COLORS.text,
+    flex: 1,
+  }
+});
 
 export default styles;
