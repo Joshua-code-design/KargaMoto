@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Alert, ActivityIndicator } from 'react-native';
 import MapView, { Marker, Circle } from 'react-native-maps';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import * as Location from 'expo-location';
 
 const { width, height } = Dimensions.get('window');
@@ -10,8 +9,6 @@ const Map = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigation = useNavigation();
-  const route = useRoute();
 
   useEffect(() => {
     (async () => {
@@ -33,24 +30,16 @@ const Map = () => {
     })();
   }, []);
 
-  useEffect(() => {
-    if (route.params?.onSelectLocation) {
-      navigation.setOptions({
-        onSelectLocation: route.params.onSelectLocation,
-      });
-    }
-  }, [navigation, route.params?.onSelectLocation]);
-
   const handleSelectLocation = (event) => {
     setSelectedLocation(event.nativeEvent.coordinate);
   };
 
   const handleConfirmLocation = () => {
-    const onSelectLocation = navigation.getParam('onSelectLocation');
-    if (onSelectLocation) {
-      onSelectLocation(selectedLocation);
+    if (selectedLocation) {
+      Alert.alert("Selected Location", `Latitude: ${selectedLocation.latitude}, Longitude: ${selectedLocation.longitude}`);
+    } else {
+      Alert.alert("No Location Selected", "Please select a location before confirming.");
     }
-    navigation.goBack();
   };
 
   if (loading) {
@@ -66,7 +55,7 @@ const Map = () => {
       <MapView 
         style={styles.map} 
         onPress={handleSelectLocation}
-        region={currentLocation}  // Updated to dynamically update location
+        region={currentLocation}
         showsUserLocation={true}
       >
         {selectedLocation && <Marker coordinate={selectedLocation} />}
