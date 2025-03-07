@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
-import MapView from 'react-native-maps';
+import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -23,6 +23,7 @@ const LocationModal = ({ visible, onClose, onSelectLocation }) => {
   const [pickupType, setPickupType] = useState(null);
   const [destinationDropdownVisible, setDestinationDropdownVisible] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState('Choose your destination');
+  const navigation = useNavigation();
 
   const togglePickupDropdown = () => {
     setPickupDropdownVisible(!pickupDropdownVisible);
@@ -51,6 +52,14 @@ const LocationModal = ({ visible, onClose, onSelectLocation }) => {
       } else {
         setSelectedPickup("Unknown Location");
       }
+    } else if (type === 'map') {
+      navigation.navigate('Map', {
+        onSelectLocation: (location) => {
+          setSelectedPickup(location);
+          setPickupType(type);
+          setPickupDropdownVisible(false);
+        }
+      });
     } else {
       setSelectedPickup(option);
     }
@@ -173,7 +182,6 @@ const LocationModal = ({ visible, onClose, onSelectLocation }) => {
     </Modal>
   );
 };
-
 
 const styles = StyleSheet.create({
   safeArea: {

@@ -12,6 +12,7 @@ import ProfilesettingScreen from './screens/ProfilesettingScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import AddressScreen from './screens/AddressScreen';
+import Map from './components/Map';
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -29,6 +30,7 @@ export default function App() {
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         <Stack.Screen name="HistoryScreen" component={HistoryScreen} />
         <Stack.Screen name="AddressScreen" component={AddressScreen} />
+        <Stack.Screen name="Map" component={Map} />
       </Stack.Navigator>
     </NavigationContainer>
   );
