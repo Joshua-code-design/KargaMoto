@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Alert, ActivityIndicator } from 'react-native';
 import MapView, { Marker, Circle } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -9,6 +10,7 @@ const Map = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
   useEffect(() => {
     (async () => {
@@ -36,7 +38,10 @@ const Map = () => {
 
   const handleConfirmLocation = () => {
     if (selectedLocation) {
-      Alert.alert("Selected Location", `Latitude: ${selectedLocation.latitude}, Longitude: ${selectedLocation.longitude}`);
+      Alert.alert("Selected Location",
+        `Latitude: ${selectedLocation.latitude}, Longitude: ${selectedLocation.longitude}`,
+        [{ text: "OK", onPress: () => navigation.goBack() }] // Ensure navigation works
+      );
     } else {
       Alert.alert("No Location Selected", "Please select a location before confirming.");
     }

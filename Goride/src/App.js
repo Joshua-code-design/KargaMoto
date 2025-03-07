@@ -35,3 +35,7 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+// To do
+
+//fix bug after backing on Maps Component cant click anything
