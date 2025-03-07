@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert, ActivityIndicator } from 'react-native';
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import FooterBar from '../components/FooterBar';
 import * as Location from 'expo-location';
 
@@ -8,6 +8,8 @@ const LandingPageScreen = ({ navigation }) => {
   const [activeTab, setActiveTab] = useState('home');
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [address, setAddress] = useState('');
 
   const onTabPress = (tab) => {
     if (tab === 'profile') {
@@ -29,12 +31,11 @@ const LandingPageScreen = ({ navigation }) => {
           return;
         }
 
-        // Start watching position changes
         locationSubscription = await Location.watchPositionAsync(
           {
             accuracy: Location.Accuracy.High,
-            timeInterval: 2000, // Update every 2 seconds
-            distanceInterval: 1, // Update every 1 meter
+            timeInterval: 2000,
+            distanceInterval: 1,
           },
           (newLocation) => {
             setLocation(newLocation.coords);
@@ -52,10 +53,28 @@ const LandingPageScreen = ({ navigation }) => {
 
     return () => {
       if (locationSubscription) {
-        locationSubscription.remove(); // Stop watching location on unmount
+        locationSubscription.remove();
       }
     };
   }, []);
+
+  const handleMapPress = async (event) => {
+    const { latitude, longitude } = event.nativeEvent.coordinate;
+    setSelectedLocation({ latitude, longitude });
+
+    try {
+      let reverseGeocode = await Location.reverseGeocodeAsync({ latitude, longitude });
+      if (reverseGeocode.length > 0) {
+        const { street, city, region, country } = reverseGeocode[0];
+        const formattedAddress = [street, city, region, country].filter(Boolean).join(', ');
+        setAddress(formattedAddress);
+        Alert.alert('Location Selected', `Address: ${formattedAddress}`);
+      }
+    } catch (error) {
+      console.error('Error fetching address:', error);
+      Alert.alert('Error', 'Unable to fetch address.');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -65,15 +84,20 @@ const LandingPageScreen = ({ navigation }) => {
         <MapView
           provider={PROVIDER_GOOGLE}
           style={styles.map}
-          showsUserLocation={true} // Enables the blue dot
-          followsUserLocation={true} // Centers map on user
+          showsUserLocation={true}
+          followsUserLocation={true}
           initialRegion={{
-            latitude: location ? location.latitude : 10.640739, // Default to Bacolod City
+            latitude: location ? location.latitude : 10.640739,
             longitude: location ? location.longitude : 122.968956,
             latitudeDelta: 0.01,
             longitudeDelta: 0.01,
           }}
-        />
+          onPress={handleMapPress}
+        >
+          {selectedLocation && (
+            <Marker coordinate={selectedLocation} title="Selected Location" description={address} />
+          )}
+        </MapView>
       )}
 
       <FooterBar onTabPress={onTabPress} activeTab={activeTab} />

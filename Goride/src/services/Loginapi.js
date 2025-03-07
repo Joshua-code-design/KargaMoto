@@ -99,7 +99,6 @@ export const verifyOTP = async (phoneNumber, otp, navigation, inputRefs, setInpu
 };
 
 
-
 export const logoutUser = async (navigation) => {
   try {
     const response = await axios.post(`${API_URL}/logout`);
