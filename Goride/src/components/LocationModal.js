@@ -21,11 +21,19 @@ const LocationModal = ({ visible, onClose, onSelectLocation }) => {
             
             {/* Pickup & Destination Inputs */}
             <View style={styles.inputContainer}>
-              <TouchableOpacity style={styles.input} activeOpacity={0.7}>
+              <TouchableOpacity 
+                style={styles.input} 
+                activeOpacity={0.7}
+                onPress={() => alert("Pickup Location", "Choose your pickup location")}
+              >
                 <Ionicons name="location-outline" size={20} color="#333" />
                 <Text style={styles.inputText}>Choose your pickup</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.input} activeOpacity={0.7}>
+              <TouchableOpacity 
+                style={styles.input} 
+                activeOpacity={0.7}
+                onPress={() => alert("Destination", "Choose your destination")}
+              >
                 <Ionicons name="navigate-outline" size={20} color="green" />
                 <Text style={styles.inputText}>Choose your destination</Text>
               </TouchableOpacity>
