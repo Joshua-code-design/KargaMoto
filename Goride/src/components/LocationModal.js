@@ -33,6 +33,13 @@ const LocationModal = ({ visible, onClose }) => {
     }
   }, [route.params]);
 
+  // Update selectedDestination when route.params changes
+  useEffect(() => {
+    if (route.params?.selectedDestination) {
+      setSelectedDestination(route.params.selectedDestination);
+    }
+  }, [route.params]);
+
   const togglePickupDropdown = () => {
     setPickupDropdownVisible(!pickupDropdownVisible);
   };
@@ -76,9 +83,15 @@ const LocationModal = ({ visible, onClose }) => {
     setPickupDropdownVisible(false);
   };
 
-  const selectDestinationOption = (option) => {
-    setSelectedDestination(option);
-    setDestinationDropdownVisible(false);
+  const selectDestinationOption = (option, type) => {
+    if (type === 'map') {
+      navigation.navigate('Map', {
+        isSelectingDestination: true, // Enable destination selection mode
+      });
+    } else {
+      setSelectedDestination(option);
+      setDestinationDropdownVisible(false);
+    }
   };
 
   return (
@@ -162,7 +175,7 @@ const LocationModal = ({ visible, onClose }) => {
                   <View style={styles.dropdownContainer}>
                     <TouchableOpacity
                       style={styles.dropdownItem}
-                      onPress={() => selectDestinationOption('Search for a place')}
+                      onPress={() => selectDestinationOption('Search for a place', 'search')}
                     >
                       <Ionicons name="search-outline" size={20} color="#4CAF50" />
                       <View style={styles.dropdownTextContainer}>
@@ -172,7 +185,7 @@ const LocationModal = ({ visible, onClose }) => {
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.dropdownItem}
-                      onPress={() => selectDestinationOption('Pick from map')}
+                      onPress={() => selectDestinationOption('Pick from map', 'map')}
                     >
                       <Ionicons name="map-outline" size={20} color="#FF9800" />
                       <View style={styles.dropdownTextContainer}>

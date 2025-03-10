@@ -3,13 +3,13 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Alert, ActivityIn
 import MapView, { Marker, Circle } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
-import LocationModal from './LocationModal';
 const { width, height } = Dimensions.get('window');
 
-const Map = () => {
+const Map = ({ route }) => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isSelectingDestination, setIsSelectingDestination] = useState(false); // New state for destination selection
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -32,29 +32,44 @@ const Map = () => {
     })();
   }, []);
 
+  // Handle selecting a location on the map
   const handleSelectLocation = (event) => {
     const { latitude, longitude } = event.nativeEvent.coordinate;
     setSelectedLocation({ latitude, longitude });
   };
 
+  // Handle confirming the selected location
   const handleConfirmLocation = async () => {
     if (!selectedLocation) {
       Alert.alert("No Location Selected", "Please select a location before confirming.");
       return;
     }
-  
+
     try {
       let addressResponse = await Location.reverseGeocodeAsync(selectedLocation);
       let address = addressResponse[0]
         ? `${addressResponse[0].name || "Unknown"}, ${addressResponse[0].city || "Unknown"}, ${addressResponse[0].region || "Unknown"}`
         : "Address not found";
-  
-      // Pass selected location and address back to LocationModal
-      navigation.navigate("LocationModal", { selectedLocation, address });
+
+      // Check if the user is selecting a destination
+      if (isSelectingDestination) {
+        // Pass the selected destination address back to LocationModal
+        navigation.navigate("LocationModal", { selectedDestination: address });
+      } else {
+        // Pass selected location and address back to LocationModal for pickup
+        navigation.navigate("LocationModal", { selectedLocation, address });
+      }
     } catch (error) {
       Alert.alert("Error", "Unable to fetch address. Try again.");
     }
   };
+
+  // Set the mode to destination selection when the component is used for selecting a destination
+  useEffect(() => {
+    if (route.params?.isSelectingDestination) {
+      setIsSelectingDestination(true);
+    }
+  }, [route.params]);
 
   if (loading) {
     return (
@@ -87,7 +102,9 @@ const Map = () => {
         onPress={handleConfirmLocation}
         disabled={!selectedLocation}
       >
-        <Text style={styles.confirmButtonText}>Confirm Location</Text>
+        <Text style={styles.confirmButtonText}>
+          {isSelectingDestination ? "Set Destination" : "Confirm Pickup"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
