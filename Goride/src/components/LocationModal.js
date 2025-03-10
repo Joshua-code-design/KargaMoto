@@ -1,29 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  Modal, 
-  TouchableOpacity, 
-  StyleSheet, 
-  Dimensions, 
-  SafeAreaView, 
-  Platform, 
+import {
+  View,
+  Text,
+  Modal,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  SafeAreaView,
+  Platform,
   StatusBar,
-  Alert
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
-const LocationModal = ({ visible, onClose, onSelectLocation }) => {
+const LocationModal = ({ visible, onClose }) => {
   const [pickupDropdownVisible, setPickupDropdownVisible] = useState(false);
   const [selectedPickup, setSelectedPickup] = useState('Set pickup location');
   const [pickupType, setPickupType] = useState(null);
   const [destinationDropdownVisible, setDestinationDropdownVisible] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState('Choose your destination');
   const navigation = useNavigation();
+  const route = useRoute();
+
+  // Update selectedPickup when route.params changes
+  useEffect(() => {
+    if (route.params?.address) {
+      setSelectedPickup(route.params.address);
+    }
+  }, [route.params]);
 
   const togglePickupDropdown = () => {
     setPickupDropdownVisible(!pickupDropdownVisible);
@@ -32,38 +40,38 @@ const LocationModal = ({ visible, onClose, onSelectLocation }) => {
   const toggleDestinationDropdown = () => {
     setDestinationDropdownVisible(!destinationDropdownVisible);
   };
-  
+
   const selectPickupOption = async (option, type) => {
     if (type === 'current') {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert("Permission Denied", "Enable location permissions to use this feature.");
+        Alert.alert('Permission Denied', 'Enable location permissions to use this feature.');
         return;
       }
-      
+
       let location = await Location.getCurrentPositionAsync({});
       let address = await Location.reverseGeocodeAsync({
         latitude: location.coords.latitude,
-        longitude: location.coords.longitude
+        longitude: location.coords.longitude,
       });
-      
+
       if (address.length > 0) {
         setSelectedPickup(`${address[0].name}, ${address[0].city}, ${address[0].region}`);
       } else {
-        setSelectedPickup("Unknown Location");
+        setSelectedPickup('Unknown Location');
       }
     } else if (type === 'map') {
       navigation.navigate('Map', {
-        onSelectLocation: (location) => {
-          setSelectedPickup(location);
+        onSelectLocation: (location, address) => {
+          setSelectedPickup(address);
           setPickupType(type);
           setPickupDropdownVisible(false);
-        }
+        },
       });
     } else {
       setSelectedPickup(option);
     }
-    
+
     setPickupType(type);
     setPickupDropdownVisible(false);
   };
@@ -78,32 +86,32 @@ const LocationModal = ({ visible, onClose, onSelectLocation }) => {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.overlay}>
           <View style={styles.modalContainer}>
-            <TouchableOpacity 
-              style={styles.closeButton} 
+            <TouchableOpacity
+              style={styles.closeButton}
               onPress={onClose}
               hitSlop={{ top: 15, right: 15, bottom: 15, left: 15 }}
             >
               <Ionicons name="close" size={24} color="black" />
             </TouchableOpacity>
-            
+
             <View style={styles.inputContainer}>
               <View>
-                <TouchableOpacity 
-                  style={[styles.input, pickupDropdownVisible && styles.inputActive]} 
+                <TouchableOpacity
+                  style={[styles.input, pickupDropdownVisible && styles.inputActive]}
                   activeOpacity={0.7}
                   onPress={togglePickupDropdown}
                 >
                   <Ionicons name="location-outline" size={20} color="#333" />
                   <Text style={styles.inputText}>{selectedPickup}</Text>
-                  <Ionicons 
-                    name={pickupDropdownVisible ? "chevron-up" : "chevron-down"} 
-                    size={20} 
-                    color="#333" 
+                  <Ionicons
+                    name={pickupDropdownVisible ? 'chevron-up' : 'chevron-down'}
+                    size={20}
+                    color="#333"
                   />
                 </TouchableOpacity>
                 {pickupDropdownVisible && (
                   <View style={styles.dropdownContainer}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       style={styles.dropdownItem}
                       onPress={() => selectPickupOption('Use current location', 'current')}
                     >
@@ -113,7 +121,7 @@ const LocationModal = ({ visible, onClose, onSelectLocation }) => {
                         <Text style={styles.dropdownItemSubtext}>Fastest option</Text>
                       </View>
                     </TouchableOpacity>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       style={styles.dropdownItem}
                       onPress={() => selectPickupOption('Search for a place', 'search')}
                     >
@@ -123,7 +131,7 @@ const LocationModal = ({ visible, onClose, onSelectLocation }) => {
                         <Text style={styles.dropdownItemSubtext}>Address, landmark, business</Text>
                       </View>
                     </TouchableOpacity>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       style={styles.dropdownItem}
                       onPress={() => selectPickupOption('Pick from map', 'map')}
                     >
@@ -137,22 +145,22 @@ const LocationModal = ({ visible, onClose, onSelectLocation }) => {
                 )}
               </View>
               <View>
-                <TouchableOpacity 
-                  style={[styles.input, destinationDropdownVisible && styles.inputActive]} 
+                <TouchableOpacity
+                  style={[styles.input, destinationDropdownVisible && styles.inputActive]}
                   activeOpacity={0.7}
                   onPress={toggleDestinationDropdown}
                 >
                   <Ionicons name="navigate-outline" size={20} color="green" />
                   <Text style={styles.inputText}>{selectedDestination}</Text>
-                  <Ionicons 
-                    name={destinationDropdownVisible ? "chevron-up" : "chevron-down"} 
-                    size={20} 
-                    color="#333" 
+                  <Ionicons
+                    name={destinationDropdownVisible ? 'chevron-up' : 'chevron-down'}
+                    size={20}
+                    color="#333"
                   />
                 </TouchableOpacity>
                 {destinationDropdownVisible && (
                   <View style={styles.dropdownContainer}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       style={styles.dropdownItem}
                       onPress={() => selectDestinationOption('Search for a place')}
                     >
@@ -162,7 +170,7 @@ const LocationModal = ({ visible, onClose, onSelectLocation }) => {
                         <Text style={styles.dropdownItemSubtext}>Address, landmark, business</Text>
                       </View>
                     </TouchableOpacity>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       style={styles.dropdownItem}
                       onPress={() => selectDestinationOption('Pick from map')}
                     >
@@ -264,79 +272,6 @@ const styles = StyleSheet.create({
     color: '#777',
     fontSize: width * 0.03,
     marginTop: 2,
-  },
-  toggleContainer: {
-    flexDirection: 'row',
-    marginBottom: height * 0.015,
-    marginTop: height * 0.01,
-    zIndex: 5,
-  },
-  toggleButton: {
-    paddingVertical: height * 0.01,
-    paddingHorizontal: width * 0.03,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 10,
-    marginHorizontal: 5,
-  },
-  toggleButtonActive: {
-    paddingVertical: height * 0.01,
-    paddingHorizontal: width * 0.03,
-    backgroundColor: '#333',
-    borderRadius: 10,
-    marginHorizontal: 5,
-  },
-  toggleActiveText: {
-    color: 'white',
-    fontWeight: '500',
-    fontSize: width * 0.035,
-  },
-  toggleText: {
-    color: '#333',
-    fontSize: width * 0.035,
-  },
-  locationListContainer: {
-    maxHeight: height * 0.3,
-    zIndex: 1,
-  },
-  locationItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: height * 0.015,
-    width: '100%',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  locationText: {
-    marginLeft: 10,
-    color: '#333',
-    fontSize: width * 0.035,
-    flex: 1,
-  },
-  actionButton: {
-    marginTop: height * 0.025,
-    padding: height * 0.018,
-    backgroundColor: '#555',
-    borderRadius: 10,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  actionButtonBlue: {
-    backgroundColor: '#2196F3',
-  },
-  actionButtonGreen: {
-    backgroundColor: '#4CAF50',
-  },
-  actionButtonOrange: {
-    backgroundColor: '#FF9800',
-  },
-  actionButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: width * 0.04,
-  },
-  actionButtonIcon: {
-    marginLeft: 8,
   },
 });
 

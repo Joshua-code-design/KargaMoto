@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Alert, ActivityIn
 import MapView, { Marker, Circle } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
-
+import LocationModal from './LocationModal';
 const { width, height } = Dimensions.get('window');
 
 const Map = () => {
@@ -33,17 +33,26 @@ const Map = () => {
   }, []);
 
   const handleSelectLocation = (event) => {
-    setSelectedLocation(event.nativeEvent.coordinate);
+    const { latitude, longitude } = event.nativeEvent.coordinate;
+    setSelectedLocation({ latitude, longitude });
   };
 
-  const handleConfirmLocation = () => {
-    if (selectedLocation) {
-      Alert.alert("Selected Location",
-        `Latitude: ${selectedLocation.latitude}, Longitude: ${selectedLocation.longitude}`,
-        [{ text: "OK", onPress: () => navigation.goBack() }] // Ensure navigation works
-      );
-    } else {
+  const handleConfirmLocation = async () => {
+    if (!selectedLocation) {
       Alert.alert("No Location Selected", "Please select a location before confirming.");
+      return;
+    }
+  
+    try {
+      let addressResponse = await Location.reverseGeocodeAsync(selectedLocation);
+      let address = addressResponse[0]
+        ? `${addressResponse[0].name || "Unknown"}, ${addressResponse[0].city || "Unknown"}, ${addressResponse[0].region || "Unknown"}`
+        : "Address not found";
+  
+      // Pass selected location and address back to LocationModal
+      navigation.navigate("LocationModal", { selectedLocation, address });
+    } catch (error) {
+      Alert.alert("Error", "Unable to fetch address. Try again.");
     }
   };
 
