@@ -26,17 +26,13 @@ const LocationModal = ({ visible, onClose }) => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  // Update selectedPickup when route.params changes
+  // Update selectedPickup and selectedDestination when route.params changes
   useEffect(() => {
-    if (route.params?.address) {
-      setSelectedPickup(route.params.address);
+    if (route.params?.pickupAddress) {
+      setSelectedPickup(route.params.pickupAddress);
     }
-  }, [route.params]);
-
-  // Update selectedDestination when route.params changes
-  useEffect(() => {
-    if (route.params?.selectedDestination) {
-      setSelectedDestination(route.params.selectedDestination);
+    if (route.params?.destinationAddress) {
+      setSelectedDestination(route.params.destinationAddress);
     }
   }, [route.params]);
 
@@ -70,10 +66,14 @@ const LocationModal = ({ visible, onClose }) => {
     } else if (type === 'map') {
       navigation.navigate('Map', {
         onSelectLocation: (location, address) => {
-          setSelectedPickup(address);
-          setPickupType(type);
-          setPickupDropdownVisible(false);
+          navigation.navigate('LocationModal', {
+            pickupAddress: address,
+            destinationAddress: selectedDestination, // Preserve destination address
+          });
         },
+        isSelectingPickup: true,
+        currentPickup: selectedPickup, // Pass current pickup address
+        currentDestination: selectedDestination, // Pass current destination address
       });
     } else {
       setSelectedPickup(option);
@@ -86,7 +86,15 @@ const LocationModal = ({ visible, onClose }) => {
   const selectDestinationOption = (option, type) => {
     if (type === 'map') {
       navigation.navigate('Map', {
-        isSelectingDestination: true, // Enable destination selection mode
+        onSelectLocation: (location, address) => {
+          navigation.navigate('LocationModal', {
+            destinationAddress: address,
+            pickupAddress: selectedPickup, // Preserve pickup address
+          });
+        },
+        isSelectingDestination: true,
+        currentPickup: selectedPickup, // Pass current pickup address
+        currentDestination: selectedDestination, // Pass current destination address
       });
     } else {
       setSelectedDestination(option);
