@@ -50,12 +50,12 @@ const Map = ({ route }) => {
         : "Address not found";
 
       if (route.params?.isSelectingPickup) {
-        navigation.navigate("LocationModal", {
+        navigation.navigate("RideScreen", {
           pickupAddress: address,
           destinationAddress: route.params.currentDestination, // Preserve destination address
         });
       } else if (route.params?.isSelectingDestination) {
-        navigation.navigate("LocationModal", {
+        navigation.navigate("RideScreen", {
           destinationAddress: address,
           pickupAddress: route.params.currentPickup, // Preserve pickup address
         });

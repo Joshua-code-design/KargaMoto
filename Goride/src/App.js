@@ -14,6 +14,7 @@ import HistoryScreen from './screens/HistoryScreen';
 import AddressScreen from './screens/AddressScreen';
 import Map from './components/Map';
 import LocationModal from './components/LocationModal';
+import RideScreen from './screens/RideScreen';
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -33,6 +34,7 @@ export default function App() {
         <Stack.Screen name="AddressScreen" component={AddressScreen} />
         <Stack.Screen name="Map" component={Map} />
         <Stack.Screen name="LocationModal" component={LocationModal} />
+        <Stack.Screen name="RideScreen" component={RideScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
