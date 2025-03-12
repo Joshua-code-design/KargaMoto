@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Alert, ActivityIndicator, Platform } from 'react-native';
 import MapView, { Marker, Circle, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -17,14 +17,14 @@ const Map = ({ route }) => {
 
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert("Permission Denied", "Enable location permissions to use this feature.");
+        Alert.alert("Permission Denied", "Enable location permissions in Settings.");
         setLoading(false);
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
+      const location = await Location.getCurrentPositionAsync({});
       setCurrentLocation({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -47,7 +47,6 @@ const Map = ({ route }) => {
     }
 
     try {
-      // Call Google Geocoding API
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${selectedLocation.latitude},${selectedLocation.longitude}&key=${GOOGLE_MAPS_API_KEY}`
       );
@@ -59,12 +58,12 @@ const Map = ({ route }) => {
         if (route.params?.isSelectingPickup) {
           navigation.navigate("RideScreen", {
             pickupAddress: address,
-            destinationAddress: route.params.currentDestination, // Preserve destination address
+            destinationAddress: route.params.currentDestination,
           });
         } else if (route.params?.isSelectingDestination) {
           navigation.navigate("RideScreen", {
             destinationAddress: address,
-            pickupAddress: route.params.currentPickup, // Preserve pickup address
+            pickupAddress: route.params.currentPickup,
           });
         }
       } else {
@@ -87,7 +86,7 @@ const Map = ({ route }) => {
     <View style={styles.container}>
       <MapView
         style={styles.map}
-        provider={PROVIDER_GOOGLE} // Use Google Maps as the provider
+        provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
         onPress={handleSelectLocation}
         region={currentLocation}
         showsUserLocation={true}
