@@ -18,7 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-
+import {requestRide} from '../services/MapsApi';
 const { width, height } = Dimensions.get('window');
 
 const LocationScreen = () => {
@@ -229,7 +229,7 @@ const LocationScreen = () => {
     }
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     // Button press animation
     Animated.sequence([
       Animated.timing(buttonScaleAnim, {
@@ -243,19 +243,59 @@ const LocationScreen = () => {
         useNativeDriver: true,
       }),
     ]).start();
-
-    // Navigate to the next screen or handle the selected locations
+  
+    // Ensure both pickup and destination are selected
     if (selectedPickup === 'Set pickup location' || selectedDestination === 'Choose your destination') {
       Alert.alert('Missing Information', 'Please select both pickup and destination locations.');
       return;
     }
-    
-    // Navigate to next screen with the selected locations
-    navigation.navigate('ConfirmRide', {
-      pickup: selectedPickup,
-      destination: selectedDestination
-    });
+  
+    try {
+      // Show loading indicator if needed
+      setIsLoading(true);
+  
+      // Get coordinates for pickup and destination addresses
+      const [pickupLocation] = await Location.geocodeAsync(selectedPickup);
+      const [destinationLocation] = await Location.geocodeAsync(selectedDestination);
+  
+      if (!pickupLocation || !destinationLocation) {
+        Alert.alert('Error', 'Could not determine coordinates for the selected locations.');
+        setLoading(false);
+        return;
+      }
+  
+      const pickup = {
+        latitude: pickupLocation.latitude,
+        longitude: pickupLocation.longitude,
+        address: selectedPickup,
+      };
+  
+      const dropoff = {
+        latitude: destinationLocation.latitude,
+        longitude: destinationLocation.longitude,
+        address: selectedDestination,
+      };
+
+      console.log(pickup, dropoff);
+  
+      // Call the requestRide function from MapsApi.js
+      await requestRide(pickup, dropoff);
+  
+      // Navigate to the ride confirmation or next screen if needed
+      // navigation.navigate('RideDetails', { pickup, dropoff });
+    } catch (error) {
+      Alert.alert('Error', 'An error occurred while fetching location details.');
+      console.error(error);
+    } 
+    finally {
+      // Hide loading indicator
+      setIsLoading(false);
+      
+      //to change navigate to Ride Requesting Screen Pakyu Joshua lamis
+      alert("Ride requested successfully!");
+    }
   };
+  
 
   const handleBack = () => {
     // Exit animations
