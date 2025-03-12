@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { 
   StyleSheet, 
@@ -20,6 +19,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SharedElement } from 'react-navigation-shared-element';
 import * as Haptics from 'expo-haptics';
 import LottieView from 'lottie-react-native';
+import { BlurView } from 'expo-blur';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
@@ -31,8 +31,8 @@ export default function HomeScreen() {
   // Animated values
   const scrollY = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.9)).current;
-  const translateYAnim = useRef(new Animated.Value(50)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+  const translateYAnim = useRef(new Animated.Value(30)).current;
   
   // Responsive size calculations
   const fontSize = {
@@ -84,7 +84,7 @@ export default function HomeScreen() {
 
   // Animate elements on mount
   useEffect(() => {
-    Animated.parallel([
+    Animated.stagger(150, [
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 800,
@@ -112,7 +112,7 @@ export default function HomeScreen() {
 
   const headerHeight = scrollY.interpolate({
     inputRange: [0, 100],
-    outputRange: [90, 70],
+    outputRange: [Platform.OS === 'ios' ? 110 : 90, 70],
     extrapolate: 'clamp',
   });
 
@@ -135,7 +135,7 @@ export default function HomeScreen() {
         translucent
       />
       
-      {/* Animated Header */}
+      {/* Animated Header with Glass Effect */}
       <Animated.View 
         style={[
           styles.header, 
@@ -145,34 +145,38 @@ export default function HomeScreen() {
           }
         ]}
       >
-        <LinearGradient
-          colors={['#1A1A1A', '#121212']}
-          style={styles.headerGradient}
-        >
-          <View style={styles.headerLogo}>
-            <MaterialCommunityIcons name="motorbike" size={24} color="#FFD700" style={styles.logoIcon} />
-            <Text style={[styles.logoText, {fontSize: fontSize.medium}]}>KARGAMOTO</Text>
-          </View>
-          <TouchableOpacity 
-            style={styles.menuButton}
-            onPress={() => navigateTo('ProfilesettingScreen')}
+        <BlurView intensity={80} tint="dark" style={styles.headerBlur}>
+          <LinearGradient
+            colors={['rgba(26,26,26,0.8)', 'rgba(18,18,18,0.85)']}
+            style={styles.headerGradient}
           >
-            <Ionicons name="menu" size={isTablet ? 32 : 24} color="#FFFFFF" />
-          </TouchableOpacity>
-        </LinearGradient>
+            <View style={styles.headerLogo}>
+              <MaterialCommunityIcons name="motorbike" size={24} color="#FFD700" style={styles.logoIcon} />
+              <Text style={[styles.logoText, {fontSize: fontSize.medium}]}>KARGAMOTO</Text>
+            </View>
+            <TouchableOpacity 
+              style={styles.menuButton}
+              onPress={() => navigateTo('ProfilesettingScreen')}
+            >
+              <View style={styles.profileIconContainer}>
+                <Ionicons name="person" size={isTablet ? 24 : 18} color="#FFFFFF" />
+              </View>
+            </TouchableOpacity>
+          </LinearGradient>
+        </BlurView>
       </Animated.View>
       
       <Animated.ScrollView 
         style={styles.content} 
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingBottom: spacing.large}}
+        contentContainerStyle={{paddingBottom: spacing.large * 2}}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
         scrollEventThrottle={16}
       >
-        {/* Wallet Card with Animation */}
+        {/* Wallet Card with Modern Animation */}
         <Animated.View 
           style={[
             styles.walletCard,
@@ -189,7 +193,7 @@ export default function HomeScreen() {
             style={styles.walletGradient}
           >
             <View style={styles.walletHeader}>
-              <Text style={[styles.walletTitle, {fontSize: fontSize.large}]}>Your Balance</Text>
+              <Text style={[styles.walletTitle, {fontSize: fontSize.medium}]}>Your Balance</Text>
               <MaterialCommunityIcons name="wallet-outline" size={24} color="#FFD700" />
             </View>
             <View style={styles.balanceRow}>
@@ -201,66 +205,111 @@ export default function HomeScreen() {
                 onPress={animateTouchable}
               >
                 <LinearGradient
-                  colors={['#000000', '#BBBBBB']}
+                  colors={['#FFD700', '#FFC107']}
                   style={styles.depositGradient}
                 >
                   <Text style={[styles.depositText, {fontSize: fontSize.small}]}>DEPOSIT</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </View>
+          
+           
           </LinearGradient>
         </Animated.View>
         
-        {/* Ride Options with Animation */}
+        {/* Modernized Ride Options */}
         <Animated.View 
-  style={[
-    styles.rideOptionsContainer,
-    {
-      opacity: fadeAnim,
-      transform: [{ translateY: translateYAnim }]
-    }
-  ]}
->
-  <TouchableOpacity 
-    style={styles.rideOption} 
-    onPress={() => navigateTo('RideScreen')}
-    activeOpacity={0.8}
-  >
-    <LinearGradient
-      colors={['#000000', '#000000']}
-      style={styles.rideGradient}
-    >
-      <View style={styles.rideOptionIconContainer}>
-        <Image 
-          source={require('../../assets/ride.png')} 
-          style={styles.rideOptionImage} 
-        />
-      </View>
-      <Text style={[styles.rideOptionText, { fontSize: fontSize.medium }]}></Text>
-    </LinearGradient>
-  </TouchableOpacity>
-  
-  <TouchableOpacity 
-    style={styles.rideOption}
-    onPress={() => navigateTo('DeliveryScreen')}
-    activeOpacity={0.8}
-  >
-    <LinearGradient
-      colors={['#000000', '#000000']}
-      style={styles.rideGradient}
-    >
-      <View style={styles.rideOptionIconContainer}>
-        <Image 
-          source={require('../../assets/deliver.png')} 
-          style={styles.rideOptionImage} 
-        />
-      </View>
-      <Text style={[styles.rideOptionText, { fontSize: fontSize.medium }]}></Text>
-    </LinearGradient>
-  </TouchableOpacity>
-</Animated.View>
+          style={[
+            styles.rideOptionsContainer,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: translateYAnim }]
+            }
+          ]}
+        >
+          <TouchableOpacity 
+            style={styles.rideOption} 
+            onPress={() => navigateTo('RideScreen')}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={['#222222', '#000000']}
+              style={styles.rideGradient}
+            >
+              <View style={styles.rideOptionContent}>
+                <Image 
+                  source={require('../../assets/kms.png')} 
+                  style={styles.rideOptionImage} 
+                />
+                <View style={styles.rideTextContainer}>
+                  <Text style={[styles.rideOptionText, { fontSize: fontSize.medium }]}>RIDE</Text>
+                  <Text style={styles.rideOptionSubtext}>Book now</Text>
+                </View>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.rideOption}
+            onPress={() => navigateTo('DeliveryScreen')}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={['#222222', '#000000']}
+              style={styles.rideGradient}
+            >
+              <View style={styles.rideOptionContent}>
+                <Image 
+                  source={require('../../assets/kms.png')} 
+                  style={styles.rideOptionImage} 
+                />
+                <View style={styles.rideTextContainer}>
+                  <Text style={[styles.rideOptionText, { fontSize: fontSize.medium }]}>DELIVERY</Text>
+                  <Text style={styles.rideOptionSubtext}>Send packages</Text>
+                </View>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+        </Animated.View>
         
-        {/* Features Section with Animation */}
+        {/* Recent Destinations Section */}
+        <Animated.View 
+          style={[
+            styles.recentSection,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: translateYAnim }]
+            }
+          ]}
+        >
+          <View style={styles.sectionTitleContainer}>
+            <Text style={[styles.sectionTitle, {fontSize: fontSize.medium}]}>Recent Places</Text>
+            <TouchableOpacity style={styles.seeAllButton}>
+              <Text style={styles.seeAllText}>See All</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.recentScrollContent}
+          >
+            {recentDestinations.map((item, index) => (
+              <TouchableOpacity 
+                key={index} 
+                style={styles.recentItem}
+                onPress={animateTouchable}
+              >
+                <View style={styles.recentIconContainer}>
+                  <FontAwesome5 name={item.icon} size={16} color="#FFD700" />
+                </View>
+                <Text style={styles.recentText}>{item.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </Animated.View>
+        
+        {/* Features Carousel with Animation */}
         <Animated.View 
           style={[
             styles.featuresSection,
@@ -271,22 +320,18 @@ export default function HomeScreen() {
           ]}
         >
           <View style={styles.sectionTitleContainer}>
-            <Text style={[styles.sectionTitle, {fontSize: fontSize.medium}]}>Features</Text>
+            <Text style={[styles.sectionTitle, {fontSize: fontSize.medium}]}>Featured</Text>
             <TouchableOpacity style={styles.seeAllButton}>
               <Text style={styles.seeAllText}>Explore</Text>
             </TouchableOpacity>
           </View>
-          
-          <Text style={[styles.sectionDescription, {fontSize: fontSize.small}]}>
-            Discover our latest services
-          </Text>
           
           {/* Enhanced Carousel */}
           <View style={styles.carouselContainer}>
             <Carousel
               loop
               width={windowWidth - (spacing.medium * 2)}
-              height={isTablet ? 300 : 200}
+              height={isTablet ? 260 : 180}
               autoPlay={true}
               autoPlayInterval={5000}
               data={carouselItems}
@@ -314,84 +359,59 @@ export default function HomeScreen() {
                 </TouchableOpacity>
               )}
             />
-          </View>
           
-          {/* Promotions Section */}
-          <View style={styles.promotionsContainer}>
-            <View style={styles.sectionTitleContainer}>
-              <Text style={[styles.sectionTitle, {fontSize: fontSize.medium}]}>Current Promotions</Text>
-            </View>
-            
-            <View style={styles.promotionCard}>
-              <LinearGradient
-                colors={['#4A148C', '#7B1FA2']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.promotionGradient}
-              >
-                <View style={styles.promotionContent}>
-                  <View>
-                    <Text style={styles.promotionTitle}>Weekend Special</Text>
-                    <Text style={styles.promotionDescription}>Get 20% off on all rides this weekend!</Text>
-                  </View>
-                  <TouchableOpacity style={styles.promotionButton}>
-                    <Text style={styles.promotionButtonText}>Claim</Text>
-                  </TouchableOpacity>
-                </View>
-              </LinearGradient>
-            </View>
           </View>
+        
         </Animated.View>
       </Animated.ScrollView>
       
-      {/* Bottom Navigation with Animation */}
-      <Animated.View 
-        style={[
-          styles.bottomNav,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: translateYAnim }]
-          }
-        ]}
-      >
-        <LinearGradient
-          colors={['#1A1A1A', '#000000']}
-          style={styles.bottomNavGradient}
+      {/* Modernized Bottom Navigation with Glass Effect*/}
+      <BlurView intensity={90} tint="dark" style={styles.bottomNavBlur}>
+        <Animated.View 
+          style={[
+            styles.bottomNav,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: translateYAnim }]
+            }
+          ]}
         >
-          {[
-            {name: 'home', label: 'Home', active: true},
-            {name: 'card-outline', label: 'Payments'},
-            {name: 'heart-outline', label: 'Favorites'},
-            {name: 'notifications-outline', label: 'Notifications'}
-          ].map((item, index) => (
-            <TouchableOpacity 
-              key={index} 
-              style={styles.navItem}
-              onPress={animateTouchable}
-              activeOpacity={0.7}
-            >
-              <Ionicons 
-                name={item.name} 
-                size={isTablet ? 28 : 24} 
-                color={item.active ? "#69247C" : "#FFFFFF"} 
-              />
-              <Text 
-                style={[
-                  styles.navText, 
-                  {fontSize: fontSize.small, color: item.active ? "#69247C" : "#FFFFFF"}
-                ]}
+          <LinearGradient
+            colors={['rgba(26,26,26,0.8)', 'rgba(0,0,0,0.85)']}
+            style={styles.bottomNavGradient}
+          >
+            {[
+              {name: 'home', label: 'Home', active: true},
+              {name: 'card-outline', label: 'Payments'},
+              {name: 'compass-outline', label: 'Explore'},
+              {name: 'person-outline', label: 'Profile'}
+            ].map((item, index) => (
+              <TouchableOpacity 
+                key={index} 
+                style={styles.navItem}
+                onPress={animateTouchable}
+                activeOpacity={0.7}
               >
-                {item.label}
-              </Text>
-              {item.active && (
-                <View style={styles.activeIndicator} />
-              )}
-            </TouchableOpacity>
-          ))}
-        </LinearGradient>
-      </Animated.View>
+                {item.active && <View style={styles.activeIndicator} />}
+                <Ionicons 
+                  name={item.name} 
+                  size={isTablet ? 24 : 22} 
+                  color={item.active ? "#FFD700" : "#FFFFFF"} 
+                />
+                <Text 
+                  style={[
+                    styles.navText, 
+                    {fontSize: fontSize.small, color: item.active ? "#FFD700" : "#FFFFFF"}
+                  ]}
+                >
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </LinearGradient>
+        </Animated.View>
+      </BlurView>
     </SafeAreaView>
-
   );
 }
 
@@ -401,23 +421,27 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
   },
   header: {
-    height: 90,
-    justifyContent: 'center',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     zIndex: 100,
+  },
+  headerBlur: {
+    width: '100%',
+    height: '100%',
   },
   headerGradient: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop:'15%',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingTop: Platform.OS === 'ios' ? 50 : 40,
     height: '100%',
+  },
+  headerLogo: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   logoIcon: {
     marginRight: 8,
@@ -425,24 +449,36 @@ const styles = StyleSheet.create({
   logoText: {
     fontWeight: '700',
     color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
+  profileIconContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   content: {
     flex: 1,
-    padding: 16,
+    paddingTop: Platform.OS === 'ios' ? 120 : 100,
+    paddingHorizontal: 16,
   },
   walletCard: {
-    borderRadius: 16,
-    marginBottom: 20,
+    borderRadius: 20,
+    marginBottom: 24,
     overflow: 'hidden',
     shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowRadius: 12,
+    elevation: 10,
   },
   walletGradient: {
     padding: 20,
-    borderRadius: 16,
+    borderRadius: 20,
   },
   walletHeader: {
     flexDirection: 'row',
@@ -453,62 +489,58 @@ const styles = StyleSheet.create({
   walletTitle: {
     fontWeight: '600',
     color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
   balanceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 8,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   balanceAmount: {
     fontWeight: 'bold',
     color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
   depositButton: {
-    borderRadius: 10,
+    borderRadius: 12,
     overflow: 'hidden',
   },
   depositGradient: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderRadius: 10,
+    borderRadius: 12,
   },
   depositText: {
     fontWeight: '600',
-    color: 'white',
+    color: '#000000',
+    letterSpacing: 0.5,
   },
-  walletStatsRow: {
+  quickActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 8,
+    marginTop: 10,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
   },
-  walletStat: {
-    flexDirection: 'row',
+  actionButton: {
     alignItems: 'center',
-    padding: 20,
   },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+  actionIconWrapper: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 215, 0, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 6,
   },
-  info: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  walletStatText: {
+  actionText: {
     color: '#DDDDDD',
     fontSize: 12,
-    marginLeft: 4,
   },
-  
-  rideOptionImage: {
-    width: 100,
-    height: '120%',
-    resizeMode: 'contain'
-  },
-  
   rideOptionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -516,7 +548,7 @@ const styles = StyleSheet.create({
   },
   rideOption: {
     width: '48%',
-    borderRadius: 16,
+    borderRadius: 18,
     overflow: 'hidden',
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
@@ -526,68 +558,94 @@ const styles = StyleSheet.create({
   },
   rideGradient: {
     padding: 16,
-    alignItems: 'center',
+    height: 100,
     justifyContent: 'center',
-    height: 120,
   },
-  historySection: {
+  rideOptionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  rideOptionImage: {
+    width: 60,
+    height: 60,
+  },
+  rideTextContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  rideOptionText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: 'white',
+    letterSpacing: 1,
+  },
+  rideOptionSubtext: {
+    fontSize: 12,
+    color: '#BBBBBB',
+    marginTop: 4,
+  },
+  recentSection: {
     marginBottom: 24,
+  },
+  recentScrollContent: {
+    paddingRight: 16,
+  },
+  recentItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1A1A1A',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  recentIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  recentText: {
+    color: '#FFFFFF',
+    fontWeight: '500',
   },
   sectionTitleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   sectionTitle: {
     fontWeight: '600',
     color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
   seeAllButton: {
-    padding: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
   },
   seeAllText: {
     color: '#FFD700',
     fontSize: 12,
     fontWeight: '500',
   },
-  historyScroll: {
-    flexDirection: 'row',
-  },
-  historyItem: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    marginRight: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  historyItemIcon: {
-    marginRight: 8,
-  },
-  historyItemText: {
-    fontWeight: '500',
-    color: '#333333',
-  },
   featuresSection: {
-    marginBottom: 16,
-  },
-  sectionDescription: {
-    color: '#BBBBBB',
     marginBottom: 16,
   },
   carouselContainer: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 50,
   },
   carouselItemContainer: {
-    borderRadius: 16,
+    borderRadius: 20,
     overflow: 'hidden',
     elevation: 5,
     shadowColor: '#000000',
@@ -617,11 +675,27 @@ const styles = StyleSheet.create({
     color: '#EEEEEE',
     fontSize: 14,
   },
+  indicatorContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 12,
+  },
+  indicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    marginHorizontal: 4,
+  },
+  activeIndicator: {
+    backgroundColor: '#FFD700',
+    width: 16,
+  },
   promotionsContainer: {
     marginBottom: 24,
   },
   promotionCard: {
-    borderRadius: 16,
+    borderRadius: 20,
     overflow: 'hidden',
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
@@ -630,8 +704,8 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   promotionGradient: {
-    padding: 16,
-    borderRadius: 16,
+    padding: 20,
+    borderRadius: 20,
   },
   promotionContent: {
     flexDirection: 'row',
@@ -651,24 +725,31 @@ const styles = StyleSheet.create({
   },
   promotionButton: {
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 10,
   },
   promotionButtonText: {
     color: '#7B1FA2',
     fontWeight: 'bold',
   },
-
+  bottomNavBlur: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  bottomNav: {
+    paddingHorizontal: 16,
+    paddingBottom: Platform.OS === 'ios' ? 24 : 16,
+  },
   bottomNavGradient: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingBottom: Platform.OS === 'ios' ? 24 : 16,
-    paddingTop: 12,
-    marginLeft:20,
-    marginRight:20,
-    marginBottom:20,
+    paddingVertical: 10,
     borderRadius: 50,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   navItem: {
     alignItems: 'center',

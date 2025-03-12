@@ -12,7 +12,6 @@ import {
   Image,
   Animated,
   Easing,
-  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
@@ -27,7 +26,6 @@ const LocationScreen = () => {
   const [pickupType, setPickupType] = useState(null);
   const [destinationDropdownVisible, setDestinationDropdownVisible] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState('Choose your destination');
-  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
   const route = useRoute();
   
@@ -159,12 +157,8 @@ const LocationScreen = () => {
 
   const selectPickupOption = async (option, type) => {
     if (type === 'current') {
-      setIsLoading(true);
-      setPickupDropdownVisible(false);
-      
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        setIsLoading(false);
         Alert.alert('Permission Denied', 'Enable location permissions to use this feature.');
         return;
       }
@@ -185,8 +179,6 @@ const LocationScreen = () => {
       } catch (error) {
         Alert.alert('Location Error', 'Unable to get your current location.');
         setSelectedPickup('Unknown Location');
-      } finally {
-        setIsLoading(false);
       }
     } else if (type === 'map') {
       navigation.navigate('Map', {
@@ -205,9 +197,7 @@ const LocationScreen = () => {
     }
 
     setPickupType(type);
-    if (type !== 'current') {
-      setPickupDropdownVisible(false);
-    }
+    setPickupDropdownVisible(false);
   };
 
   const selectDestinationOption = (option, type) => {
@@ -297,14 +287,6 @@ const LocationScreen = () => {
           <Text style={styles.headerTitle}>Your Journey</Text>
           <View style={styles.placeholder} />
         </Animated.View>
-        
-        {/* Loading Indicator */}
-        {isLoading && (
-          <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color="#111" />
-            <Text style={styles.loadingText}>Getting your location...</Text>
-          </View>
-        )}
         
         {/* Main content */}
         <View style={styles.content}>
@@ -532,7 +514,6 @@ const LocationScreen = () => {
               style={styles.continueButton} 
               activeOpacity={0.8}
               onPress={handleContinue}
-              disabled={isLoading}
             >
               <Text style={styles.continueButtonText}>Continue</Text>
               <Ionicons name="arrow-forward" size={20} color="#fff" />
@@ -646,7 +627,7 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#4CAF50', // Changed to green
+    backgroundColor: '#333',
   },
   inputsWrapper: {
     flex: 1,
@@ -765,23 +746,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginRight: 10,
     letterSpacing: 0.5,
-  },
-  loadingOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 100,
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: width * 0.04,
-    fontWeight: '500',
-    color: '#111',
   }
 });
 
