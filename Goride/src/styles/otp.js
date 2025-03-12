@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
   button: {
     paddingVertical: 14,
     paddingHorizontal: 32,
+    marginBottom: '100%',
     borderRadius: 25,
     elevation: 3,
     shadowColor: '#000',

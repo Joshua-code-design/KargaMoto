@@ -143,6 +143,10 @@ const LocationScreen = () => {
     ]).start();
   };
 
+  const navigationTo = (screen) => {
+    navigation.navigate(screen);
+     };
+
   const togglePickupDropdown = () => {
     animatePickupDot();
     setPickupDropdownVisible(!pickupDropdownVisible);
@@ -316,7 +320,7 @@ const LocationScreen = () => {
             },
           ]}
         >
-          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+          =<TouchableOpacity onPress={() => navigationTo('RideScreen')} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color="#111" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Your Journey</Text>

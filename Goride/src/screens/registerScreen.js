@@ -79,7 +79,7 @@ const RegisterScreen = () => {
     
     try {
       const fullname = `${firstName} ${lastName}`;
-      const response = await axios.post('http://192.168.1.27:5000/api/register-user', {
+      const response = await axios.post('http://192.168.1.31:5000/api/register-user', {
         full_name: fullname,
         phone_number: phoneNumber 
       });
