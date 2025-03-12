@@ -16,7 +16,8 @@ import * as Location from 'expo-location';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { requestRide } from '../services/MapsApi';
-import { geocodeAddress, reverseGeocodeCoordinates } from '../services/Geocoding'; // Import the new functions
+import { geocodeAddress, reverseGeocodeCoordinates } from '../services/Geocoding';
+import * as Haptics from 'expo-haptics';
 import styles from '../styles/riderScreen';
 
 const { width, height } = Dimensions.get('window');
@@ -142,10 +143,6 @@ const LocationScreen = () => {
       }),
     ]).start();
   };
-
-  const navigationTo = (screen) => {
-    navigation.navigate(screen);
-     };
 
   const togglePickupDropdown = () => {
     animatePickupDot();
@@ -283,26 +280,21 @@ const LocationScreen = () => {
     } finally {
       setIsLoading(false);
       alert('Ride requested successfully!');
+      navigation.navigate('BookingScreen');
     }
+
   };
 
-  const handleBack = () => {
-    // Exit animations
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 50,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      navigation.goBack();
-    });
+  const animateTouchable = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.light);
   };
+  
+  const navigateTo = (screen) => {
+    animateTouchable();  // Optional haptic feedback
+    navigation.navigate(screen);
+};
+
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -320,9 +312,9 @@ const LocationScreen = () => {
             },
           ]}
         >
-          =<TouchableOpacity onPress={() => navigationTo('RideScreen')} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="#111" />
-          </TouchableOpacity>
+         <TouchableOpacity onPress={() => navigateTo('LandingPageScreen')} style={styles.backButton}>
+    <Ionicons name="arrow-back" size={24} color="#111" />
+  </TouchableOpacity>
           <Text style={styles.headerTitle}>Your Journey</Text>
           <View style={styles.placeholder} />
         </Animated.View>

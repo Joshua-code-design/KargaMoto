@@ -13,8 +13,9 @@ import ProfileScreen from './screens/ProfileScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import AddressScreen from './screens/AddressScreen';
 import Map from './components/Map';
-import RideScreen from './screens/RideScreen';
 import DeliveryScreen from './screens/DeliveryScreen';
+import RideScreen from './screens/RideScreen';
+import BookingScreen from './screens/BookingScreen';
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -33,8 +34,9 @@ export default function App() {
         <Stack.Screen name="HistoryScreen" component={HistoryScreen} />
         <Stack.Screen name="AddressScreen" component={AddressScreen} />
         <Stack.Screen name="Map" component={Map} />
-        <Stack.Screen name="RideScreen" component={RideScreen} />
         <Stack.Screen name="DeliveryScreen" component={DeliveryScreen} />
+        <Stack.Screen name="RideScreen" component={RideScreen} />
+        <Stack.Screen name="BookingScreen" component={BookingScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

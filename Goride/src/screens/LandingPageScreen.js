@@ -18,7 +18,6 @@ import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SharedElement } from 'react-navigation-shared-element';
 import * as Haptics from 'expo-haptics';
-import LottieView from 'lottie-react-native';
 import { BlurView } from 'expo-blur';
 
 export default function HomeScreen() {
