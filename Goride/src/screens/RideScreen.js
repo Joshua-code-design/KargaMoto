@@ -15,8 +15,10 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import {requestRide} from '../services/MapsApi';
+import { requestRide } from '../services/MapsApi';
+import { geocodeAddress, reverseGeocodeCoordinates } from '../services/Geocoding'; // Import the new functions
 import styles from '../styles/riderScreen';
+
 const { width, height } = Dimensions.get('window');
 
 const LocationScreen = () => {
@@ -28,7 +30,7 @@ const LocationScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
   const route = useRoute();
-  
+
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -36,8 +38,6 @@ const LocationScreen = () => {
   const cardSlideAnim = useRef(new Animated.Value(100)).current;
   const buttonScaleAnim = useRef(new Animated.Value(0.9)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
-
-  // Animated dots
   const pickupDotAnim = useRef(new Animated.Value(0.8)).current;
   const destinationDotAnim = useRef(new Animated.Value(0.8)).current;
 
@@ -159,7 +159,7 @@ const LocationScreen = () => {
     if (type === 'current') {
       setIsLoading(true);
       setPickupDropdownVisible(false);
-      
+
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setIsLoading(false);
@@ -169,17 +169,11 @@ const LocationScreen = () => {
 
       try {
         let location = await Location.getCurrentPositionAsync({});
-        let address = await Location.reverseGeocodeAsync({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        });
-
-        if (address.length > 0) {
-          const formattedAddress = `${address[0].name || ''}, ${address[0].city || ''}, ${address[0].region || ''}`;
-          setSelectedPickup(formattedAddress);
-        } else {
-          setSelectedPickup('Unknown Location');
-        }
+        const address = await reverseGeocodeCoordinates(
+          location.coords.latitude,
+          location.coords.longitude
+        );
+        setSelectedPickup(address);
       } catch (error) {
         Alert.alert('Location Error', 'Unable to get your current location.');
         setSelectedPickup('Unknown Location');
@@ -241,33 +235,31 @@ const LocationScreen = () => {
         useNativeDriver: true,
       }),
     ]).start();
-  
+
     // Ensure both pickup and destination are selected
     if (selectedPickup === 'Set pickup location' || selectedDestination === 'Choose your destination') {
       Alert.alert('Missing Information', 'Please select both pickup and destination locations.');
       return;
     }
-  
+
     try {
-      // Show loading indicator if needed
       setIsLoading(true);
-  
-      // Get coordinates for pickup and destination addresses
-      const [pickupLocation] = await Location.geocodeAsync(selectedPickup);
-      const [destinationLocation] = await Location.geocodeAsync(selectedDestination);
-  
+
+      // Use Google Geocoding API to get coordinates
+      const pickupLocation = await geocodeAddress(selectedPickup);
+      const destinationLocation = await geocodeAddress(selectedDestination);
+
       if (!pickupLocation || !destinationLocation) {
         Alert.alert('Error', 'Could not determine coordinates for the selected locations.');
-        setLoading(false);
         return;
       }
-  
+
       const pickup = {
         latitude: pickupLocation.latitude,
         longitude: pickupLocation.longitude,
         address: selectedPickup,
       };
-  
+
       const dropoff = {
         latitude: destinationLocation.latitude,
         longitude: destinationLocation.longitude,
@@ -275,25 +267,20 @@ const LocationScreen = () => {
       };
 
       console.log(pickup, dropoff);
-  
+
       // Call the requestRide function from MapsApi.js
       await requestRide(pickup, dropoff);
-  
+
       // Navigate to the ride confirmation or next screen if needed
       // navigation.navigate('RideDetails', { pickup, dropoff });
     } catch (error) {
       Alert.alert('Error', 'An error occurred while fetching location details.');
       console.error(error);
-    } 
-    finally {
-      // Hide loading indicator
+    } finally {
       setIsLoading(false);
-      
-      //to change navigate to Ride Requesting Screen Pakyu Joshua lamis
-      alert("Ride requested successfully!");
+      alert('Ride requested successfully!');
     }
   };
-  
 
   const handleBack = () => {
     // Exit animations
@@ -320,13 +307,13 @@ const LocationScreen = () => {
         style={styles.container}
       >
         {/* Header */}
-        <Animated.View 
+        <Animated.View
           style={[
             styles.header,
             {
               opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }]
-            }
+              transform: [{ translateY: slideAnim }],
+            },
           ]}
         >
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
@@ -335,7 +322,7 @@ const LocationScreen = () => {
           <Text style={styles.headerTitle}>Your Journey</Text>
           <View style={styles.placeholder} />
         </Animated.View>
-        
+
         {/* Loading Indicator */}
         {isLoading && (
           <View style={styles.loadingOverlay}>
@@ -343,28 +330,28 @@ const LocationScreen = () => {
             <Text style={styles.loadingText}>Getting your location...</Text>
           </View>
         )}
-        
+
         {/* Main content */}
         <View style={styles.content}>
-          <Animated.View 
+          <Animated.View
             style={[
               styles.mapPreview,
               {
                 transform: [{ translateY: mapSlideAnim }],
-                opacity: fadeAnim
-              }
+                opacity: fadeAnim,
+              },
             ]}
           >
-            <Image 
+            <Image
               source={require('../../assets/kms.png')}
               style={styles.mapImage}
               resizeMode="cover"
             />
             <View style={styles.mapOverlay}>
-              <Animated.View 
-                style={{ 
+              <Animated.View
+                style={{
                   transform: [{ scale: pulseAnim }],
-                  opacity: fadeAnim
+                  opacity: fadeAnim,
                 }}
               >
                 <Text style={styles.mapText}>Where are you going today?</Text>
@@ -372,36 +359,36 @@ const LocationScreen = () => {
             </View>
           </Animated.View>
 
-          <Animated.View 
+          <Animated.View
             style={[
               styles.card,
               {
                 transform: [{ translateY: cardSlideAnim }],
-                opacity: fadeAnim
-              }
+                opacity: fadeAnim,
+              },
             ]}
           >
             <View style={styles.inputContainer}>
               <View style={styles.locationIconContainer}>
-                <Animated.View 
+                <Animated.View
                   style={[
                     styles.pickupDot,
-                    { 
+                    {
                       transform: [{ scale: pickupDotAnim }],
-                    }
-                  ]} 
+                    },
+                  ]}
                 />
                 <View style={styles.locationLine} />
-                <Animated.View 
+                <Animated.View
                   style={[
                     styles.destinationDot,
-                    { 
+                    {
                       transform: [{ scale: destinationDotAnim }],
-                    }
-                  ]} 
+                    },
+                  ]}
                 />
               </View>
-              
+
               <View style={styles.inputsWrapper}>
                 <View>
                   <TouchableOpacity
@@ -413,24 +400,24 @@ const LocationScreen = () => {
                     <Text style={styles.inputText} numberOfLines={1}>
                       {selectedPickup}
                     </Text>
-                    <Animated.View 
+                    <Animated.View
                       style={{
-                        transform: [{ 
-                          rotate: pickupDropdownVisible ? '180deg' : '0deg'
-                        }]
+                        transform: [
+                          { rotate: pickupDropdownVisible ? '180deg' : '0deg' },
+                        ],
                       }}
                     >
                       <Ionicons name="chevron-down" size={20} color="#111" />
                     </Animated.View>
                   </TouchableOpacity>
                   {pickupDropdownVisible && (
-                    <Animated.View 
+                    <Animated.View
                       style={[
                         styles.dropdownContainer,
                         {
                           opacity: fadeAnim,
-                          transform: [{ translateY: slideAnim }]
-                        }
+                          transform: [{ translateY: slideAnim }],
+                        },
                       ]}
                     >
                       <TouchableOpacity
@@ -466,7 +453,7 @@ const LocationScreen = () => {
                     </Animated.View>
                   )}
                 </View>
-                
+
                 <View>
                   <TouchableOpacity
                     style={[styles.input, destinationDropdownVisible && styles.inputActive]}
@@ -477,24 +464,24 @@ const LocationScreen = () => {
                     <Text style={styles.inputText} numberOfLines={1}>
                       {selectedDestination}
                     </Text>
-                    <Animated.View 
+                    <Animated.View
                       style={{
-                        transform: [{ 
-                          rotate: destinationDropdownVisible ? '180deg' : '0deg'
-                        }]
+                        transform: [
+                          { rotate: destinationDropdownVisible ? '180deg' : '0deg' },
+                        ],
                       }}
                     >
                       <Ionicons name="chevron-down" size={20} color="#111" />
                     </Animated.View>
                   </TouchableOpacity>
                   {destinationDropdownVisible && (
-                    <Animated.View 
+                    <Animated.View
                       style={[
                         styles.dropdownContainer,
                         {
                           opacity: fadeAnim,
-                          transform: [{ translateY: slideAnim }]
-                        }
+                          transform: [{ translateY: slideAnim }],
+                        },
                       ]}
                     >
                       <TouchableOpacity
@@ -522,10 +509,10 @@ const LocationScreen = () => {
                 </View>
               </View>
             </View>
-            
+
             <View style={styles.recentLocations}>
               <Text style={styles.recentTitle}>Recent Locations</Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.recentItem}
                 onPress={() => selectDestinationOption('Home - 123 Main St', 'saved')}
               >
@@ -536,8 +523,8 @@ const LocationScreen = () => {
                 </View>
                 <Ionicons name="chevron-forward" size={18} color="#777" />
               </TouchableOpacity>
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
                 style={styles.recentItem}
                 onPress={() => selectDestinationOption('Work - 456 Office Park', 'saved')}
               >
@@ -551,23 +538,23 @@ const LocationScreen = () => {
             </View>
           </Animated.View>
         </View>
-        
+
         {/* Footer with continue button */}
-        <Animated.View 
+        <Animated.View
           style={[
             styles.footer,
             {
-              opacity: fadeAnim
-            }
+              opacity: fadeAnim,
+            },
           ]}
         >
-          <Animated.View 
+          <Animated.View
             style={{
-              transform: [{ scale: buttonScaleAnim }]
+              transform: [{ scale: buttonScaleAnim }],
             }}
           >
-            <TouchableOpacity 
-              style={styles.continueButton} 
+            <TouchableOpacity
+              style={styles.continueButton}
               activeOpacity={0.8}
               onPress={handleContinue}
               disabled={isLoading}
@@ -581,6 +568,5 @@ const LocationScreen = () => {
     </SafeAreaView>
   );
 };
-
 
 export default LocationScreen;
