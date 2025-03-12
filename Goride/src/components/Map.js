@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Alert, ActivityIndicator } from 'react-native';
-import MapView, { Marker, Circle } from 'react-native-maps';
+import MapView, { Marker, Circle, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
+
+// Add your Google Maps API key here
+const GOOGLE_MAPS_API_KEY = 'AIzaSyBezmbkcpuSIpDOrFtMkGfsU3u_ZDf7xlg';
 
 const Map = ({ route }) => {
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -44,21 +47,28 @@ const Map = ({ route }) => {
     }
 
     try {
-      let addressResponse = await Location.reverseGeocodeAsync(selectedLocation);
-      let address = addressResponse[0]
-        ? `${addressResponse[0].name || "Unknown"}, ${addressResponse[0].city || "Unknown"}, ${addressResponse[0].region || "Unknown"}`
-        : "Address not found";
+      // Call Google Geocoding API
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${selectedLocation.latitude},${selectedLocation.longitude}&key=${GOOGLE_MAPS_API_KEY}`
+      );
+      const data = await response.json();
 
-      if (route.params?.isSelectingPickup) {
-        navigation.navigate("RideScreen", {
-          pickupAddress: address,
-          destinationAddress: route.params.currentDestination, // Preserve destination address
-        });
-      } else if (route.params?.isSelectingDestination) {
-        navigation.navigate("RideScreen", {
-          destinationAddress: address,
-          pickupAddress: route.params.currentPickup, // Preserve pickup address
-        });
+      if (data.status === 'OK' && data.results.length > 0) {
+        const address = data.results[0].formatted_address;
+
+        if (route.params?.isSelectingPickup) {
+          navigation.navigate("RideScreen", {
+            pickupAddress: address,
+            destinationAddress: route.params.currentDestination, // Preserve destination address
+          });
+        } else if (route.params?.isSelectingDestination) {
+          navigation.navigate("RideScreen", {
+            destinationAddress: address,
+            pickupAddress: route.params.currentPickup, // Preserve pickup address
+          });
+        }
+      } else {
+        Alert.alert("Error", "Unable to fetch address. Try again.");
       }
     } catch (error) {
       Alert.alert("Error", "Unable to fetch address. Try again.");
@@ -77,6 +87,7 @@ const Map = ({ route }) => {
     <View style={styles.container}>
       <MapView
         style={styles.map}
+        provider={PROVIDER_GOOGLE} // Use Google Maps as the provider
         onPress={handleSelectLocation}
         region={currentLocation}
         showsUserLocation={true}
