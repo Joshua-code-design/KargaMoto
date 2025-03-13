@@ -17,6 +17,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { registerUser } from '../services/Loginapi';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 const { width } = Dimensions.get('window');
 
@@ -379,7 +380,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    height: hp(56),
+    height: hp(8),
   },
   buttonText: {
     color: 'white',
