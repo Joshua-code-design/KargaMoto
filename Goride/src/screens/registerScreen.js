@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    height: 56,
+    height: hp(56),
   },
   buttonText: {
     color: 'white',

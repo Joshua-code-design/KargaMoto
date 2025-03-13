@@ -22,7 +22,7 @@ import styles from '../styles/riderScreen';
 
 const { width, height } = Dimensions.get('window');
 
-const LocationScreen = () => {
+const RideScreen = () => {
   const [pickupDropdownVisible, setPickupDropdownVisible] = useState(false);
   const [selectedPickup, setSelectedPickup] = useState('Set pickup location');
   const [pickupType, setPickupType] = useState(null);
@@ -565,4 +565,4 @@ const LocationScreen = () => {
   );
 };
 
-export default LocationScreen;
+export default RideScreen;
