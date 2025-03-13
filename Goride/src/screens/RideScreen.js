@@ -1,3 +1,4 @@
+import 'react-native-get-random-values';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -42,13 +43,24 @@ const RideScreen = () => {
   const pickupDotAnim = useRef(new Animated.Value(0.8)).current;
   const destinationDotAnim = useRef(new Animated.Value(0.8)).current;
 
-  // Update selectedPickup and selectedDestination when route.params changes
   useEffect(() => {
     if (route.params?.pickupAddress) {
       setSelectedPickup(route.params.pickupAddress);
+      console.log('Pickup Address:', route.params.pickupAddress);
+      console.log('Pickup Latitude:', route.params.pickupLatitude);
+      console.log('Pickup Longitude:', route.params.pickupLongitude);
     }
     if (route.params?.destinationAddress) {
       setSelectedDestination(route.params.destinationAddress);
+      console.log('Destination Address:', route.params.destinationAddress);
+      console.log('Destination Latitude:', route.params.destinationLatitude);
+      console.log('Destination Longitude:', route.params.destinationLongitude);
+    }
+    if (route.params?.currentPickup) {
+      setSelectedPickup(route.params.currentPickup);
+    }
+    if (route.params?.currentDestination) {
+      setSelectedDestination(route.params.currentDestination);
     }
   }, [route.params]);
 
@@ -193,6 +205,13 @@ const RideScreen = () => {
         currentPickup: selectedPickup,
         currentDestination: selectedDestination,
       });
+    } else if (type === 'search') {
+      // Navigate to the SearchPlaceScreen for pickup
+      navigation.navigate('SearchPlaceScreen', {
+        isPickup: true,
+        currentPickup: selectedPickup, // Pass the current pickup value
+        currentDestination: selectedDestination, // Pass the current destination value
+      });
     } else {
       setSelectedPickup(option);
     }
@@ -215,6 +234,13 @@ const RideScreen = () => {
         isSelectingDestination: true,
         currentPickup: selectedPickup,
         currentDestination: selectedDestination,
+      });
+    } else if (type === 'search') {
+      // Navigate to the SearchPlaceScreen for destination
+      navigation.navigate('SearchPlaceScreen', {
+        isPickup: false,
+        currentPickup: selectedPickup, // Pass the current pickup value
+        currentDestination: selectedDestination, // Pass the current destination value
       });
     } else {
       setSelectedDestination(option);
@@ -267,7 +293,7 @@ const RideScreen = () => {
         address: selectedDestination,
       };
 
-      console.log(pickup, dropoff);
+      // console.log(pickup, dropoff);
 
       // Call the requestRide function from MapsApi.js
       await requestRide(pickup, dropoff);
@@ -292,9 +318,7 @@ const RideScreen = () => {
   const navigateTo = (screen) => {
     animateTouchable();  // Optional haptic feedback
     navigation.navigate(screen);
-};
-
-
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
