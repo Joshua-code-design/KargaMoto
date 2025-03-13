@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { Image, View, TextInput, TouchableOpacity, Text, StyleSheet, SafeAreaView, ActivityIndicator, StatusBar, Animated, Dimensions } from 'react-native';
+import { 
+  Image, 
+  View, 
+  TextInput, 
+  TouchableOpacity, 
+  Text, 
+  StyleSheet, 
+  SafeAreaView, 
+  ActivityIndicator, 
+  StatusBar, 
+  Animated, 
+  Dimensions 
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 
@@ -52,11 +64,41 @@ const Toast = ({ visible, message, type, onClose }) => {
   );
 };
 
+// Gender selection button component
+const GenderButton = ({ label, selected, onPress, icon }) => {
+  return (
+    <TouchableOpacity 
+      style={[
+        styles.genderButton,
+        selected ? styles.genderButtonSelected : null
+      ]} 
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
+      <MaterialIcons 
+        name={icon} 
+        size={20} 
+        color={selected ? '#FFFFFF' : '#333333'} 
+        style={styles.genderIcon} 
+      />
+      <Text 
+        style={[
+          styles.genderButtonText, 
+          selected ? styles.genderButtonTextSelected : null
+        ]}
+      >
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
+};
+
 const RegisterScreen = () => {
   const route = useRoute(); 
   const { phoneNumber } = route.params || { phoneNumber: '' }; 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [selectedGender, setSelectedGender] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
   const navigation = useNavigation();
@@ -70,7 +112,7 @@ const RegisterScreen = () => {
   };
 
   const handleRegister = async () => {
-    if (!firstName || !lastName) {
+    if (!firstName || !lastName || !selectedGender) {
       showToast('Please fill in all fields to continue.', 'error');
       return;
     }
@@ -78,15 +120,21 @@ const RegisterScreen = () => {
     setIsLoading(true);
     
     try {
-      const fullName = `${firstName} ${lastName}`;
-      const response = await registerUser(fullName, phoneNumber);
-  
+      const fullname = `${firstName} ${lastName}`;
+      const response = await axios.post('http://192.168.1.33:5000/api/register-user', {
+        full_name: fullname,
+        phone_number: phoneNumber,
+        gender: selectedGender
+      });
+
       setIsLoading(false);
       
       if (response.status === 200) {
         showToast('Your account has been created successfully!');
+        
         setFirstName('');
         setLastName('');
+        setSelectedGender('');
         
         setTimeout(() => {
           navigation.navigate('LoginScreen');
@@ -114,57 +162,82 @@ const RegisterScreen = () => {
 
       <View style={styles.formContainer}>
         <Image 
-          source={require('../../assets/km.png')} // Adjust the path to your logo image
+          source={require('../../assets/km.png')} 
           style={styles.logoImage}
         />
         <Text style={styles.logoText}>Account Registration</Text>
         <Text style={styles.subtitle}>Kindly provide your information to proceed.</Text>
         
         <View style={styles.inputsContainer}>
-  <View style={styles.inputWrapper}>
-    <Text style={styles.inputLabel}>Phone Number</Text>
-    <View style={[styles.input, styles.disabledInput]}>
-      <Image 
-        source={require('../../assets/iconphone.png')} 
-        style={styles.inputImage} 
-      />
-      <Text style={styles.phoneText}>{"+63" + phoneNumber}</Text>
-    </View>
-  </View>
-  
-  <View style={styles.inputWrapper}>
-  <Text style={styles.inputLabel}>First Name</Text>
-  <View style={styles.input}>
-    <Image 
-      source={require('../../assets/iconuser.png')} // Replace with the correct path to your image
-      style={styles.inputImage} 
-    />
-    <TextInput
-      placeholder="Enter your first name"
-      placeholderTextColor="#A0A0A0"
-      value={firstName}
-      onChangeText={setFirstName}
-      style={styles.textInput}
-    />
-  </View>
-</View>
+          <View style={styles.inputWrapper}>
+            <Text style={styles.inputLabel}>Phone Number</Text>
+            <View style={[styles.input, styles.disabledInput]}>
+              <Image 
+                source={require('../../assets/iconphone.png')} 
+                style={styles.inputImage} 
+              />
+              <Text style={styles.phoneText}>{"+63" + phoneNumber}</Text>
+            </View>
+          </View>
           
-<View style={styles.inputWrapper}>
-  <Text style={styles.inputLabel}>Last Name</Text>
-  <View style={styles.input}>
-    <Image 
-      source={require('../../assets/iconuser.png')} // Replace with the correct path to your image
-      style={styles.inputImage} 
-    />
-    <TextInput
-      placeholder="Enter your last name"
-      placeholderTextColor="#A0A0A0"
-      value={lastName}
-      onChangeText={setLastName}
-      style={styles.textInput}
-    />
-  </View>
-</View>
+          <View style={styles.inputWrapper}>
+            <Text style={styles.inputLabel}>First Name</Text>
+            <View style={styles.input}>
+              <Image 
+                source={require('../../assets/iconuser.png')} 
+                style={styles.inputImage} 
+              />
+              <TextInput
+                placeholder="Enter your first name"
+                placeholderTextColor="#A0A0A0"
+                value={firstName}
+                onChangeText={setFirstName}
+                style={styles.textInput}
+              />
+            </View>
+          </View>
+          
+          <View style={styles.inputWrapper}>
+            <Text style={styles.inputLabel}>Last Name</Text>
+            <View style={styles.input}>
+              <Image 
+                source={require('../../assets/iconuser.png')} 
+                style={styles.inputImage} 
+              />
+              <TextInput
+                placeholder="Enter your last name"
+                placeholderTextColor="#A0A0A0"
+                value={lastName}
+                onChangeText={setLastName}
+                style={styles.textInput}
+              />
+            </View>
+          </View>
+
+          {/* Gender Selection Buttons */}
+          <View style={styles.genderWrapper}>
+            <Text style={styles.inputLabel}>Gender</Text>
+            <View style={styles.genderButtonsContainer}>
+              <GenderButton 
+                label="Male" 
+                selected={selectedGender === 'Male'} 
+                onPress={() => setSelectedGender('Male')}
+                icon="person"
+              />
+              <GenderButton 
+                label="Female" 
+                selected={selectedGender === 'Female'} 
+                onPress={() => setSelectedGender('Female')}
+                icon="person-outline"
+              />
+              <GenderButton 
+                label="Other" 
+                selected={selectedGender === 'Other'} 
+                onPress={() => setSelectedGender('Other')}
+                icon="people-outline"
+              />
+            </View>
+          </View>
         </View>
         
         <TouchableOpacity 
@@ -198,14 +271,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F9FA',
   },
-
   inputImage: {
     width: 20, 
     height: 20, 
     marginRight: 12,
     resizeMode: 'contain',
   },
-  
   formContainer: {
     flex: 1,
     paddingHorizontal: 24,
@@ -255,9 +326,6 @@ const styles = StyleSheet.create({
   disabledInput: {
     backgroundColor: '#F5F5F5',
   },
-  inputIcon: {
-    marginRight: 12,
-  },
   textInput: {
     flex: 1,
     fontSize: 16,
@@ -267,6 +335,47 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666666',
   },
+  
+  // Gender selection styles
+  genderWrapper: {
+    marginBottom: 20,
+  },
+  genderButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+  },
+  genderButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    marginHorizontal: 4,
+    minWidth: 80,
+    maxWidth: width / 3 - 16,
+  },
+  genderButtonSelected: {
+    backgroundColor: '#000000',
+    borderColor: '#000000',
+  },
+  genderIcon: {
+    marginRight: 6,
+  },
+  genderButtonText: {
+    fontSize: 14,
+    color: '#333333',
+    fontWeight: '500',
+  },
+  genderButtonTextSelected: {
+    color: '#FFFFFF',
+  },
+  
   button: {
     borderRadius: 30,
     paddingVertical: 16,
@@ -274,25 +383,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     height: 56,
-    
   },
   buttonText: {
     color: 'white',
     fontWeight: '600',
     fontSize: 16,
     marginRight: 8,
-  },
-  footer: {
-    marginTop: 24,
-    alignItems: 'center',
-  },
-  footerText: {
-    fontSize: 14,
-    color: '#666666',
-  },
-  footerLink: {
-    color: '#4776E6',
-    fontWeight: '600',
   },
   toastContainer: {
     position: 'absolute',
@@ -323,7 +419,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginLeft: 8,
     flex: 1,
-  }
+  },
 });
 
 export default RegisterScreen;
