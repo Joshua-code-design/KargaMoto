@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
+import { registerUser } from '../services/Loginapi';
 
 const { width } = Dimensions.get('window');
 
@@ -112,7 +113,7 @@ const RegisterScreen = () => {
   };
 
   const handleRegister = async () => {
-    if (!firstName || !lastName || !selectedGender) {
+    if (!firstName || !lastName) {
       showToast('Please fill in all fields to continue.', 'error');
       return;
     }
@@ -120,21 +121,16 @@ const RegisterScreen = () => {
     setIsLoading(true);
     
     try {
-      const fullname = `${firstName} ${lastName}`;
-      const response = await axios.post('http://192.168.1.33:5000/api/register-user', {
-        full_name: fullname,
-        phone_number: phoneNumber,
-        gender: selectedGender
-      });
-
+      const gender = selectedGender;
+      const fullName = `${firstName} ${lastName}`;
+      const response = await registerUser(fullName, phoneNumber,gender);
+  
       setIsLoading(false);
       
       if (response.status === 200) {
         showToast('Your account has been created successfully!');
-        
         setFirstName('');
         setLastName('');
-        setSelectedGender('');
         
         setTimeout(() => {
           navigation.navigate('LoginScreen');
@@ -148,6 +144,7 @@ const RegisterScreen = () => {
       );
     }
   };
+
 
   return (
     <SafeAreaView style={styles.container}>

@@ -98,11 +98,12 @@ export const verifyOTP = async (phoneNumber, otp, navigation, inputRefs, setInpu
   }
 };
 
-export const registerUser = async (fullName, phoneNumber) => {
+export const registerUser = async (fullName, phoneNumber,gender) => {
   try {
     const response = await axios.post(`${API_URL}/register-user`, {
       full_name: fullName,
       phone_number: phoneNumber,
+      gender: gender
     });
     return response;
   } catch (error) {
