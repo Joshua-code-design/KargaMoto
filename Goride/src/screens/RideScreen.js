@@ -323,7 +323,7 @@ const LocationScreen = () => {
         {isLoading && (
           <View style={styles.loadingOverlay}>
             <ActivityIndicator size="large" color="#111" />
-            <Text style={styles.loadingText}>Getting your location...</Text>
+            <Text style={styles.loadingText}>Loading...</Text>
           </View>
         )}
 

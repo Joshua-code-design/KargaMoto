@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert, Animated } from 'react-native';
 
   // const API_URL = "https://kargamotoapi.onrender.com/api";
-const API_URL = "http://192.168.1.31:5000/api";
+const API_URL = "http://192.168.1.33:5000/api";
 
 export const loginUser = async (phoneNumber, showToast, navigation, setLoading) => {
   setLoading(true);
@@ -95,6 +95,18 @@ export const verifyOTP = async (phoneNumber, otp, navigation, inputRefs, setInpu
         shake.start();
       }
     });
+  }
+};
+
+export const registerUser = async (fullName, phoneNumber) => {
+  try {
+    const response = await axios.post(`${API_URL}/register-user`, {
+      full_name: fullName,
+      phone_number: phoneNumber,
+    });
+    return response;
+  } catch (error) {
+    throw error;
   }
 };
 

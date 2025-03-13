@@ -78,17 +78,13 @@ const RegisterScreen = () => {
     setIsLoading(true);
     
     try {
-      const fullname = `${firstName} ${lastName}`;
-      const response = await axios.post('http://192.168.1.31:5000/api/register-user', {
-        full_name: fullname,
-        phone_number: phoneNumber 
-      });
-
+      const fullName = `${firstName} ${lastName}`;
+      const response = await registerUser(fullName, phoneNumber);
+  
       setIsLoading(false);
       
       if (response.status === 200) {
         showToast('Your account has been created successfully!');
-        
         setFirstName('');
         setLastName('');
         
