@@ -27,11 +27,15 @@ const SearchPlaceScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <GooglePlacesAutocomplete
-        placeholder="Search for a place"
+        placeholder="Search for a place in Bacolod City"
         onPress={handlePlaceSelect}
         query={{
-          key: 'AIzaSyBezmbkcpuSIpDOrFtMkGfsU3u_ZDf7xlg', // Replace with your Google Places API key
+          key: 'AIzaSyBezmbkcpuSIpDOrFtMkGfsU3u_ZDf7xlg', // Replace with your Google API Key
           language: 'en',
+          components: 'country:PH', // Restrict to the Philippines
+          location: '10.6765,122.9509', // Bacolod City's lat & lng
+          radius: 25000, // 10km radius around Bacolod
+          strictbounds: true, // Enforce results within bounds
         }}
         fetchDetails={true} // Ensure details are fetched
         styles={{
