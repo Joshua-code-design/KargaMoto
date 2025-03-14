@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import Carousel from 'react-native-reanimated-carousel';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation,useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SharedElement } from 'react-navigation-shared-element';
 import * as Haptics from 'expo-haptics';
@@ -32,6 +32,7 @@ export default function HomeScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
   const translateYAnim = useRef(new Animated.Value(30)).current;
+  
   
   // Responsive size calculations
   const fontSize = {
@@ -121,9 +122,9 @@ export default function HomeScreen() {
   };
 
   // Navigation with transition
-  const navigateTo = (screen) => {
+  const navigateTo = (screen, params = {}) => {
     animateTouchable();
-    navigation.navigate(screen);
+    navigation.navigate(screen, params);
   };
 
   return (
@@ -197,7 +198,7 @@ export default function HomeScreen() {
             </View>
             <View style={styles.balanceRow}>
               <Text style={[styles.balanceAmount, {fontSize: fontSize.xlarge}]}>
-                {formatCurrency(1000000000)}
+                {formatCurrency(10000)}
               </Text>
               <TouchableOpacity 
                 style={styles.depositButton}
@@ -228,7 +229,7 @@ export default function HomeScreen() {
         >
           <TouchableOpacity 
             style={styles.rideOption} 
-            onPress={() => navigateTo('RideScreen')}
+            onPress={() => navigateTo('RideScreen', { serviceType: 'Ride' })}
             activeOpacity={0.8}
           >
             <LinearGradient
@@ -250,7 +251,7 @@ export default function HomeScreen() {
           
           <TouchableOpacity 
             style={styles.rideOption}
-            onPress={() => navigateTo('DeliveryScreen')}
+            onPress={() => navigateTo('RideScreen', { serviceType: 'Delivery' })}
             activeOpacity={0.8}
           >
             <LinearGradient

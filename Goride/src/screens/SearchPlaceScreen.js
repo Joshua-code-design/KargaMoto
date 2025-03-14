@@ -20,6 +20,7 @@ const SearchPlaceScreen = () => {
       [isPickup ? 'pickupLongitude' : 'destinationLongitude']: longitude,
       currentPickup: isPickup ? address : currentPickup, // Preserve existing pickup
       currentDestination: isPickup ? currentDestination : address, // Preserve existing destination
+      serviceType: route.params?.serviceType, 
     });
   };
 

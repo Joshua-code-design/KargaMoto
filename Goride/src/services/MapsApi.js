@@ -3,17 +3,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert, Animated } from 'react-native';
 
   // const API_URL = "https://kargamotoapi.onrender.com/api";
-  const API_URL = "http://192.168.1.33:5000/api";
+  const API_URL = "http://192.168.1.18:5000/api";
 
-  export const requestRide = async (pickup, dropoff) => {
+  export const requestRide = async (pickup, dropoff,service) => {
     try {
         const token = await AsyncStorage.getItem('token');
         const fare = 1000;
 
-        console.log("pickup:", pickup);
-        console.log("dropoff:", dropoff);
+        // console.log("pickup:", pickup);
+        // console.log("dropoff:", dropoff);
+        // console.log("serviceType:", ServiceType);
+
         const response = await axios.post(`${API_URL}/book-service`, {
-            booking_type: "Ride",
+            booking_type: service,
             pickup_location: {
                 latitude: pickup.latitude,
                 longitude: pickup.longitude,
@@ -32,6 +34,7 @@ import { Alert, Animated } from 'react-native';
             }
         });
         return response.data;
+
     } catch (error) {
         console.error("Error requesting ride:", error);
         return null;

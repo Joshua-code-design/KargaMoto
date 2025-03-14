@@ -59,11 +59,13 @@ const Map = ({ route }) => {
           navigation.navigate("RideScreen", {
             pickupAddress: address,
             destinationAddress: route.params.currentDestination,
+            serviceType: route.params?.serviceType,
           });
         } else if (route.params?.isSelectingDestination) {
           navigation.navigate("RideScreen", {
             destinationAddress: address,
             pickupAddress: route.params.currentPickup,
+            serviceType: route.params?.serviceType,
           });
         }
       } else {

@@ -33,6 +33,9 @@ const RideScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
+  const serviceType = route.params?.serviceType;
+  const [service, setService] = useState(serviceType); // Initialize with serviceType from route.params
+
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -43,18 +46,20 @@ const RideScreen = () => {
   const pickupDotAnim = useRef(new Animated.Value(0.8)).current;
   const destinationDotAnim = useRef(new Animated.Value(0.8)).current;
 
+  // Update service state whenever route.params.serviceType changes
+  useEffect(() => {
+    if (route.params?.serviceType && !service) {
+      setService(route.params.serviceType);
+    }
+  }, [route.params?.serviceType, service]);
+
+  // Handle other route.params updates
   useEffect(() => {
     if (route.params?.pickupAddress) {
       setSelectedPickup(route.params.pickupAddress);
-      console.log('Pickup Address:', route.params.pickupAddress);
-      console.log('Pickup Latitude:', route.params.pickupLatitude);
-      console.log('Pickup Longitude:', route.params.pickupLongitude);
     }
     if (route.params?.destinationAddress) {
       setSelectedDestination(route.params.destinationAddress);
-      console.log('Destination Address:', route.params.destinationAddress);
-      console.log('Destination Latitude:', route.params.destinationLatitude);
-      console.log('Destination Longitude:', route.params.destinationLongitude);
     }
     if (route.params?.currentPickup) {
       setSelectedPickup(route.params.currentPickup);
@@ -199,18 +204,20 @@ const RideScreen = () => {
           navigation.navigate('LocationScreen', {
             pickupAddress: address,
             destinationAddress: selectedDestination,
+            serviceType: service, // Pass serviceType
           });
         },
         isSelectingPickup: true,
         currentPickup: selectedPickup,
         currentDestination: selectedDestination,
+        serviceType: service, // Pass serviceType
       });
     } else if (type === 'search') {
-      // Navigate to the SearchPlaceScreen for pickup
       navigation.navigate('SearchPlaceScreen', {
         isPickup: true,
-        currentPickup: selectedPickup, // Pass the current pickup value
-        currentDestination: selectedDestination, // Pass the current destination value
+        currentPickup: selectedPickup,
+        currentDestination: selectedDestination,
+        serviceType: service, // Pass serviceType
       });
     } else {
       setSelectedPickup(option);
@@ -229,18 +236,20 @@ const RideScreen = () => {
           navigation.navigate('LocationScreen', {
             destinationAddress: address,
             pickupAddress: selectedPickup,
+            serviceType: service, // Pass serviceType
           });
         },
         isSelectingDestination: true,
         currentPickup: selectedPickup,
         currentDestination: selectedDestination,
+        serviceType: service, // Pass serviceType
       });
     } else if (type === 'search') {
-      // Navigate to the SearchPlaceScreen for destination
       navigation.navigate('SearchPlaceScreen', {
         isPickup: false,
-        currentPickup: selectedPickup, // Pass the current pickup value
-        currentDestination: selectedDestination, // Pass the current destination value
+        currentPickup: selectedPickup,
+        currentDestination: selectedDestination,
+        serviceType: service, // Pass serviceType
       });
     } else {
       setSelectedDestination(option);
@@ -249,6 +258,8 @@ const RideScreen = () => {
   };
 
   const handleContinue = async () => {
+
+    
     // Button press animation
     Animated.sequence([
       Animated.timing(buttonScaleAnim, {
@@ -293,28 +304,24 @@ const RideScreen = () => {
         address: selectedDestination,
       };
 
-      // console.log(pickup, dropoff);
-
       // Call the requestRide function from MapsApi.js
-      await requestRide(pickup, dropoff);
+      await requestRide(pickup, dropoff,service);
 
       // Navigate to the ride confirmation or next screen if needed
-      // navigation.navigate('RideDetails', { pickup, dropoff });
+      navigation.navigate('BookingScreen', { serviceType: service }); // Pass serviceType
     } catch (error) {
       Alert.alert('Error', 'An error occurred while fetching location details.');
       console.error(error);
     } finally {
       setIsLoading(false);
       alert('Ride requested successfully!');
-      navigation.navigate('BookingScreen');
     }
-
   };
 
   const animateTouchable = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.light);
   };
-  
+
   const navigateTo = (screen) => {
     animateTouchable();  // Optional haptic feedback
     navigation.navigate(screen);
@@ -336,10 +343,10 @@ const RideScreen = () => {
             },
           ]}
         >
-         <TouchableOpacity onPress={() => navigateTo('LandingPageScreen')} style={styles.backButton}>
-    <Ionicons name="arrow-back" size={24} color="#111" />
-  </TouchableOpacity>
-          <Text style={styles.headerTitle}>Your Journey</Text>
+          <TouchableOpacity onPress={() => navigateTo('LandingPageScreen')} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#111" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{service}</Text>
           <View style={styles.placeholder} />
         </Animated.View>
 
