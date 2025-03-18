@@ -41,3 +41,36 @@ import { Alert, Animated } from 'react-native';
     }
 };
 
+
+export const addFavorites = async (home, work) => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        if (!home && !work) {
+            console.warn("Both home and work locations are missing.");
+            return null;
+        }
+        if (home && (!home.latitude || !home.longitude || !home.address)) {
+            alert("Home location fields are missing (latitude, longitude, or address).");
+            return null;
+        }
+        if (work && (!work.latitude || !work.longitude || !work.address)) {
+            alert("Work location fields are missing (latitude, longitude, or address).");
+            return null;
+        }
+        const response = await axios.post(`${API_URL}/add-favorites`, {
+            home: home,
+            work: work
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response.data;
+
+    } catch (error) {
+        console.error("Error adding favorites:", error);
+        return null;
+    }
+};
+
+
