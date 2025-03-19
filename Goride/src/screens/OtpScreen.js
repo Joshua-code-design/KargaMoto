@@ -1,9 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, TouchableOpacity, Text, SafeAreaView, TextInput, Animated } from 'react-native';
+import { 
+  View, 
+  TouchableOpacity, 
+  Text, 
+  SafeAreaView, 
+  TextInput, 
+  Animated, 
+  KeyboardAvoidingView, 
+  Platform,
+  Keyboard,
+  ScrollView,
+  Dimensions
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { verifyOTP } from '../services/Loginapi';
 import styles from '../styles/otp';
-
 
 // Toast Component
 const Toast = ({ visible, message, type, onHide }) => {
@@ -66,12 +77,17 @@ const OtpScreen = ({ navigation, route }) => {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
   const [inputStatus, setInputStatus] = useState('default'); // 'default', 'success', 'error'
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const inputRefs = useRef([]);
   
+  // Track screen width for responsiveness
+  const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
+
   useEffect(() => {
     if (inputRefs.current[0]) {
       inputRefs.current[0].focus();
     }
+    
     const countdown = setInterval(() => {
       setTimer(prev => {
         if (prev === 1) {
@@ -82,15 +98,31 @@ const OtpScreen = ({ navigation, route }) => {
       });
     }, 1000);
     
-    return () => clearInterval(countdown);
-  }, []);
+    // Add keyboard listeners for iOS to detect when keyboard appears/disappears
+    const keyboardWillShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => setKeyboardVisible(true)
+    );
+    
+    const keyboardWillHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => setKeyboardVisible(false)
+    );
 
-  // Reset input status if user modifies the OTP after validation
-  useEffect(() => {
-    if (inputStatus !== 'default') {
-      setInputStatus('default');
-    }
-  }, [otp]);
+    // Event listener for screen size changes (orientation changes)
+    const handleDimensionChange = ({ window }) => {
+      setScreenWidth(window.width);
+    };
+    
+    const dimensionSubscription = Dimensions.addEventListener('change', handleDimensionChange);
+
+    return () => {
+      clearInterval(countdown);
+      keyboardWillShowListener.remove();
+      keyboardWillHideListener.remove();
+      dimensionSubscription.remove(); // Cleanup dimension listener
+    };
+  }, []);
 
   const showToast = (message, type = 'success') => {
     setToastMessage(message);
@@ -121,6 +153,7 @@ const OtpScreen = ({ navigation, route }) => {
   };
 
   const handleVerifyOTP = () => {
+    Keyboard.dismiss();
     verifyOTP(phoneNumber, otp, navigation, inputRefs, setInputStatus, showToast);
   };
 
@@ -132,7 +165,6 @@ const OtpScreen = ({ navigation, route }) => {
       showToast('Verification code resent');
       // Add API call to resend OTP here
       
-      // Focus on first input after resend
       if (inputRefs.current[0]) {
         inputRefs.current[0].focus();
       }
@@ -141,7 +173,6 @@ const OtpScreen = ({ navigation, route }) => {
     }
   };
 
-  // Function to get the proper box style based on current input status
   const getInputBoxStyle = () => {
     switch (inputStatus) {
       case 'success':
@@ -154,54 +185,64 @@ const OtpScreen = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Toast 
-        visible={toastVisible}
-        message={toastMessage}
-        type={toastType}
-        onHide={hideToast}
-      />
-      
-      <View style={styles.contentContainer}>
-        <Text style={styles.title}>Enter code</Text>
-        <Text style={styles.description}>
-          We've sent an SMS with an activation code to your phone
-        </Text>
+    <KeyboardAvoidingView 
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+    >
+      <SafeAreaView style={styles.container}>
+        <Toast 
+          visible={toastVisible}
+          message={toastMessage}
+          type={toastType}
+          onHide={hideToast}
+        />
         
-        <View style={styles.otpContainer}>
-          {otp.map((digit, index) => (
-            <TextInput
-              key={index}
-              ref={ref => (inputRefs.current[index] = ref)}
-              style={[getInputBoxStyle()]}
-              keyboardType="numeric"
-              maxLength={1}
-              value={digit}
-              onChangeText={value => handleOtpChange(value, index)}
-              onKeyPress={e => handleKeyPress(e, index)}
-              selectTextOnFocus
-            />
-          ))}
-        </View>
-        <TouchableOpacity onPress={handleResendCode} disabled={timer > 0}>
-          <Text style={[styles.resendText, timer > 0 && styles.disabledText]}>
-            {timer > 0 ? `Resend code in ${timer}s` : 'Resend code'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[styles.button, styles.nextButton]}
-          onPress={handleVerifyOTP}
-          activeOpacity={0.7} 
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.nextButtonText}>Next</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+          <View style={styles.contentContainer}>
+            <Text style={styles.title}>Enter code</Text>
+            <Text style={styles.description}>
+              We've sent an SMS with an activation code to your phone
+            </Text>
+            
+            <View style={styles.otpContainer}>
+              {otp.map((digit, index) => (
+                <TextInput
+                  key={index}
+                  ref={ref => (inputRefs.current[index] = ref)}
+                  style={[getInputBoxStyle()]}
+                  keyboardType="numeric"
+                  maxLength={1}
+                  value={digit}
+                  onChangeText={value => handleOtpChange(value, index)}
+                  onKeyPress={e => handleKeyPress(e, index)}
+                  selectTextOnFocus
+                />
+              ))}
+            </View>
+            <TouchableOpacity onPress={handleResendCode} disabled={timer > 0}>
+              <Text style={[styles.resendText, timer > 0 && styles.disabledText]}>
+                {timer > 0 ? `Resend code in ${timer}s` : 'Resend code'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={[styles.button, styles.nextButton]}
+            onPress={handleVerifyOTP}
+            activeOpacity={0.7} 
+          >
+            <Text style={styles.nextButtonText}>Next</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
-
 
 export default OtpScreen;

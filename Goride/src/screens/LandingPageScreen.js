@@ -20,6 +20,8 @@ import { SharedElement } from 'react-navigation-shared-element';
 import * as Haptics from 'expo-haptics';
 import { BlurView } from 'expo-blur';
 
+
+
 export default function HomeScreen() {
   const navigation = useNavigation();
   const windowWidth = Dimensions.get('window').width;
@@ -154,14 +156,14 @@ export default function HomeScreen() {
               <MaterialCommunityIcons name="motorbike" size={24} color="#FFD700" style={styles.logoIcon} />
               <Text style={[styles.logoText, {fontSize: fontSize.medium}]}>KARGAMOTO</Text>
             </View>
-            <TouchableOpacity 
-              style={styles.menuButton}
-              onPress={() => navigateTo('ProfilesettingScreen')}
-            >
-              <View style={styles.profileIconContainer}>
-                <Ionicons name="person" size={isTablet ? 24 : 18} color="#FFFFFF" />
-              </View>
-            </TouchableOpacity>
+            <TouchableOpacity
+  style={styles.menuButton}
+  onPress={() => navigateTo('MessagesScreen')}
+>
+  <View style={styles.messageIconContainer}>
+    <Ionicons name="chatbubble-ellipses" size={isTablet ? 24 : 18} color="#FFFFFF" />
+  </View>
+</TouchableOpacity>
           </LinearGradient>
         </BlurView>
       </Animated.View>
@@ -367,55 +369,55 @@ export default function HomeScreen() {
       
       {/* Modernized Bottom Navigation with Glass Effect*/}
       <BlurView intensity={90} tint="dark" style={styles.bottomNavBlur}>
-        <Animated.View 
-          style={[
-            styles.bottomNav,
-            {
-              opacity: fadeAnim,
-              transform: [{ translateY: translateYAnim }]
-            }
-          ]}
+  <Animated.View
+    style={[
+      styles.bottomNav,
+      {
+        opacity: fadeAnim,
+        transform: [{ translateY: translateYAnim }]
+      }
+    ]}
+  >
+    <LinearGradient
+      colors={['rgba(26,26,26,0.8)', 'rgba(0,0,0,0.85)']}
+      style={styles.bottomNavGradient}
+    >
+      {[
+        { name: 'home', label: 'Home', screen: 'LandingPageScreen', active: true },
+        { name: 'heart-outline', label: 'Favorites', screen: 'Favorites', active:true },
+        { name: 'person-outline', label: 'Profile', screen: 'ProfilesettingScreen', active:true },
+      ].map((item, index) => (
+        <TouchableOpacity
+          key={index}
+          style={styles.navItem}
+          onPress={() => navigation.navigate(item.screen)}
+          activeOpacity={0.7}
         >
-          <LinearGradient
-            colors={['rgba(26,26,26,0.8)', 'rgba(0,0,0,0.85)']}
-            style={styles.bottomNavGradient}
+          {item.active && <View style={styles.activeIndicator} />}
+          <Ionicons
+            name={item.name}
+            size={isTablet ? 24 : 22}
+            color={item.active ? "#FFD700" : "#FFFFFF"}
+          />
+          <Text
+            style={[
+              styles.navText,
+              { fontSize: fontSize.small, color: item.active ? "#FFD700" : "#FFFFFF" }
+            ]}
           >
-            {[
-              {name: 'home', label: 'Home', active: true},
-              {name: 'card-outline', label: 'Payments'},
-              {name: 'compass-outline', label: 'Explore'},
-              {name: 'person-outline', label: 'Profile'}
-            ].map((item, index) => (
-              <TouchableOpacity 
-                key={index} 
-                style={styles.navItem}
-                onPress={animateTouchable}
-                activeOpacity={0.7}
-              >
-                {item.active && <View style={styles.activeIndicator} />}
-                <Ionicons 
-                  name={item.name} 
-                  size={isTablet ? 24 : 22} 
-                  color={item.active ? "#FFD700" : "#FFFFFF"} 
-                />
-                <Text 
-                  style={[
-                    styles.navText, 
-                    {fontSize: fontSize.small, color: item.active ? "#FFD700" : "#FFFFFF"}
-                  ]}
-                >
-                  {item.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </LinearGradient>
-        </Animated.View>
-      </BlurView>
+            {item.label}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </LinearGradient>
+  </Animated.View>
+</BlurView>;
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  
   container: {
     flex: 1,
     backgroundColor: '#121212',
@@ -760,4 +762,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
     fontWeight: '500',
   },
+
+  
 });

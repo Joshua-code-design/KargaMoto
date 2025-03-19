@@ -16,7 +16,8 @@ import Map from './components/Map';
 import DeliveryScreen from './screens/DeliveryScreen';
 import RideScreen from './screens/RideScreen';
 import BookingScreen from './screens/BookingScreen';
-import SearchPlaceScreen from './screens/SearchPlaceScreen';
+import SearchScreen from './screens/SearchScreen';
+import FeedScreen from './screens/FeedScreen';
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -38,7 +39,8 @@ export default function App() {
         <Stack.Screen name="DeliveryScreen" component={DeliveryScreen} />
         <Stack.Screen name="RideScreen" component={RideScreen} />
         <Stack.Screen name="BookingScreen" component={BookingScreen} />
-        <Stack.Screen name="SearchPlaceScreen" component={SearchPlaceScreen} />
+        <Stack.Screen name="SearchScreen" component={SearchScreen} />
+        <Stack.Screen name="FeedScreen" component={FeedScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
