@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert, Animated } from 'react-native';
 
   // const API_URL = "https://kargamotoapi.onrender.com/api";
-const API_URL = "http://192.168.1.18:5000/api";
+const API_URL = "http://192.168.1.30:5000/api";
 
 export const loginUser = async (phoneNumber, showToast, navigation, setLoading) => {
   setLoading(true);

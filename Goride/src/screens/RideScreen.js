@@ -305,16 +305,15 @@ const RideScreen = () => {
       };
 
       // Call the requestRide function from MapsApi.js
-      await requestRide(pickup, dropoff,service);
+      //await requestRide(pickup, dropoff,service);
 
       // Navigate to the ride confirmation or next screen if needed
-      navigation.navigate('BookingScreen', { serviceType: service }); // Pass serviceType
+      navigation.navigate('BookingScreen', { serviceType: service, pickup: pickup, destination: dropoff }); // Pass serviceType
     } catch (error) {
       Alert.alert('Error', 'An error occurred while fetching location details.');
       console.error(error);
     } finally {
       setIsLoading(false);
-      alert('Ride requested successfully!');
     }
   };
 

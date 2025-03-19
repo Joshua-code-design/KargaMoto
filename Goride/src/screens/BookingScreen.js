@@ -1,12 +1,100 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
+import React, { useEffect,useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, Alert } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { calculateDistanceAndETA } from '../services/Geocoding';
+
 
 const BookingConfirmationScreen = ({ navigation }) => {
+  const route = useRoute();
+  const { serviceType, pickup, destination } = route.params || {};
+  const [distance, setDistance] = useState(null);
+  const [duration, setDuration] = useState(null);
+  const [fare, setFare] = useState();
+
+  // Extract location details
+  const pickupAddress = pickup?.address || "Unknown Pickup Location";
+  const pickupCoords = pickup ? `(${pickup.latitude}, ${pickup.longitude})` : "";
+  
+  const destinationAddress = destination?.address || "Unknown Destination";
+  const destinationCoords = destination ? `(${destination.latitude}, ${destination.longitude})` : "";
+
+  
+  const fetchAndAlertDistance = async () => {
+    try {
+      // Call the calculateDistanceAndETA function
+      const result = await calculateDistanceAndETA(pickup, destination);
+      console.log("API Response:", result); // Debug the result object
+  
+      if (result) {
+        const formatDuration = (duration) => {
+          // Extract numeric value from duration string (e.g., "933s" -> 933)
+          const seconds = typeof duration === 'string' ? parseFloat(duration) : duration;
+  
+          if (isNaN(seconds)) {
+            console.error("Invalid duration value:", duration);
+            return "N/A";
+          }
+  
+          // Convert seconds to minutes
+          const minutes = Math.floor(seconds / 60);
+          return `${minutes} minutes`;
+        };
+  
+        const formattedETA = formatDuration(result.eta);
+        console.log("Formatted ETA:", formattedETA); // Debug the formatted ETA
+  
+        // Update state or display the result
+        setDistance(result.distance);
+        setDuration(formattedETA);
+      } else {
+        Alert.alert("Error", "Failed to fetch distance data.");
+      }
+    } catch (error) {
+      console.error("Error in fetchAndAlertDistance:", error);
+      Alert.alert("Error", "An error occurred while fetching distance data.");
+    }
+  };
+  const fareCalculation = () => {
+   // Calculate fare based on distance  
+   const baseFare = 50;
+   const farePerKm = 10;
+   const baseKilometer = 2;
+   
+   console.log("Distance in fareCalculation:", distance);
+
+  const distanceInKm = parseFloat(distance);
+   
+   if (isNaN(distanceInKm)) {  
+       console.error("Invalid distance value:", distance);
+       return "N/A";
+   }
+
+   if (distanceInKm <= baseKilometer) {
+       setFare(baseFare);
+   } else {
+       const extraDistance = distanceInKm - baseKilometer;
+       const totalPayment = baseFare + (extraDistance * farePerKm);
+       setFare(Math.round(totalPayment));
+   }
+  };
+  
+
+  // Show alert when screen loads
+  useEffect(() => {
+    fetchAndAlertDistance();
+  }, []);
+  
+  useEffect(() => {
+    if (distance !== null) {
+      fareCalculation();
+    }
+  }, [distance]);
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -15,47 +103,48 @@ const BookingConfirmationScreen = ({ navigation }) => {
         <Text style={styles.headerTitle}>Book Confirmation</Text>
         <View style={{ width: 24 }} />
       </View>
-      
+
       {/* Content */}
       <View style={styles.content}>
         {/* Location Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Location</Text>
           <View style={styles.locationContainer}>
+            {/* Pickup */}
             <View style={styles.locationPoint}>
               <View style={styles.grayCircle}>
                 <MaterialIcons name="location-on" size={16} color="#777" />
               </View>
-              <Text style={styles.locationText}>SM BACOLOD</Text>
+              <Text style={styles.locationText}>{pickupAddress}</Text>
             </View>
-            
+
             <View style={styles.verticalLine} />
-            
+
+            {/* Destination */}
             <View style={styles.locationPoint}>
               <View style={styles.greenCircle}>
                 <MaterialIcons name="location-on" size={16} color="#fff" />
               </View>
-              <Text style={styles.locationText}>ROBINSON'S BACOLOD</Text>
-              <Text style={styles.destinationText}>Destination Point</Text>
+              <Text style={styles.locationText}>{destinationAddress}</Text>
             </View>
           </View>
         </View>
-        
+
         {/* Distance & Time Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Distance & Time</Text>
           <View style={styles.rowContainer}>
             <View style={styles.infoItem}>
               <Text style={styles.infoLabel}>Distance</Text>
-              <Text style={styles.infoValue}>10 km</Text>
+              <Text style={styles.infoValue}>{distance}</Text>
             </View>
             <View style={styles.infoItem}>
               <Text style={styles.infoLabel}>Time of Arrival</Text>
-              <Text style={styles.infoValue}>10 minutes</Text>
+              <Text style={styles.infoValue}>{duration}</Text>
             </View>
           </View>
         </View>
-        
+
         {/* Payment Method Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -71,17 +160,17 @@ const BookingConfirmationScreen = ({ navigation }) => {
             <Text style={styles.paymentText}>Cash</Text>
           </View>
         </View>
-        
+
         {/* Payment Details Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Payment Details</Text>
           <View style={styles.paymentDetails}>
             <Text style={styles.paymentLabel}>Total Payment</Text>
-            <Text style={styles.paymentAmount}>1,200.00</Text>
+            <Text style={styles.paymentAmount}>₱ {fare}</Text>
           </View>
         </View>
       </View>
-      
+
       {/* Confirm Button */}
       <TouchableOpacity style={styles.confirmButton}>
         <Text style={styles.confirmButtonText}>Confirm</Text>
@@ -89,6 +178,7 @@ const BookingConfirmationScreen = ({ navigation }) => {
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
