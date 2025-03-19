@@ -1,6 +1,41 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions, Platform, PixelRatio } from 'react-native';
 
+// Get device dimensions
 const { width, height } = Dimensions.get('window');
+
+// Normalize function to scale sizes across different devices
+const normalize = (size) => {
+  const scale = width / 375; // Base width scaling (iPhone 8 width)
+  const newSize = size * scale;
+  
+  // Different scaling for iOS and Android
+  if (Platform.OS === 'ios') {
+    return Math.round(PixelRatio.roundToNearestPixel(newSize));
+  } else {
+    return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 2;
+  }
+};
+
+// Calculate responsive dimensions
+const isSmallDevice = width < 375;
+const isTablet = width > 600;
+const isLargeTablet = width > 900;
+
+// Helper for responsive margin, padding based on screen size
+const responsive = {
+  padding: isTablet ? normalize(30) : normalize(24),
+  margin: isTablet ? normalize(25) : normalize(20),
+  buttonHeight: isTablet ? normalize(60) : normalize(48),
+  inputSize: isTablet ? normalize(60) : isSmallDevice ? normalize(38) : normalize(45),
+  inputMargin: isTablet ? normalize(10) : normalize(6),
+  fontSize: {
+    title: isTablet ? normalize(28) : normalize(22),
+    description: isTablet ? normalize(16) : normalize(14),
+    input: isTablet ? normalize(24) : normalize(20),
+    button: isTablet ? normalize(18) : normalize(16),
+    toast: isTablet ? normalize(16) : normalize(14),
+  }
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -8,112 +43,122 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   contentContainer: {
-    paddingHorizontal: 24,
-    marginTop: 80,
+    paddingHorizontal: responsive.padding,
+    marginTop: height * 0.12, // Relative to screen height
     alignItems: 'center',
   },
   title: {
-    fontSize: 22,
+    fontSize: responsive.fontSize.title,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 12,
+    marginBottom: responsive.margin / 2,
     textAlign: 'center',
   },
   description: {
-    fontSize: 14,
+    fontSize: responsive.fontSize.description,
     color: '#666',
     textAlign: 'center',
-    lineHeight: 20,
-    maxWidth: '80%',
-    marginBottom: 30,
+    lineHeight: responsive.fontSize.description * 1.4,
+    maxWidth: isTablet ? '70%' : '80%',
+    marginBottom: responsive.margin * 1.5,
   },
   otpContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: responsive.margin,
     width: '100%',
   },
   otpBox: {
-    width: 45,
-    height: 45,
+    width: responsive.inputSize,
+    height: responsive.inputSize,
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 8,
+    borderRadius: normalize(8),
     textAlign: 'center',
-    fontSize: 20,
-    marginHorizontal: 6,
+    fontSize: responsive.fontSize.input,
+    marginHorizontal: responsive.inputMargin,
     backgroundColor: 'white',
     color: '#000',
   },
   otpBoxSuccess: {
-    width: 45,
-    height: 45,
+    width: responsive.inputSize,
+    height: responsive.inputSize,
     borderWidth: 1,
     borderColor: '#4CAF50',
-    borderRadius: 8,
+    borderRadius: normalize(8),
     textAlign: 'center',
-    fontSize: 20,
-    marginHorizontal: 6,
+    fontSize: responsive.fontSize.input,
+    marginHorizontal: responsive.inputMargin,
     backgroundColor: 'rgba(76, 175, 80, 0.05)',
     color: '#4CAF50',
   },
   otpBoxError: {
-    width: 45,
-    height: 45,
+    width: responsive.inputSize,
+    height: responsive.inputSize,
     borderWidth: 1,
     borderColor: '#F44336',
-    borderRadius: 8,
+    borderRadius: normalize(8),
     textAlign: 'center',
-    fontSize: 20,
-    marginHorizontal: 6,
+    fontSize: responsive.fontSize.input,
+    marginHorizontal: responsive.inputMargin,
     backgroundColor: 'rgba(244, 67, 54, 0.05)',
     color: '#F44336',
   },
   resendText: {
     color: '#1E88E5',
-    marginTop: 20,
+    marginTop: responsive.margin,
     textAlign: 'center',
+    fontSize: responsive.fontSize.description,
   },
   disabledText: {
     color: '#9E9E9E',
   },
   buttonContainer: {
     position: 'absolute',
-    bottom: 40,
+    bottom: height * 0.05, // Relative to screen height
     left: 0,
     right: 0,
     flexDirection: 'row',
     justifyContent: 'center',
-    paddingHorizontal: 24,
+    paddingHorizontal: responsive.padding,
+  },
+  // Additional button container for when keyboard is visible on iOS
+  keyboardVisibleButtonContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingHorizontal: responsive.padding,
+    marginTop: responsive.margin * 2,
+    marginBottom: responsive.margin * 2,
   },
   button: {
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    marginBottom: '100%',
-    borderRadius: 25,
+    paddingVertical: normalize(14),
+    borderRadius: normalize(25),
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    width: '80%',
+    width: isTablet ? '60%' : '80%',
+    height: responsive.buttonHeight,
+    justifyContent: 'center',
   },
   nextButton: {
     backgroundColor: '#1E88E5',
   },
   nextButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: responsive.fontSize.button,
     fontWeight: '600',
     textAlign: 'center',
   },
   // Toast styles
   toastContainer: {
     position: 'absolute',
-    top: 50,
-    left: 20,
-    right: 20,
+    top: height * 0.075, // Relative to screen height
+    left: responsive.padding,
+    right: responsive.padding,
     zIndex: 9999,
     alignItems: 'center',
   },
@@ -121,11 +166,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'white',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    minWidth: '80%',
-    maxWidth: '90%',
+    paddingVertical: normalize(12),
+    paddingHorizontal: normalize(16),
+    borderRadius: normalize(8),
+    minWidth: isTablet ? '60%' : '80%',
+    maxWidth: isTablet ? '70%' : '90%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
@@ -133,14 +178,15 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   iconContainer: {
-    marginRight: 12,
+    marginRight: normalize(12),
   },
   toastMessage: {
-    fontSize: 14,
+    fontSize: responsive.fontSize.toast,
     color: '#333',
     flex: 1,
     fontWeight: '500',
-  }
+  },
 });
+
 
 export default styles;

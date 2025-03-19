@@ -1,12 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  Image, 
+  ScrollView, 
+  SafeAreaView,
+  Dimensions,
+  Platform,
+  StatusBar
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ModernButton from '../components/ModernButton';
 import PopupModal from '../components/PopupModal';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from '@react-navigation/native';
 import { logoutUser } from '../services/Loginapi';
-import styles from '../styles/pofilescreen.js';
+
+// Get screen dimensions for responsiveness
+const { width, height } = Dimensions.get('window');
+
+// Calculate responsive sizes
+const scale = Math.min(width, height) / 375; // Base scale on 375px width (iPhone X)
+const normalize = (size) => Math.round(scale * size);
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
@@ -20,14 +37,17 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     const fetchUserDetails = async () => {
-      const userDetails = await AsyncStorage.getItem('userDetails');
-      if (userDetails !== null) {
-        const parsedDetails = JSON.parse(userDetails);
-        console.log("parsedDetails:", parsedDetails);
-        setUserName(parsedDetails.full_name);
-        setGender(parsedDetails.gender);
-        setMobileNumber(parsedDetails.phone_number);
-        setUserType(parsedDetails.user_type);
+      try {
+        const userDetails = await AsyncStorage.getItem('userDetails');
+        if (userDetails !== null) {
+          const parsedDetails = JSON.parse(userDetails);
+          setUserName(parsedDetails.full_name || "Not provided");
+          setGender(parsedDetails.gender || "Not provided");
+          setMobileNumber(parsedDetails.phone_number || "Not provided");
+          setUserType(parsedDetails.user_type || "Standard User");
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
       }
     };
 
@@ -53,76 +73,142 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Cover Photo */}
-      <View style={styles.coverContainer} />
-
-      {/* Profile Section */}
-      <View style={styles.profileContainer}>
-        <View style={styles.profileIconContainer}>
-          {profileImage ? (
-            <Image source={{ uri: profileImage }} style={styles.profileImage} />
-          ) : (
-            <Icon name="account-circle" size={100} color="#ccc" />
-          )}
-          <TouchableOpacity style={styles.editProfileIcon}>
-            <Icon name="pencil" size={20} color="#000" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Personal Information Section */}
-      <View style={styles.infoContainer}>
-        <View style={styles.rowBetween}>
-          <Text style={styles.sectionTitle}>Personal Information</Text>
-          <TouchableOpacity>
-            <Icon name="pencil" size={20} color="#777" />
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.label}>Name</Text>
-        <Text style={styles.value}>{userName}</Text>
-
-        <Text style={styles.label}>Sex</Text>
-        <Text style={styles.value}>{gender}</Text>
-      </View>
-
-      {/* Contact Information Section */}
-      <View style={styles.infoContainer}>
-        <Text style={styles.sectionTitle}>Contact Information</Text>
-
-        <Text style={styles.label}>Mobile Number</Text>
-        <Text style={styles.value}>{mobileNumber}</Text>
-
-        <Text style={styles.label}>User Type</Text>
-        <Text style={styles.value}>{userType}</Text>
-
-        <View style={styles.rowBetween}>
-          <View>
-            <Text style={styles.label}>Email Address</Text>
-            <Text style={[styles.value, { color: "black" }]}>Add Email</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView 
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.container}>
+          {/* Cover Photo */}
+          <View style={styles.coverContainer}>
+            {/* Optional: Add gradient overlay */}
+            <View style={styles.coverGradient} />
           </View>
-          <TouchableOpacity>
-            <Icon name="plus-circle" size={20} color="black" />
-          </TouchableOpacity>
+
+          {/* Profile Section */}
+          <View style={styles.profileContainer}>
+            <View style={styles.profileImageWrapper}>
+              {profileImage ? (
+                <Image source={{ uri: profileImage }} style={styles.profileImage} />
+              ) : (
+                <View style={styles.profileImagePlaceholder}>
+                  <Icon name="account" size={normalize(60)} color="#fff" />
+                </View>
+              )}
+              <TouchableOpacity style={styles.editProfileButton}>
+                <Icon name="camera" size={normalize(16)} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.nameContainer}>
+              <Text style={styles.userName}>{userName}</Text>
+              <Text style={styles.userType}>{userType}</Text>
+            </View>
+          </View>
+          
+          {/* Information Cards */}
+          {/* Personal Information Section */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Personal Information</Text>
+              <TouchableOpacity style={styles.editButton}>
+                <Icon name="pencil-outline" size={normalize(18)} color="#4A80F0" />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.cardDivider} />
+            
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Full Name</Text>
+              <Text style={styles.infoValue}>{userName}</Text>
+            </View>
+            
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Gender</Text>
+              <Text style={styles.infoValue}>{gender}</Text>
+            </View>
+          </View>
+
+          {/* Contact Information Section */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Contact Information</Text>
+              <TouchableOpacity style={styles.editButton}>
+                <Icon name="pencil-outline" size={normalize(18)} color="#4A80F0" />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.cardDivider} />
+            
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Mobile Number</Text>
+              <Text style={styles.infoValue}>{mobileNumber}</Text>
+            </View>
+            
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Email Address</Text>
+              <TouchableOpacity style={styles.addButton}>
+                <Text style={styles.addButtonText}>Add Email</Text>
+                <Icon name="plus-circle-outline" size={normalize(16)} color="#4A80F0" />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Account Settings */}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Account Settings</Text>
+            <View style={styles.cardDivider} />
+            
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity 
+                style={styles.settingsButton}
+                onPress={() => navigation.navigate('EditProfile')}
+              >
+                <Icon name="account-edit-outline" size={normalize(20)} color="#4A80F0" />
+                <Text style={styles.settingsButtonText}>Edit Profile</Text>
+                <Icon name="chevron-right" size={normalize(20)} color="#8E8E93" />
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.settingsButton}
+                onPress={() => navigation.navigate('PrivacySettings')}
+              >
+                <Icon name="shield-account-outline" size={normalize(20)} color="#4A80F0" />
+                <Text style={styles.settingsButtonText}>Privacy Settings</Text>
+                <Icon name="chevron-right" size={normalize(20)} color="#8E8E93" />
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.settingsButton}
+                onPress={() => navigation.navigate('Notifications')}
+              >
+                <Icon name="bell-outline" size={normalize(20)} color="#4A80F0" />
+                <Text style={styles.settingsButtonText}>Notifications</Text>
+                <Icon name="chevron-right" size={normalize(20)} color="#8E8E93" />
+              </TouchableOpacity>
+            </View>
+          </View>
+          
+          {/* Account Actions */}
+          <View style={styles.actionButtonsContainer}>
+            <TouchableOpacity 
+              style={[styles.actionButton, styles.logoutButton]}
+              onPress={() => handleShowModal("logout")}
+            >
+              <Icon name="logout" size={normalize(18)} color="#fff" />
+              <Text style={styles.logoutButtonText}>Logout</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.actionButton, styles.deleteButton]}
+              onPress={() => handleShowModal("delete")}
+            >
+              <Icon name="delete-outline" size={normalize(18)} color="#fff" />
+              <Text style={styles.deleteButtonText}>Delete Account</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-
-      {/* Account Settings */}
-      <View style={styles.infoContainer}>
-        <Text style={styles.accountSetting}>Account Settings</Text>
-
-        <ModernButton
-          title="Delete Account"
-          onPress={() => handleShowModal("delete")}
-          color="red"
-        />
-        <ModernButton
-          title="Logout"
-          onPress={() => handleShowModal("logout")}
-          color="black"
-        />
-      </View>
+      </ScrollView>
 
       {/* Popup Modal */}
       <PopupModal
@@ -136,6 +222,192 @@ export default function ProfileScreen() {
         onCancel={() => setModalVisible(false)}
         onConfirm={handleConfirm}
       />
-    </View>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#F8F9FB",
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#F8F9FB",
+  },
+  coverContainer: {
+    height: normalize(120),
+    backgroundColor: "#4A80F0",
+    position: "relative",
+  },
+  coverGradient: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: normalize(60),
+    backgroundColor: "rgba(0,0,0,0.1)",
+  },
+  profileContainer: {
+    alignItems: "center",
+    marginTop: -normalize(50),
+    paddingHorizontal: normalize(20),
+  },
+  profileImageWrapper: {
+    position: "relative",
+    marginBottom: normalize(10),
+  },
+  profileImagePlaceholder: {
+    width: normalize(100),
+    height: normalize(100),
+    borderRadius: normalize(50),
+    backgroundColor: "#4A80F0",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: "#FFFFFF",
+  },
+  profileImage: {
+    width: normalize(100),
+    height: normalize(100),
+    borderRadius: normalize(50),
+    borderWidth: 3,
+    borderColor: "#FFFFFF",
+  },
+  editProfileButton: {
+    position: "absolute",
+    bottom: normalize(5),
+    right: normalize(5),
+    backgroundColor: "#4A80F0",
+    width: normalize(30),
+    height: normalize(30),
+    borderRadius: normalize(15),
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
+  },
+  nameContainer: {
+    alignItems: 'center',
+    marginBottom: normalize(20),
+  },
+  userName: {
+    fontSize: normalize(22),
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: normalize(5),
+  },
+  userType: {
+    fontSize: normalize(14),
+    color: "#777",
+    textTransform: "capitalize",
+  },
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: normalize(12),
+    padding: normalize(16),
+    marginHorizontal: normalize(16),
+    marginBottom: normalize(16),
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3.84,
+    elevation: 3,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  cardTitle: {
+    fontSize: normalize(16),
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: normalize(8),
+  },
+  cardDivider: {
+    height: 1,
+    backgroundColor: "#EEEEEE",
+    marginBottom: normalize(16),
+  },
+  editButton: {
+    padding: normalize(5),
+  },
+  infoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: normalize(14),
+  },
+  infoLabel: {
+    fontSize: normalize(14),
+    color: "#777",
+    flex: 1,
+  },
+  infoValue: {
+    fontSize: normalize(14),
+    color: "#333",
+    fontWeight: "500",
+    textAlign: "right",
+    flex: 2,
+  },
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  addButtonText: {
+    fontSize: normalize(14),
+    color: "#4A80F0",
+    marginRight: normalize(5),
+  },
+  buttonContainer: {
+    marginTop: normalize(8),
+  },
+  settingsButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: normalize(12),
+    borderBottomWidth: 1,
+    borderBottomColor: "#EEEEEE",
+  },
+  settingsButtonText: {
+    fontSize: normalize(15),
+    color: "#333",
+    flex: 1,
+    marginLeft: normalize(15),
+  },
+  actionButtonsContainer: {
+    paddingHorizontal: normalize(16),
+    marginBottom: normalize(30),
+  },
+  actionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: normalize(14),
+    borderRadius: normalize(8),
+    marginBottom: normalize(12),
+  },
+  logoutButton: {
+    backgroundColor: "#4A80F0",
+  },
+  deleteButton: {
+    backgroundColor: "#FB4E4E",
+  },
+  logoutButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "600",
+    fontSize: normalize(15),
+    marginLeft: normalize(8),
+  },
+  deleteButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "600",
+    fontSize: normalize(15),
+    marginLeft: normalize(8),
+  }
+}); 

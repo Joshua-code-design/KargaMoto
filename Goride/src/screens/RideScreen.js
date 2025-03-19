@@ -308,7 +308,7 @@ const RideScreen = () => {
       await requestRide(pickup, dropoff,service);
 
       // Navigate to the ride confirmation or next screen if needed
-      navigation.navigate('BookingScreen', { serviceType: service }); // Pass serviceType
+      navigation.navigate('SearchScreen', { serviceType: service }); // Pass serviceType
     } catch (error) {
       Alert.alert('Error', 'An error occurred while fetching location details.');
       console.error(error);
