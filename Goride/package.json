@@ -11,6 +11,7 @@
   "dependencies": {
     "@expo-google-fonts/lexend": "^0.2.3",
     "@expo/vector-icons": "^14.0.2",
+    "@mapbox/polyline": "^1.2.1",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/blur": "^4.4.1",
     "@react-native-community/checkbox": "^0.5.17",
@@ -38,7 +39,7 @@
     "react-native-get-random-values": "^1.11.0",
     "react-native-google-places-autocomplete": "^2.5.7",
     "react-native-linear-gradient": "^2.8.3",
-    "react-native-maps": "1.18.0",
+    "react-native-maps": "^1.18.0",
     "react-native-paper": "^5.13.1",
     "react-native-reanimated": "~3.16.1",
     "react-native-reanimated-carousel": "^4.0.2",

@@ -15,6 +15,9 @@ import {
 } from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import MapView, { Marker, Polyline } from "react-native-maps";
+import { ActivityIndicator } from "react-native";
+import { decode } from "@mapbox/polyline";
 import { calculateDistanceAndETA } from '../services/Geocoding';
 
 // Get device dimensions and pixel ratio for true responsiveness
@@ -47,104 +50,56 @@ const BookingConfirmationScreen = ({ navigation }) => {
   const [fare, setFare] = useState(null);
   const [mapUrl, setMapUrl] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [polylineCoords, setPolylineCoords] = useState([]);
 
   // Extract location details
   const pickupAddress = pickup?.address || "Unknown Pickup Location";
   const destinationAddress = destination?.address || "Unknown Destination";
   
-  // Generate static map URL
-  const generateMapUrl = useCallback(() => {
-    if (!pickup || !destination) return null;
-    
-    // Using Google Static Maps API
-    // Note: In a real app, you'd want to hide your API key using environment variables
-    const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
-    
-    // Set map center to midpoint between pickup and destination
-    const midLat = (pickup.latitude + destination.latitude) / 2;
-    const midLng = (pickup.longitude + destination.longitude) / 2;
-    
-    // Calculate zoom level based on distance
-    let zoomLevel = 13;
-    if (distance) {
-      const distanceValue = parseFloat(distance);
-      if (distanceValue < 1) zoomLevel = 15;
-      else if (distanceValue < 3) zoomLevel = 14;
-      else if (distanceValue < 10) zoomLevel = 12;
-      else zoomLevel = 11;
-    }
-    
-    // Create map URL
-    let url = `https://maps.googleapis.com/maps/api/staticmap?`;
-    url += `center=${midLat},${midLng}`;
-    url += `&zoom=${zoomLevel}`;
-    url += `&size=600x300`;
-    url += `&maptype=roadmap`;
-    
-    // Add markers
-    url += `&markers=color:green|label:A|${pickup.latitude},${pickup.longitude}`;
-    url += `&markers=color:red|label:B|${destination.latitude},${destination.longitude}`;
-    
-    // Add path
-    url += `&path=color:0x4CAF50CC|weight:5|${pickup.latitude},${pickup.longitude}|${destination.latitude},${destination.longitude}`;
-    
-    // Add key
-    url += `&key=${apiKey}`;
-    
-    return url;
-  }, [pickup, destination, distance]);
   
   const fetchAndAlertDistance = async () => {
     try {
       setLoading(true);
-      // Call the calculateDistanceAndETA function
       const result = await calculateDistanceAndETA(pickup, destination);
-      console.log("API Response:", result);
+  
+      
   
       if (result) {
         const formatDuration = (duration) => {
-          // Extract numeric value from duration string (e.g., "933s" -> 933)
-          const seconds = typeof duration === 'string' ? parseFloat(duration) : duration;
-  
-          if (isNaN(seconds)) {
-            console.error("Invalid duration value:", duration);
-            return "N/A";
-          }
-  
-          // Convert seconds to minutes
-          const minutes = Math.floor(seconds / 60);
-          return `${minutes} minutes`;
+          const seconds = typeof duration === "string" ? parseFloat(duration) : duration;
+          return isNaN(seconds) ? "N/A" : `${Math.floor(seconds / 60)} minutes`;
         };
   
-        const formattedETA = formatDuration(result.eta);
-        console.log("Formatted ETA:", formattedETA);
-  
-        // Update state or display the result
         setDistance(result.distance);
-        setDuration(formattedETA);
-        
-        // Generate map URL
-        const url = generateMapUrl();
-        setMapUrl(url);
+        setDuration(formatDuration(result.eta));
+  
+        if (result.polyline) {
+          // Decode polyline using @mapbox/polyline
+          const decodedPolyline = decode(result.polyline).map(([lat, lng]) => ({
+            latitude: lat,
+            longitude: lng,
+          }));
+
+          setPolylineCoords(decodedPolyline);
+        }
       } else {
         Alert.alert("Error", "Failed to fetch distance data.");
       }
-      setLoading(false);
     } catch (error) {
-      console.error("Error in fetchAndAlertDistance:", error);
+      console.error("API Error:", error.response?.data || error.message);
       Alert.alert("Error", "An error occurred while fetching distance data.");
+    } finally {
       setLoading(false);
     }
   };
+  
 
   const fareCalculation = () => {
     // Calculate fare based on distance  
     const baseFare = 50;
     const farePerKm = 10;
     const baseKilometer = 2;
-    
-    console.log("Distance in fareCalculation:", distance);
-    
+
     const distanceInKm = parseFloat(distance);
     
     if (isNaN(distanceInKm)) {  
@@ -191,26 +146,30 @@ const BookingConfirmationScreen = ({ navigation }) => {
       {/* Content */}
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Map View */}
-        <View style={styles.mapContainer}>
-          {mapUrl ? (
-            <Image 
-              source={{ uri: mapUrl }}
-              style={styles.mapImage}
-              resizeMode="cover"
-            />
-          ) : (
-            <View style={styles.mapPlaceholder}>
-              <MaterialIcons name="map" size={normalize(40)} color="#cccccc" />
-              <Text style={styles.mapPlaceholderText}>Loading map...</Text>
-            </View>
-          )}
-          <View style={styles.mapOverlay}>
-            <View style={styles.routeInfoContainer}>
-              <Text style={styles.routeDistanceText}>{distance || "Calculating..."}</Text>
-              <Text style={styles.routeDurationText}>{duration || "Calculating..."}</Text>
-            </View>
-          </View>
-        </View>
+        <View style={{ flex: 1, height: SCREEN_HEIGHT * 0.5 }}>
+  {loading ? (
+    <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 20 }} />
+  ) : (
+    <MapView
+      style={{ flex: 1 }}
+      initialRegion={{
+        latitude: pickup.latitude,
+        longitude: pickup.longitude,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      }}
+    >
+      {/* Pickup Marker */}
+      <Marker coordinate={pickup} title="Pickup" pinColor="green" />
+      {/* Destination Marker */}
+      <Marker coordinate={destination} title="Destination" pinColor="red" />
+      {/* Route Polyline */}
+      {polylineCoords.length > 0 && (
+        <Polyline coordinates={polylineCoords} strokeWidth={5} strokeColor="blue" />
+      )}
+    </MapView>
+  )}
+</View>
 
         {/* Location Section */}
         <View style={styles.section}>

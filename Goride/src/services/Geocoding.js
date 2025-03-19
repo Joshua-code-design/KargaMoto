@@ -42,8 +42,6 @@ export const reverseGeocodeCoordinates = async (latitude, longitude) => {
 };
 
 export const calculateDistanceAndETA = async (pickup, destination) => {
-  //console.log("CalculateDistanceAndETA Tick");
-
   // Define origin and destination using latitude and longitude
   const origin = {
     location: {
@@ -78,15 +76,18 @@ export const calculateDistanceAndETA = async (pickup, destination) => {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': GOOGLE_MAPS_API_KEY,
-        'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters', // Only request duration and distance
+        'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline', // Request polyline along with distance and duration
       },
     });
+
+    
 
     if (response.data && response.data.routes && response.data.routes.length > 0) {
       const route = response.data.routes[0];
       return {
         distance: `${(route.distanceMeters / 1000).toFixed(2)} km`, // Convert meters to kilometers
         eta: route.duration, // Duration in seconds
+        polyline: route.polyline.encodedPolyline, // Encoded polyline for drawing the route
       };
     } else {
       console.error("Error fetching route:", response.data.error);
