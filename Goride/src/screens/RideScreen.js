@@ -11,8 +11,9 @@ import {
   Animated,
   Easing,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -21,9 +22,10 @@ import { geocodeAddress, reverseGeocodeCoordinates } from '../services/Geocoding
 import * as Haptics from 'expo-haptics';
 import styles from '../styles/riderScreen';
 
-const { width, height } = Dimensions.get('window');
-
 const RideScreen = () => {
+  // Screen dimensions with listener for orientation changes
+  const [dimensions, setDimensions] = useState(Dimensions.get('window'));
+  
   const [pickupDropdownVisible, setPickupDropdownVisible] = useState(false);
   const [selectedPickup, setSelectedPickup] = useState('Set pickup location');
   const [pickupType, setPickupType] = useState(null);
@@ -34,7 +36,7 @@ const RideScreen = () => {
   const route = useRoute();
 
   const serviceType = route.params?.serviceType;
-  const [service, setService] = useState(serviceType); // Initialize with serviceType from route.params
+  const [service, setService] = useState(serviceType);
 
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -45,6 +47,15 @@ const RideScreen = () => {
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const pickupDotAnim = useRef(new Animated.Value(0.8)).current;
   const destinationDotAnim = useRef(new Animated.Value(0.8)).current;
+
+  // Dimension change listener
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener('change', ({ window }) => {
+      setDimensions(window);
+    });
+    
+    return () => subscription?.remove();
+  }, []);
 
   // Update service state whenever route.params.serviceType changes
   useEffect(() => {
@@ -192,9 +203,13 @@ const RideScreen = () => {
           location.coords.longitude
         );
         setSelectedPickup(address);
+        // Provide haptic feedback on successful location setting
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } catch (error) {
         Alert.alert('Location Error', 'Unable to get your current location.');
         setSelectedPickup('Unknown Location');
+        // Provide haptic feedback on error
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       } finally {
         setIsLoading(false);
       }
@@ -204,20 +219,20 @@ const RideScreen = () => {
           navigation.navigate('LocationScreen', {
             pickupAddress: address,
             destinationAddress: selectedDestination,
-            serviceType: service, // Pass serviceType
+            serviceType: service,
           });
         },
         isSelectingPickup: true,
         currentPickup: selectedPickup,
         currentDestination: selectedDestination,
-        serviceType: service, // Pass serviceType
+        serviceType: service,
       });
     } else if (type === 'search') {
       navigation.navigate('SearchPlaceScreen', {
         isPickup: true,
         currentPickup: selectedPickup,
         currentDestination: selectedDestination,
-        serviceType: service, // Pass serviceType
+        serviceType: service,
       });
     } else {
       setSelectedPickup(option);
@@ -236,20 +251,20 @@ const RideScreen = () => {
           navigation.navigate('LocationScreen', {
             destinationAddress: address,
             pickupAddress: selectedPickup,
-            serviceType: service, // Pass serviceType
+            serviceType: service,
           });
         },
         isSelectingDestination: true,
         currentPickup: selectedPickup,
         currentDestination: selectedDestination,
-        serviceType: service, // Pass serviceType
+        serviceType: service,
       });
     } else if (type === 'search') {
       navigation.navigate('SearchPlaceScreen', {
         isPickup: false,
         currentPickup: selectedPickup,
         currentDestination: selectedDestination,
-        serviceType: service, // Pass serviceType
+        serviceType: service,
       });
     } else {
       setSelectedDestination(option);
@@ -258,8 +273,6 @@ const RideScreen = () => {
   };
 
   const handleContinue = async () => {
-
-    
     // Button press animation
     Animated.sequence([
       Animated.timing(buttonScaleAnim, {
@@ -273,6 +286,9 @@ const RideScreen = () => {
         useNativeDriver: true,
       }),
     ]).start();
+
+    // Provide haptic feedback
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     // Ensure both pickup and destination are selected
     if (selectedPickup === 'Set pickup location' || selectedDestination === 'Choose your destination') {
@@ -304,11 +320,8 @@ const RideScreen = () => {
         address: selectedDestination,
       };
 
-      // Call the requestRide function from MapsApi.js
-      //await requestRide(pickup, dropoff,service);
-
-      // Navigate to the ride confirmation or next screen if needed
-      navigation.navigate('BookingScreen', { serviceType: service, pickup: pickup, destination: dropoff }); // Pass serviceType
+      // Navigate to the ride confirmation or next screen
+      navigation.navigate('BookingScreen', { serviceType: service, pickup: pickup, destination: dropoff });
     } catch (error) {
       Alert.alert('Error', 'An error occurred while fetching location details.');
       console.error(error);
@@ -318,18 +331,40 @@ const RideScreen = () => {
   };
 
   const animateTouchable = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.light);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   const navigateTo = (screen) => {
-    animateTouchable();  // Optional haptic feedback
+    animateTouchable();
     navigation.navigate(screen);
+  };
+
+  // Dynamically adjust sizes based on screen dimensions
+  const dynamicStyles = {
+    mapHeight: dimensions.height * (dimensions.height < 700 ? 0.2 : 0.25),
+    fontSize: {
+      small: dimensions.width * 0.03,
+      medium: dimensions.width * 0.04,
+      large: dimensions.width * 0.045,
+      xl: dimensions.width * 0.05,
+    },
+    padding: {
+      xs: dimensions.width * 0.02,
+      sm: dimensions.width * 0.03,
+      md: dimensions.width * 0.04,
+      lg: dimensions.width * 0.05,
+    },
+    iconSize: {
+      small: dimensions.width * 0.045,
+      medium: dimensions.width * 0.055,
+      large: dimensions.width * 0.065,
+    },
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <LinearGradient
-        colors={['#f5f5f5', '#ffffff']}
+        colors={['#f7f7f7', '#ffffff']}
         style={styles.container}
       >
         {/* Header */}
@@ -339,13 +374,14 @@ const RideScreen = () => {
             {
               opacity: fadeAnim,
               transform: [{ translateY: slideAnim }],
+              paddingVertical: dynamicStyles.padding.sm,
             },
           ]}
         >
           <TouchableOpacity onPress={() => navigateTo('LandingPageScreen')} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="#111" />
+            <Ionicons name="arrow-back" size={dynamicStyles.iconSize.medium} color="#111" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{service}</Text>
+          <Text style={[styles.headerTitle, { fontSize: dynamicStyles.fontSize.xl }]}>{service}</Text>
           <View style={styles.placeholder} />
         </Animated.View>
 
@@ -353,7 +389,7 @@ const RideScreen = () => {
         {isLoading && (
           <View style={styles.loadingOverlay}>
             <ActivityIndicator size="large" color="#111" />
-            <Text style={styles.loadingText}>Loading...</Text>
+            <Text style={[styles.loadingText, { fontSize: dynamicStyles.fontSize.medium }]}>Loading...</Text>
           </View>
         )}
 
@@ -363,6 +399,7 @@ const RideScreen = () => {
             style={[
               styles.mapPreview,
               {
+                height: dynamicStyles.mapHeight,
                 transform: [{ translateY: mapSlideAnim }],
                 opacity: fadeAnim,
               },
@@ -380,7 +417,7 @@ const RideScreen = () => {
                   opacity: fadeAnim,
                 }}
               >
-                <Text style={styles.mapText}>Where are you going today?</Text>
+                <Text style={[styles.mapText, { fontSize: dynamicStyles.fontSize.xl }]}>Where are you going today?</Text>
               </Animated.View>
             </View>
           </Animated.View>
@@ -391,6 +428,7 @@ const RideScreen = () => {
               {
                 transform: [{ translateY: cardSlideAnim }],
                 opacity: fadeAnim,
+                paddingHorizontal: dynamicStyles.padding.md,
               },
             ]}
           >
@@ -401,15 +439,21 @@ const RideScreen = () => {
                     styles.pickupDot,
                     {
                       transform: [{ scale: pickupDotAnim }],
+                      width: dimensions.width * 0.035,
+                      height: dimensions.width * 0.035,
+                      borderRadius: dimensions.width * 0.018,
                     },
                   ]}
                 />
-                <View style={styles.locationLine} />
+                <View style={[styles.locationLine, { height: dimensions.height * 0.04 }]} />
                 <Animated.View
                   style={[
                     styles.destinationDot,
                     {
                       transform: [{ scale: destinationDotAnim }],
+                      width: dimensions.width * 0.035,
+                      height: dimensions.width * 0.035,
+                      borderRadius: dimensions.width * 0.018,
                     },
                   ]}
                 />
@@ -418,23 +462,35 @@ const RideScreen = () => {
               <View style={styles.inputsWrapper}>
                 <View>
                   <TouchableOpacity
-                    style={[styles.input, pickupDropdownVisible && styles.inputActive]}
+                    style={[
+                      styles.input, 
+                      pickupDropdownVisible && styles.inputActive,
+                      { padding: dynamicStyles.padding.sm }
+                    ]}
                     activeOpacity={0.7}
                     onPress={togglePickupDropdown}
                   >
-                    <Text style={styles.inputLabel}>PICKUP</Text>
-                    <Text style={styles.inputText} numberOfLines={1}>
-                      {selectedPickup}
-                    </Text>
-                    <Animated.View
-                      style={{
-                        transform: [
-                          { rotate: pickupDropdownVisible ? '180deg' : '0deg' },
-                        ],
-                      }}
-                    >
-                      <Ionicons name="chevron-down" size={20} color="#111" />
-                    </Animated.View>
+                    <Text style={[styles.inputLabel, { fontSize: dynamicStyles.fontSize.small }]}>PICKUP</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <Text 
+                        style={[
+                          styles.inputText, 
+                          { fontSize: dynamicStyles.fontSize.medium, flex: 1 }
+                        ]} 
+                        numberOfLines={1}
+                      >
+                        {selectedPickup}
+                      </Text>
+                      <Animated.View
+                        style={{
+                          transform: [
+                            { rotate: pickupDropdownVisible ? '180deg' : '0deg' },
+                          ],
+                        }}
+                      >
+                        <MaterialIcons name="location-on" size={dynamicStyles.iconSize.medium} color="#111" />
+                      </Animated.View>
+                    </View>
                   </TouchableOpacity>
                   {pickupDropdownVisible && (
                     <Animated.View
@@ -447,33 +503,33 @@ const RideScreen = () => {
                       ]}
                     >
                       <TouchableOpacity
-                        style={styles.dropdownItem}
+                        style={[styles.dropdownItem, { padding: dynamicStyles.padding.sm }]}
                         onPress={() => selectPickupOption('Use current location', 'current')}
                       >
-                        <Ionicons name="locate-outline" size={20} color="#111" />
+                        <MaterialIcons name="my-location" size={dynamicStyles.iconSize.small} color="#111" />
                         <View style={styles.dropdownTextContainer}>
-                          <Text style={styles.dropdownItemText}>Use current location</Text>
-                          <Text style={styles.dropdownItemSubtext}>Fastest option</Text>
+                          <Text style={[styles.dropdownItemText, { fontSize: dynamicStyles.fontSize.medium }]}>Use current location</Text>
+                          <Text style={[styles.dropdownItemSubtext, { fontSize: dynamicStyles.fontSize.small }]}>Fastest option</Text>
                         </View>
                       </TouchableOpacity>
                       <TouchableOpacity
-                        style={styles.dropdownItem}
+                        style={[styles.dropdownItem, { padding: dynamicStyles.padding.sm }]}
                         onPress={() => selectPickupOption('Search for a place', 'search')}
                       >
-                        <Ionicons name="search-outline" size={20} color="#111" />
+                        <MaterialIcons name="search" size={dynamicStyles.iconSize.small} color="#111" />
                         <View style={styles.dropdownTextContainer}>
-                          <Text style={styles.dropdownItemText}>Search for a place</Text>
-                          <Text style={styles.dropdownItemSubtext}>Address, landmark, business</Text>
+                          <Text style={[styles.dropdownItemText, { fontSize: dynamicStyles.fontSize.medium }]}>Search for a place</Text>
+                          <Text style={[styles.dropdownItemSubtext, { fontSize: dynamicStyles.fontSize.small }]}>Address, landmark, business</Text>
                         </View>
                       </TouchableOpacity>
                       <TouchableOpacity
-                        style={styles.dropdownItem}
+                        style={[styles.dropdownItem, { padding: dynamicStyles.padding.sm }]}
                         onPress={() => selectPickupOption('Pick from map', 'map')}
                       >
-                        <Ionicons name="map-outline" size={20} color="#111" />
+                        <MaterialIcons name="map" size={dynamicStyles.iconSize.small} color="#111" />
                         <View style={styles.dropdownTextContainer}>
-                          <Text style={styles.dropdownItemText}>Pick from map</Text>
-                          <Text style={styles.dropdownItemSubtext}>Select a point on the map</Text>
+                          <Text style={[styles.dropdownItemText, { fontSize: dynamicStyles.fontSize.medium }]}>Pick from map</Text>
+                          <Text style={[styles.dropdownItemSubtext, { fontSize: dynamicStyles.fontSize.small }]}>Select a point on the map</Text>
                         </View>
                       </TouchableOpacity>
                     </Animated.View>
@@ -482,23 +538,35 @@ const RideScreen = () => {
 
                 <View>
                   <TouchableOpacity
-                    style={[styles.input, destinationDropdownVisible && styles.inputActive]}
+                    style={[
+                      styles.input, 
+                      destinationDropdownVisible && styles.inputActive,
+                      { padding: dynamicStyles.padding.sm }
+                    ]}
                     activeOpacity={0.7}
                     onPress={toggleDestinationDropdown}
                   >
-                    <Text style={styles.inputLabel}>DESTINATION</Text>
-                    <Text style={styles.inputText} numberOfLines={1}>
-                      {selectedDestination}
-                    </Text>
-                    <Animated.View
-                      style={{
-                        transform: [
-                          { rotate: destinationDropdownVisible ? '180deg' : '0deg' },
-                        ],
-                      }}
-                    >
-                      <Ionicons name="chevron-down" size={20} color="#111" />
-                    </Animated.View>
+                    <Text style={[styles.inputLabel, { fontSize: dynamicStyles.fontSize.small }]}>DESTINATION</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <Text 
+                        style={[
+                          styles.inputText, 
+                          { fontSize: dynamicStyles.fontSize.medium, flex: 1 }
+                        ]} 
+                        numberOfLines={1}
+                      >
+                        {selectedDestination}
+                      </Text>
+                      <Animated.View
+                        style={{
+                          transform: [
+                            { rotate: destinationDropdownVisible ? '180deg' : '0deg' },
+                          ],
+                        }}
+                      >
+                        <MaterialIcons name="location-on" size={dynamicStyles.iconSize.medium} color="#4CAF50" />
+                      </Animated.View>
+                    </View>
                   </TouchableOpacity>
                   {destinationDropdownVisible && (
                     <Animated.View
@@ -511,23 +579,23 @@ const RideScreen = () => {
                       ]}
                     >
                       <TouchableOpacity
-                        style={styles.dropdownItem}
+                        style={[styles.dropdownItem, { padding: dynamicStyles.padding.sm }]}
                         onPress={() => selectDestinationOption('Search for a place', 'search')}
                       >
-                        <Ionicons name="search-outline" size={20} color="#111" />
+                        <MaterialIcons name="search" size={dynamicStyles.iconSize.small} color="#111" />
                         <View style={styles.dropdownTextContainer}>
-                          <Text style={styles.dropdownItemText}>Search for a place</Text>
-                          <Text style={styles.dropdownItemSubtext}>Address, landmark, business</Text>
+                          <Text style={[styles.dropdownItemText, { fontSize: dynamicStyles.fontSize.medium }]}>Search for a place</Text>
+                          <Text style={[styles.dropdownItemSubtext, { fontSize: dynamicStyles.fontSize.small }]}>Address, landmark, business</Text>
                         </View>
                       </TouchableOpacity>
                       <TouchableOpacity
-                        style={styles.dropdownItem}
+                        style={[styles.dropdownItem, { padding: dynamicStyles.padding.sm }]}
                         onPress={() => selectDestinationOption('Pick from map', 'map')}
                       >
-                        <Ionicons name="map-outline" size={20} color="#111" />
+                        <MaterialIcons name="map" size={dynamicStyles.iconSize.small} color="#111" />
                         <View style={styles.dropdownTextContainer}>
-                          <Text style={styles.dropdownItemText}>Pick from map</Text>
-                          <Text style={styles.dropdownItemSubtext}>Select a point on the map</Text>
+                          <Text style={[styles.dropdownItemText, { fontSize: dynamicStyles.fontSize.medium }]}>Pick from map</Text>
+                          <Text style={[styles.dropdownItemSubtext, { fontSize: dynamicStyles.fontSize.small }]}>Select a point on the map</Text>
                         </View>
                       </TouchableOpacity>
                     </Animated.View>
@@ -537,29 +605,29 @@ const RideScreen = () => {
             </View>
 
             <View style={styles.recentLocations}>
-              <Text style={styles.recentTitle}>Recent Locations</Text>
+              <Text style={[styles.recentTitle, { fontSize: dynamicStyles.fontSize.large }]}>Recent Locations</Text>
               <TouchableOpacity
-                style={styles.recentItem}
+                style={[styles.recentItem, { padding: dynamicStyles.padding.sm }]}
                 onPress={() => selectDestinationOption('Home - 123 Main St', 'saved')}
               >
-                <Ionicons name="home-outline" size={20} color="#111" />
+                <MaterialIcons name="home" size={dynamicStyles.iconSize.small} color="#111" />
                 <View style={styles.recentTextContainer}>
-                  <Text style={styles.recentItemText}>Home</Text>
-                  <Text style={styles.recentItemSubtext}>123 Main St</Text>
+                  <Text style={[styles.recentItemText, { fontSize: dynamicStyles.fontSize.medium }]}>Home</Text>
+                  <Text style={[styles.recentItemSubtext, { fontSize: dynamicStyles.fontSize.small }]}>123 Main St</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={18} color="#777" />
+                <MaterialIcons name="arrow-forward-ios" size={dynamicStyles.iconSize.small * 0.8} color="#777" />
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.recentItem}
+                style={[styles.recentItem, { padding: dynamicStyles.padding.sm }]}
                 onPress={() => selectDestinationOption('Work - 456 Office Park', 'saved')}
               >
-                <Ionicons name="briefcase-outline" size={20} color="#111" />
+                <MaterialIcons name="work" size={dynamicStyles.iconSize.small} color="#111" />
                 <View style={styles.recentTextContainer}>
-                  <Text style={styles.recentItemText}>Work</Text>
-                  <Text style={styles.recentItemSubtext}>456 Office Park</Text>
+                  <Text style={[styles.recentItemText, { fontSize: dynamicStyles.fontSize.medium }]}>Work</Text>
+                  <Text style={[styles.recentItemSubtext, { fontSize: dynamicStyles.fontSize.small }]}>456 Office Park</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={18} color="#777" />
+                <MaterialIcons name="arrow-forward-ios" size={dynamicStyles.iconSize.small * 0.8} color="#777" />
               </TouchableOpacity>
             </View>
           </Animated.View>
@@ -571,6 +639,7 @@ const RideScreen = () => {
             styles.footer,
             {
               opacity: fadeAnim,
+              padding: dynamicStyles.padding.md,
             },
           ]}
         >
@@ -580,13 +649,13 @@ const RideScreen = () => {
             }}
           >
             <TouchableOpacity
-              style={styles.continueButton}
+              style={[styles.continueButton, { padding: dynamicStyles.padding.sm }]}
               activeOpacity={0.8}
               onPress={handleContinue}
               disabled={isLoading}
             >
-              <Text style={styles.continueButtonText}>Continue</Text>
-              <Ionicons name="arrow-forward" size={20} color="#fff" />
+              <Text style={[styles.continueButtonText, { fontSize: dynamicStyles.fontSize.large }]}>Continue</Text>
+              <MaterialIcons name="arrow-forward" size={dynamicStyles.iconSize.small} color="#fff" />
             </TouchableOpacity>
           </Animated.View>
         </Animated.View>

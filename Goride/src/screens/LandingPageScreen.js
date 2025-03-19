@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { 
   StyleSheet, 
   Text, 
@@ -8,33 +8,45 @@ import {
   ScrollView, 
   SafeAreaView, 
   StatusBar, 
-  Dimensions, 
   Platform, 
-  Animated 
+  Animated,
+  useWindowDimensions
 } from 'react-native';
 import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import Carousel from 'react-native-reanimated-carousel';
-import { useNavigation,useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SharedElement } from 'react-navigation-shared-element';
 import * as Haptics from 'expo-haptics';
 import { BlurView } from 'expo-blur';
 
-
-
 export default function HomeScreen() {
+  // Use the hook for responsive dimensions
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const navigation = useNavigation();
-  const windowWidth = Dimensions.get('window').width;
-  const windowHeight = Dimensions.get('window').height;
-  const isSmallDevice = windowWidth < 375;
-  const isTablet = windowWidth > 768;
+  
+  // Dynamically determine device size
+  const [deviceSize, setDeviceSize] = useState({
+    isSmallDevice: windowWidth < 375,
+    isTablet: windowWidth > 768
+  });
+
+  // Update device size on dimension changes
+  useEffect(() => {
+    setDeviceSize({
+      isSmallDevice: windowWidth < 375,
+      isTablet: windowWidth > 768
+    });
+  }, [windowWidth]);
+  
+  // Destructure for cleaner code
+  const { isSmallDevice, isTablet } = deviceSize;
   
   // Animated values
   const scrollY = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
   const translateYAnim = useRef(new Animated.Value(30)).current;
-  
   
   // Responsive size calculations
   const fontSize = {
@@ -51,7 +63,7 @@ export default function HomeScreen() {
     large: isSmallDevice ? 16 : (isTablet ? 32 : 24),
   };
 
-  // Modern carousel images with better quality
+  // Modern carousel images with better quality and error handling
   const carouselItems = [
     { 
       uri: 'https://www.apurple.co/wp-content/uploads/2023/01/Book-A-Ride.jpg',
@@ -118,9 +130,13 @@ export default function HomeScreen() {
     extrapolate: 'clamp',
   });
 
-  // Animation for touchable feedback
+  // Animation for touchable feedback with error handling
   const animateTouchable = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch (error) {
+      console.log('Haptics not available');
+    }
   };
 
   // Navigation with transition
@@ -128,6 +144,10 @@ export default function HomeScreen() {
     animateTouchable();
     navigation.navigate(screen, params);
   };
+
+  // Calculate carousel dimensions dynamically
+  const carouselWidth = windowWidth - (spacing.medium * 2);
+  const carouselHeight = isTablet ? windowWidth * 0.25 : windowWidth * 0.4;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -149,7 +169,7 @@ export default function HomeScreen() {
       >
         <BlurView intensity={80} tint="dark" style={styles.headerBlur}>
           <LinearGradient
-            colors={['rgba(26,26,26,0.8)', 'rgba(18,18,18,0.85)']}
+            colors={['black', 'black']}
             style={styles.headerGradient}
           >
             <View style={styles.headerLogo}>
@@ -157,13 +177,13 @@ export default function HomeScreen() {
               <Text style={[styles.logoText, {fontSize: fontSize.medium}]}>KARGAMOTO</Text>
             </View>
             <TouchableOpacity
-  style={styles.menuButton}
-  onPress={() => navigateTo('MessagesScreen')}
->
-  <View style={styles.messageIconContainer}>
-    <Ionicons name="chatbubble-ellipses" size={isTablet ? 24 : 18} color="#FFFFFF" />
-  </View>
-</TouchableOpacity>
+              style={styles.menuButton}
+              onPress={() => navigateTo('MessagesScreen')}
+            >
+              <View style={styles.messageIconContainer}>
+                <Ionicons name="chatbubble-ellipses" size={isTablet ? 24 : 18} color="#FFFFFF" />
+              </View>
+            </TouchableOpacity>
           </LinearGradient>
         </BlurView>
       </Animated.View>
@@ -184,7 +204,9 @@ export default function HomeScreen() {
             styles.walletCard,
             {
               opacity: fadeAnim,
-              transform: [{ scale: scaleAnim }]
+              transform: [{ scale: scaleAnim }],
+              marginHorizontal: spacing.medium,
+              marginTop: spacing.medium
             }
           ]}
         >
@@ -214,8 +236,6 @@ export default function HomeScreen() {
                 </LinearGradient>
               </TouchableOpacity>
             </View>
-          
-           
           </LinearGradient>
         </Animated.View>
         
@@ -225,12 +245,14 @@ export default function HomeScreen() {
             styles.rideOptionsContainer,
             {
               opacity: fadeAnim,
-              transform: [{ translateY: translateYAnim }]
+              transform: [{ translateY: translateYAnim }],
+              marginHorizontal: spacing.medium,
+              marginTop: spacing.medium
             }
           ]}
         >
           <TouchableOpacity 
-            style={styles.rideOption} 
+            style={[styles.rideOption, { marginRight: spacing.small / 2 }]} 
             onPress={() => navigateTo('RideScreen', { serviceType: 'Ride' })}
             activeOpacity={0.8}
           >
@@ -241,18 +263,19 @@ export default function HomeScreen() {
               <View style={styles.rideOptionContent}>
                 <Image 
                   source={require('../../assets/kms.png')} 
-                  style={styles.rideOptionImage} 
+                  style={[styles.rideOptionImage, {width: isTablet ? 60 : 40, height: isTablet ? 60 : 40}]} 
+                  resizeMode="contain"
                 />
                 <View style={styles.rideTextContainer}>
                   <Text style={[styles.rideOptionText, { fontSize: fontSize.medium }]}>RIDE</Text>
-                  <Text style={styles.rideOptionSubtext}>Book now</Text>
+                  <Text style={[styles.rideOptionSubtext, { fontSize: fontSize.small }]}>Book now</Text>
                 </View>
               </View>
             </LinearGradient>
           </TouchableOpacity>
           
           <TouchableOpacity 
-            style={styles.rideOption}
+            style={[styles.rideOption, { marginLeft: spacing.small / 2 }]}
             onPress={() => navigateTo('RideScreen', { serviceType: 'Delivery' })}
             activeOpacity={0.8}
           >
@@ -263,11 +286,12 @@ export default function HomeScreen() {
               <View style={styles.rideOptionContent}>
                 <Image 
                   source={require('../../assets/kms.png')} 
-                  style={styles.rideOptionImage} 
+                  style={[styles.rideOptionImage, {width: isTablet ? 60 : 40, height: isTablet ? 60 : 40}]}
+                  resizeMode="contain"
                 />
                 <View style={styles.rideTextContainer}>
                   <Text style={[styles.rideOptionText, { fontSize: fontSize.medium }]}>DELIVERY</Text>
-                  <Text style={styles.rideOptionSubtext}>Send packages</Text>
+                  <Text style={[styles.rideOptionSubtext, { fontSize: fontSize.small }]}>Send packages</Text>
                 </View>
               </View>
             </LinearGradient>
@@ -280,32 +304,48 @@ export default function HomeScreen() {
             styles.recentSection,
             {
               opacity: fadeAnim,
-              transform: [{ translateY: translateYAnim }]
+              transform: [{ translateY: translateYAnim }],
+              marginTop: spacing.medium,
+              paddingHorizontal: spacing.medium
             }
           ]}
         >
           <View style={styles.sectionTitleContainer}>
             <Text style={[styles.sectionTitle, {fontSize: fontSize.medium}]}>Recent Places</Text>
             <TouchableOpacity style={styles.seeAllButton}>
-              <Text style={styles.seeAllText}>See All</Text>
+              <Text style={[styles.seeAllText, {fontSize: fontSize.small}]}>See All</Text>
             </TouchableOpacity>
           </View>
           
           <ScrollView 
             horizontal 
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.recentScrollContent}
+            contentContainerStyle={[styles.recentScrollContent, {paddingVertical: spacing.small}]}
           >
             {recentDestinations.map((item, index) => (
               <TouchableOpacity 
                 key={index} 
-                style={styles.recentItem}
+                style={[
+                  styles.recentItem,
+                  {
+                    marginRight: spacing.small,
+                    padding: spacing.small,
+                    minWidth: isTablet ? 120 : 90
+                  }
+                ]}
                 onPress={animateTouchable}
               >
-                <View style={styles.recentIconContainer}>
-                  <FontAwesome5 name={item.icon} size={16} color="#FFD700" />
+                <View style={[
+                  styles.recentIconContainer,
+                  {
+                    width: isTablet ? 42 : 32,
+                    height: isTablet ? 42 : 32,
+                    marginBottom: spacing.xs
+                  }
+                ]}>
+                  <FontAwesome5 name={item.icon} size={isTablet ? 18 : 14} color="#FFD700" />
                 </View>
-                <Text style={styles.recentText}>{item.name}</Text>
+                <Text style={[styles.recentText, {fontSize: fontSize.small}]}>{item.name}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -317,14 +357,16 @@ export default function HomeScreen() {
             styles.featuresSection,
             {
               opacity: fadeAnim,
-              transform: [{ translateY: translateYAnim }]
+              transform: [{ translateY: translateYAnim }],
+              marginTop: spacing.medium,
+              paddingHorizontal: spacing.medium
             }
           ]}
         >
           <View style={styles.sectionTitleContainer}>
             <Text style={[styles.sectionTitle, {fontSize: fontSize.medium}]}>Featured</Text>
             <TouchableOpacity style={styles.seeAllButton}>
-              <Text style={styles.seeAllText}>Explore</Text>
+              <Text style={[styles.seeAllText, {fontSize: fontSize.small}]}>Explore</Text>
             </TouchableOpacity>
           </View>
           
@@ -332,8 +374,8 @@ export default function HomeScreen() {
           <View style={styles.carouselContainer}>
             <Carousel
               loop
-              width={windowWidth - (spacing.medium * 2)}
-              height={isTablet ? 260 : 180}
+              width={carouselWidth}
+              height={carouselHeight}
               autoPlay={true}
               autoPlayInterval={5000}
               data={carouselItems}
@@ -342,96 +384,92 @@ export default function HomeScreen() {
                 <TouchableOpacity 
                   activeOpacity={0.9}
                   onPress={animateTouchable}
-                  style={styles.carouselItemContainer}
+                  style={[styles.carouselItemContainer, {borderRadius: spacing.small}]}
                 >
                   <SharedElement id={`item.${index}.image`}>
                     <Image 
                       source={{ uri: item.uri }} 
                       style={styles.carouselImage} 
-                      resizeMode="cover" 
+                      resizeMode="cover"
+                      defaultSource={require('../../assets/kms.png')} // Fallback image
                     />
                   </SharedElement>
                   <LinearGradient
                     colors={['transparent', 'rgba(0,0,0,0.8)']}
                     style={styles.carouselGradient}
                   >
-                    <Text style={styles.carouselTitle}>{item.title}</Text>
-                    <Text style={styles.carouselDescription}>{item.description}</Text>
+                    <Text style={[styles.carouselTitle, {fontSize: fontSize.medium}]}>{item.title}</Text>
+                    <Text style={[styles.carouselDescription, {fontSize: fontSize.small}]}>{item.description}</Text>
                   </LinearGradient>
                 </TouchableOpacity>
               )}
             />
-          
           </View>
-        
         </Animated.View>
       </Animated.ScrollView>
       
-      {/* Modernized Bottom Navigation with Glass Effect*/}
+      {/* Modernized Bottom Navigation with Glass Effect */}
       <BlurView intensity={90} tint="dark" style={styles.bottomNavBlur}>
-  <Animated.View
-    style={[
-      styles.bottomNav,
-      {
-        opacity: fadeAnim,
-        transform: [{ translateY: translateYAnim }]
-      }
-    ]}
-  >
-    <LinearGradient
-      colors={['rgba(26,26,26,0.8)', 'rgba(0,0,0,0.85)']}
-      style={styles.bottomNavGradient}
-    >
-      {[
-        { name: 'home', label: 'Home', screen: 'LandingPageScreen', active: true },
-        { name: 'heart-outline', label: 'Favorites', screen: 'Favorites', active:true },
-        { name: 'person-outline', label: 'Profile', screen: 'ProfilesettingScreen', active:true },
-      ].map((item, index) => (
-        <TouchableOpacity
-          key={index}
-          style={styles.navItem}
-          onPress={() => navigation.navigate(item.screen)}
-          activeOpacity={0.7}
+        <Animated.View
+          style={[
+            styles.bottomNav,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: translateYAnim }]
+            }
+          ]}
         >
-          {item.active && <View style={styles.activeIndicator} />}
-          <Ionicons
-            name={item.name}
-            size={isTablet ? 24 : 22}
-            color={item.active ? "#FFD700" : "#FFFFFF"}
-          />
-          <Text
-            style={[
-              styles.navText,
-              { fontSize: fontSize.small, color: item.active ? "#FFD700" : "#FFFFFF" }
-            ]}
+          <LinearGradient
+            colors={['black', 'rgba(0,0,0,0.85)']}
+            style={styles.bottomNavGradient}
           >
-            {item.label}
-          </Text>
-        </TouchableOpacity>
-      ))}
-    </LinearGradient>
-  </Animated.View>
-</BlurView>;
+            {[
+              { name: 'home', label: 'Home', screen: 'LandingPageScreen', active: true },
+              { name: 'heart-outline', label: 'Favorites', screen: 'Favorites', active: false },
+              { name: 'person-outline', label: 'Profile', screen: 'ProfilesettingScreen', active: false },
+            ].map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.navItem}
+                onPress={() => navigateTo(item.screen)}
+                activeOpacity={0.7}
+              >
+                {item.active && <View style={styles.activeIndicator} />}
+                <Ionicons
+                  name={item.name}
+                  size={isTablet ? 24 : 22}
+                  color={item.active ? "#FFD700" : "#FFFFFF"}
+                />
+                <Text
+                  style={[
+                    styles.navText,
+                    { fontSize: fontSize.small, color: item.active ? "#FFD700" : "#FFFFFF" }
+                  ]}
+                >
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </LinearGradient>
+        </Animated.View>
+      </BlurView>
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
-  
   container: {
     flex: 1,
-    backgroundColor: '#121212',
+    backgroundColor: '#000000',
   },
   header: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    zIndex: 100,
+    zIndex: 10,
   },
   headerBlur: {
-    width: '100%',
-    height: '100%',
+    flex: 1,
   },
   headerGradient: {
     flexDirection: 'row',
@@ -449,211 +487,149 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   logoText: {
-    fontWeight: '700',
     color: '#FFFFFF',
-    letterSpacing: 0.5,
+    fontWeight: 'bold',
   },
-  profileIconContainer: {
+  menuButton: {
+    padding: 8,
+  },
+  messageIconContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    padding: 8,
     borderRadius: 20,
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   content: {
     flex: 1,
-    paddingTop: Platform.OS === 'ios' ? 120 : 100,
-    paddingHorizontal: 16,
+    paddingTop: Platform.OS === 'ios' ? 110 : 90,
   },
   walletCard: {
-    borderRadius: 20,
-    marginBottom: 24,
+    borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
     elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
   walletGradient: {
-    padding: 20,
-    borderRadius: 20,
+    padding: 16,
+    borderRadius: 16,
   },
   walletHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   walletTitle: {
-    fontWeight: '600',
     color: '#FFFFFF',
-    letterSpacing: 0.5,
+    fontWeight: '500',
   },
   balanceRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 20,
+    justifyContent: 'space-between',
   },
   balanceAmount: {
-    fontWeight: 'bold',
     color: '#FFFFFF',
-    letterSpacing: 0.5,
+    fontWeight: 'bold',
   },
   depositButton: {
-    borderRadius: 12,
+    borderRadius: 20,
     overflow: 'hidden',
   },
   depositGradient: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
   },
   depositText: {
-    fontWeight: '600',
     color: '#000000',
-    letterSpacing: 0.5,
-  },
-  quickActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  actionButton: {
-    alignItems: 'center',
-  },
-  actionIconWrapper: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255, 215, 0, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  actionText: {
-    color: '#DDDDDD',
-    fontSize: 12,
+    fontWeight: 'bold',
   },
   rideOptionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 24,
   },
   rideOption: {
-    width: '48%',
-    borderRadius: 18,
+    flex: 1,
+    borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
   rideGradient: {
     padding: 16,
-    height: 100,
-    justifyContent: 'center',
+    borderRadius: 16,
   },
   rideOptionContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
   },
   rideOptionImage: {
-    width: 60,
-    height: 60,
+    marginRight: 12,
   },
   rideTextContainer: {
     flex: 1,
-    alignItems: 'center',
   },
   rideOptionText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: 'white',
-    letterSpacing: 1,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
   },
   rideOptionSubtext: {
-    fontSize: 12,
-    color: '#BBBBBB',
+    color: '#AAAAAA',
     marginTop: 4,
   },
   recentSection: {
-    marginBottom: 24,
-  },
-  recentScrollContent: {
-    paddingRight: 16,
-  },
-  recentItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1A1A1A',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 12,
-    marginRight: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  recentIconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255, 215, 0, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  recentText: {
-    color: '#FFFFFF',
-    fontWeight: '500',
+    width: '100%',
   },
   sectionTitleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   sectionTitle: {
-    fontWeight: '600',
     color: '#FFFFFF',
-    letterSpacing: 0.5,
+    fontWeight: 'bold',
   },
   seeAllButton: {
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    padding: 4,
   },
   seeAllText: {
     color: '#FFD700',
-    fontSize: 12,
-    fontWeight: '500',
+  },
+  recentScrollContent: {
+    paddingBottom: 12,
+  },
+  recentItem: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  recentIconContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  recentText: {
+    color: '#FFFFFF',
+    textAlign: 'center',
   },
   featuresSection: {
-    marginBottom: 16,
+    width: '100%',
   },
   carouselContainer: {
     alignItems: 'center',
-    marginBottom: 50,
+    marginVertical: 20,
   },
   carouselItemContainer: {
-    borderRadius: 20,
     overflow: 'hidden',
-    elevation: 5,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    width: '100%',
     height: '100%',
   },
   carouselImage: {
@@ -666,74 +642,16 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 16,
+    height: '50%',
+    justifyContent: 'flex-end',
   },
   carouselTitle: {
     color: '#FFFFFF',
     fontWeight: 'bold',
-    fontSize: 18,
     marginBottom: 4,
   },
   carouselDescription: {
-    color: '#EEEEEE',
-    fontSize: 14,
-  },
-  indicatorContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 12,
-  },
-  indicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    marginHorizontal: 4,
-  },
-  activeIndicator: {
-    backgroundColor: '#FFD700',
-    width: 16,
-  },
-  promotionsContainer: {
-    marginBottom: 24,
-  },
-  promotionCard: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  promotionGradient: {
-    padding: 20,
-    borderRadius: 20,
-  },
-  promotionContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  promotionTitle: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontSize: 18,
-    marginBottom: 4,
-  },
-  promotionDescription: {
-    color: '#EEEEEE',
-    fontSize: 14,
-    maxWidth: '80%',
-  },
-  promotionButton: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 10,
-  },
-  promotionButtonText: {
-    color: '#7B1FA2',
-    fontWeight: 'bold',
+    color: '#DDDDDD',
   },
   bottomNavBlur: {
     position: 'absolute',
@@ -742,26 +660,30 @@ const styles = StyleSheet.create({
     right: 0,
   },
   bottomNav: {
-    paddingHorizontal: 16,
-    paddingBottom: Platform.OS === 'ios' ? 24 : 16,
+    width: '100%',
+    backgroundColor:'black'
   },
   bottomNavGradient: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: 10,
-    borderRadius: 50,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    paddingVertical: 12,
+    paddingBottom: Platform.OS === 'ios' ? 28 : 12,
   },
   navItem: {
     alignItems: 'center',
-    paddingHorizontal: 16,
+    justifyContent: 'center',
     position: 'relative',
+    paddingHorizontal: 16,
+  },
+  activeIndicator: {
+    position: 'absolute',
+    top: -12,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#FFD700',
   },
   navText: {
-    marginTop: 6,
-    fontWeight: '500',
+    marginTop: 4,
   },
-
-  
 });

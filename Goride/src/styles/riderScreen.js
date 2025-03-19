@@ -1,11 +1,11 @@
-import { StyleSheet, Dimensions, Platform, StatusBar} from 'react-native';
+import { StyleSheet, Dimensions, Platform, StatusBar } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f7f7f7',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   container: {
@@ -18,14 +18,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 0.05,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
+    paddingTop: Platform.OS === 'ios' ? 0 : 10,
+    paddingBottom: 10,
   },
   backButton: {
     padding: 8,
   },
   headerTitle: {
-    fontSize: width * 0.05,
     fontWeight: '600',
     color: '#111',
+    letterSpacing: 0.5,
   },
   placeholder: {
     width: 40,
@@ -34,14 +36,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   mapPreview: {
-    height: height * 0.25,
     width: '100%',
     position: 'relative',
+    overflow: 'hidden',
   },
   mapImage: {
     width: '100%',
     height: '120%',
-    opacity: 0.8, // Reduced opacity for black and white theme
+    opacity: 0.9,
   },
   mapOverlay: {
     position: 'absolute',
@@ -49,14 +51,12 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.4)', // Darker overlay for contrast
+    backgroundColor: 'rgba(0,0,0,0.35)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   mapText: {
     color: '#fff',
-    marginTop:'25%',
-    fontSize: width * 0.05,
     fontWeight: '600',
     textShadowColor: 'rgba(0,0,0,0.7)',
     textShadowOffset: { width: 1, height: 1 },
@@ -65,10 +65,9 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     marginTop: -20,
-    paddingHorizontal: width * 0.05,
     paddingTop: height * 0.03,
     flex: 1,
     shadowColor: '#000',
@@ -80,51 +79,60 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     width: '100%',
-    marginBottom: height * 0.03,
+    marginBottom: height * 0.025,
   },
   locationIconContainer: {
-    width: 30,
+    width: width * 0.08,
     alignItems: 'center',
     marginRight: 10,
     paddingTop: 20,
   },
   pickupDot: {
-    width: 12,
-    height: 12,
     borderRadius: 6,
     backgroundColor: '#111',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
   },
   locationLine: {
     width: 2,
-    height: 30,
     backgroundColor: '#ddd',
     marginVertical: 5,
   },
   destinationDot: {
-    width: 12,
-    height: 12,
     borderRadius: 6,
-    backgroundColor: '#4CAF50', // Changed to green
+    backgroundColor: '#4CAF50',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
   },
   inputsWrapper: {
     flex: 1,
   },
   input: {
     backgroundColor: '#f9f9f9',
-    padding: height * 0.018,
-    borderRadius: 10,
+    borderRadius: 12,
     marginBottom: height * 0.015,
     borderWidth: 1,
     borderColor: '#e0e0e0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
   },
   inputActive: {
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
     borderBottomWidth: 0,
     borderColor: '#222',
+    backgroundColor: '#f5f5f5',
   },
   inputLabel: {
-    fontSize: width * 0.03,
     color: '#777',
     marginBottom: 4,
     fontWeight: '500',
@@ -132,14 +140,12 @@ const styles = StyleSheet.create({
   },
   inputText: {
     color: '#111',
-    fontSize: width * 0.04,
     fontWeight: '500',
-    marginRight: 20,
   },
   dropdownContainer: {
     backgroundColor: '#f9f9f9',
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
     marginBottom: height * 0.015,
     borderWidth: 1,
     borderColor: '#222',
@@ -151,78 +157,75 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     zIndex: 20,
   },
+
   dropdownItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: height * 0.018,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#eee',
   },
   dropdownTextContainer: {
-    marginLeft: 10,
     flex: 1,
+    marginLeft: 10,
   },
   dropdownItemText: {
     color: '#111',
-    fontSize: width * 0.04,
     fontWeight: '500',
   },
   dropdownItemSubtext: {
     color: '#777',
-    fontSize: width * 0.03,
     marginTop: 2,
   },
   recentLocations: {
-    marginTop: height * 0.01,
+    marginTop: 15,
   },
   recentTitle: {
-    fontSize: width * 0.045,
     fontWeight: '600',
     color: '#111',
-    marginBottom: height * 0.015,
-    letterSpacing: 0.5,
+    marginBottom: 10,
   },
   recentItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: height * 0.018,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    backgroundColor: '#f9f9f9',
+    borderRadius: 12,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
   },
   recentTextContainer: {
-    marginLeft: 10,
     flex: 1,
+    marginLeft: 10,
   },
   recentItemText: {
     color: '#111',
-    fontSize: width * 0.04,
     fontWeight: '500',
   },
   recentItemSubtext: {
     color: '#777',
-    fontSize: width * 0.03,
     marginTop: 2,
   },
   footer: {
-    padding: width * 0.05,
-    backgroundColor: '#fff',
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: '#e0e0e0',
+    backgroundColor: '#fff',
   },
   continueButton: {
     backgroundColor: '#111',
-    borderRadius: 10,
-    padding: height * 0.018,
+    borderRadius: 12,
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   continueButtonText: {
     color: '#fff',
-    fontSize: width * 0.045,
     fontWeight: '600',
-    marginRight: 10,
-    letterSpacing: 0.5,
+    marginRight: 8,
   },
   loadingOverlay: {
     position: 'absolute',
@@ -230,16 +233,16 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: 'rgba(255,255,255,0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 100,
+    zIndex: 9999,
   },
   loadingText: {
     marginTop: 10,
-    fontSize: width * 0.04,
-    fontWeight: '500',
     color: '#111',
+    fontWeight: '500',
   }
-});
-export default styles;
+  });
+  
+  export default styles;
