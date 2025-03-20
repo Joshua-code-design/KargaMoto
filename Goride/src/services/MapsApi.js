@@ -5,26 +5,25 @@ import { Alert, Animated } from 'react-native';
   // const API_URL = "https://kargamotoapi.onrender.com/api";
   const API_URL = "http://192.168.1.30:5000/api";
 
-  export const requestRide = async (pickup, dropoff,service) => {
+  export const requestRide = async (pickup, destination,serviceType,fare) => {
     try {
         const token = await AsyncStorage.getItem('token');
-        const fare = 1000;
 
         // console.log("pickup:", pickup);
         // console.log("dropoff:", dropoff);
         // console.log("serviceType:", ServiceType);
 
         const response = await axios.post(`${API_URL}/book-service`, {
-            booking_type: service,
+            booking_type: serviceType,
             pickup_location: {
                 latitude: pickup.latitude,
                 longitude: pickup.longitude,
                 address: pickup.address
             },
             dropoff_location: {
-                latitude: dropoff.latitude,
-                longitude: dropoff.longitude,
-                address: dropoff.address
+                latitude: destination.latitude,
+                longitude: destination.longitude,
+                address: destination.address
             },
             fare: fare,
             status: "requested"
@@ -81,9 +80,6 @@ export const addFavorites = async (home, work) => {
 };
 
 
-export const calculateDistance = async (pickup, destination) => {
-
-};
 
 
 
