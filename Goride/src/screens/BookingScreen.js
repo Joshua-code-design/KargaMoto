@@ -19,6 +19,7 @@ import MapView, { Marker, Polyline } from "react-native-maps";
 import { ActivityIndicator } from "react-native";
 import { decode } from "@mapbox/polyline";
 import { calculateDistanceAndETA } from '../services/Geocoding';
+import { requestRide } from '../services/MapsApi';
 
 // Get device dimensions and pixel ratio for true responsiveness
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -115,6 +116,33 @@ const BookingConfirmationScreen = ({ navigation }) => {
       setFare(Math.round(totalPayment));
     }
   };
+
+  const onConfirmBooking = async () => {
+    try {   
+      if (!fare || isNaN(fare) || fare <= 0) {
+        console.error("Invalid fare value:", fare);
+        Alert.alert("Error", "Failed to calculate fare. Please try again.");
+        return;
+      }
+      if(!serviceType){
+        console.error("Invalid service type:", serviceType);    
+        Alert.alert("Error", "Failed to calculate service type. Please try again.");
+        return; 
+      }
+      if(!pickup || !destination){    
+        console.error("Invalid location:", pickup, destination);
+        Alert.alert("Error", "Failed to calculate location. Please try again.");      
+        return;
+      }
+      
+      await requestRide(pickup, destination,serviceType, fare);
+      Alert.alert("Success", "Your ride has been successfully requested.");
+
+    } catch (error) {
+      console.error("Error requesting ride:", error);
+      Alert.alert("Error", "Failed to request ride. Please try again.");
+    }
+  }
   
   // Show alert when screen loads
   useEffect(() => {
@@ -272,7 +300,7 @@ const BookingConfirmationScreen = ({ navigation }) => {
             <Text style={styles.fareAmount}>₱ {fare ? fare.toFixed(2) : '0.00'}</Text>
           </View>
           <TouchableOpacity style={styles.confirmButton}>
-            <Text style={styles.confirmButtonText}>Confirm Booking</Text>
+            <Text style={styles.confirmButtonText} onPress={onConfirmBooking}>Confirm Booking</Text>
           </TouchableOpacity>
         </View>
       </View>
