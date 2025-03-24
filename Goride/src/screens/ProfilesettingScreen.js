@@ -178,14 +178,6 @@ export default function ProfileScreen() {
                 <Icon name="chevron-right" size={normalize(20)} color="white" />
               </TouchableOpacity>
 
-              <TouchableOpacity 
-                style={styles.settingsButton}
-                onPress={() => navigation.navigate('EditProfile')}
-              >
-                <Icon name="map-marker-outline" size={normalize(20)} color="white" />
-                <Text style={styles.settingsButtonText}>Address</Text>
-                <Icon name="chevron-right" size={normalize(20)} color="white" />
-              </TouchableOpacity>
 
               <TouchableOpacity 
                 style={styles.settingsButton}

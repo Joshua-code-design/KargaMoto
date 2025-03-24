@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions, Platform, PixelRatio } from 'react-native';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 // Get device dimensions
 const { width, height } = Dimensions.get('window');
@@ -23,15 +24,17 @@ const isLargeTablet = width > 900;
 
 // Helper for responsive margin, padding based on screen size
 const responsive = {
-  padding: isTablet ? normalize(30) : normalize(24),
-  margin: isTablet ? normalize(25) : normalize(20),
+  padding: isTablet ? normalize(40) : normalize(40),
+  margin: isTablet ? normalize(30) : normalize(20),
   buttonHeight: isTablet ? normalize(60) : normalize(48),
-  inputSize: isTablet ? normalize(60) : isSmallDevice ? normalize(38) : normalize(45),
-  inputMargin: isTablet ? normalize(10) : normalize(6),
+  // Reduced input size for smaller OTP boxes
+  inputSize: isTablet ? normalize(50) : normalize(50),
+  inputMargin: isTablet ? normalize(8) : normalize(5),
   fontSize: {
     title: isTablet ? normalize(28) : normalize(22),
     description: isTablet ? normalize(16) : normalize(14),
-    input: isTablet ? normalize(24) : normalize(20),
+    // Slightly smaller font size for input
+    input: isTablet ? normalize(20) : normalize(16),
     button: isTablet ? normalize(18) : normalize(16),
     toast: isTablet ? normalize(16) : normalize(14),
   }
@@ -44,7 +47,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: responsive.padding,
-    marginTop: height * 0.12, // Relative to screen height
+    marginTop: hp(10), // Relative to screen height
     alignItems: 'center',
   },
   title: {
@@ -66,8 +69,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: responsive.margin,
-    width: '100%',
+    width: wp(100),
   },
   otpBox: {
     width: responsive.inputSize,
@@ -76,7 +78,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: normalize(8),
     textAlign: 'center',
-    fontSize: responsive.fontSize.input,
+    fontSize: responsive.fontSize.input, 
     marginHorizontal: responsive.inputMargin,
     backgroundColor: 'white',
     color: '#000',
@@ -125,7 +127,7 @@ const styles = StyleSheet.create({
   },
   // Additional button container for when keyboard is visible on iOS
   keyboardVisibleButtonContainer: {
-    width: '100%',
+    width: wp(100),
     flexDirection: 'row',
     justifyContent: 'center',
     paddingHorizontal: responsive.padding,
@@ -145,7 +147,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   nextButton: {
-    backgroundColor: '#1E88E5',
+    backgroundColor: '#000',
   },
   nextButtonText: {
     color: 'white',
@@ -187,6 +189,5 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 });
-
 
 export default styles;

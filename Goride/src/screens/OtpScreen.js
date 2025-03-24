@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { verifyOTP } from '../services/Loginapi';
 import styles from '../styles/otp';
 
+
 // Toast Component
 const Toast = ({ visible, message, type, onHide }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -237,7 +238,7 @@ const OtpScreen = ({ navigation, route }) => {
             onPress={handleVerifyOTP}
             activeOpacity={0.7} 
           >
-            <Text style={styles.nextButtonText}>Next</Text>
+            <Text style={styles.nextButtonText}>Submit</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

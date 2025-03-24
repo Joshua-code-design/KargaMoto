@@ -44,7 +44,7 @@ const Toast = ({ visible, message, success, onHide }) => {
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("9307725683");
   const [isFocused, setIsFocused] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: "", success: true });
   const [loading, setLoading] = useState(false);

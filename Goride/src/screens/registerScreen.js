@@ -12,7 +12,8 @@ import {
   ActivityIndicator, 
   StatusBar, 
   Animated, 
-  Dimensions 
+  Dimensions, 
+  ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -148,6 +149,7 @@ const RegisterScreen = () => {
 
 
   return (
+    <ScrollView> 
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#F8F9FA" />
 
@@ -160,7 +162,7 @@ const RegisterScreen = () => {
 
       <View style={styles.formContainer}>
         <Image 
-          source={require('../../assets/km.png')} 
+          source={require('../../assets/kms.png')} 
           style={styles.logoImage}
         />
         <Text style={styles.logoText}>Account Registration</Text>
@@ -261,6 +263,7 @@ const RegisterScreen = () => {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
+    </ScrollView>
   );
 };
 
@@ -270,22 +273,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F9FA',
   },
   inputImage: {
-    width: 20, 
-    height: 20, 
-    marginRight: 12,
+    width: wp(5), 
+    marginRight: hp(2),
     resizeMode: 'contain',
   },
   formContainer: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 50,
+    paddingHorizontal: wp(10),
   },
   logoImage: {
-    width: 110, 
-    height: 100, 
+    width: wp(50), 
+    height: hp(16), 
     borderRadius: 50,
     alignSelf: 'center',
-    marginBottom: 30, 
   },
   logoText: {
     fontSize: 30,
@@ -296,20 +296,20 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#666666',
-    marginBottom: 32,
+    marginBottom: hp(3),
   },
   inputsContainer: {
-    marginBottom: 32,
+    marginBottom: hp(1),
   },
   inputWrapper: {
-    marginBottom: 20,
+    marginBottom: hp(2),
   },
   inputLabel: {
     fontSize: 14,
     fontWeight: '600',
     color: '#333333',
-    marginBottom: 8,
-    marginLeft: 10,
+    marginBottom: hp(2),
+    marginLeft: hp(2),
   },
   input: {
     backgroundColor: '#FFFFFF',
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
     flexDirection: 'row',
     alignItems: 'center',
-    height: 56,
+    height: hp(6),
     paddingHorizontal: 16,
   },
   disabledInput: {
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
   
   // Gender selection styles
   genderWrapper: {
-    marginBottom: 20,
+    marginBottom: hp(5),
   },
   genderButtonsContainer: {
     flexDirection: 'row',
@@ -352,10 +352,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    marginHorizontal: 4,
-    minWidth: 80,
+    paddingVertical: wp(3),
+    paddingHorizontal: wp(5),
+    marginHorizontal: hp(1),
+    minWidth: wp(20),
     maxWidth: width / 3 - 16,
   },
   genderButtonSelected: {
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
     borderColor: '#000000',
   },
   genderIcon: {
-    marginRight: 6,
+    marginRight: hp(1),
   },
   genderButtonText: {
     fontSize: 14,
@@ -376,18 +376,16 @@ const styles = StyleSheet.create({
   
   button: {
     borderRadius: 30,
-    paddingVertical: 16,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    marginButton: hp(10),
-    height: hp(8),
+    height: hp(7),
   },
   buttonText: {
     color: 'white',
     fontWeight: '600',
     fontSize: 16,
-    marginRight: 8,
+    marginRight: hp(2),
   },
   toastContainer: {
     position: 'absolute',
