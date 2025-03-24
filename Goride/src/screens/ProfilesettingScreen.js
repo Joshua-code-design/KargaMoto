@@ -1,249 +1,430 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Switch, SafeAreaView, StatusBar } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation} from '@react-navigation/native';
-import * as Haptics from 'expo-haptics';
+import React, { useState, useEffect } from "react";
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  Image, 
+  ScrollView, 
+  SafeAreaView,
+  Dimensions,
+  Platform,
+  StatusBar
+} from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import PopupModal from '../components/PopupModal';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from '@react-navigation/native';
+import { logoutUser } from '../services/Loginapi';
 
-const ProfileScreen = () => {
+// Get screen dimensions for responsiveness
+const { width, height } = Dimensions.get('window');
+
+// Calculate responsive sizes
+const scale = Math.min(width, height) / 375; // Base scale on 375px width (iPhone X)
+const normalize = (size) => Math.round(scale * size);
+
+export default function ProfileScreen() {
   const navigation = useNavigation();
-  const [darkMode, setDarkMode] = React.useState(true);
-  const [notificationsEnabled, setNotificationsEnabled] = React.useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState("");
+  const [userName, setUserName] = useState("Loading...");
+  const [gender, setGender] = useState("Loading...");
+  const [mobileNumber, setMobileNumber] = useState("Loading...");
+  const [userType, setUserType] = useState("Loading...");
 
-  const animateTouchable = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.light);
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const userDetails = await AsyncStorage.getItem('userDetails');
+        if (userDetails !== null) {
+          const parsedDetails = JSON.parse(userDetails);
+          setUserName(parsedDetails.full_name || "Not provided");
+          setGender(parsedDetails.gender || "Not provided");
+          setMobileNumber(parsedDetails.phone_number || "Not provided");
+          setUserType(parsedDetails.user_type || "Standard User");
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
+
+  // Show modal with correct message
+  const handleShowModal = (type) => {
+    setModalType(type);
+    setModalVisible(true);
   };
 
-  const navigateTo = (screen) => {
-    animateTouchable();  // Optional haptic feedback
-    navigation.navigate(screen);
-  };
-
-  // Toggle theme function
-  const toggleTheme = () => {
-    animateTouchable(); // Add haptic feedback for theme toggle
-    setDarkMode(!darkMode);
-  };
-
-  // Create theme-based styles
-  const theme = {
-    backgroundColor: darkMode ? '#121212' : '#FFFFFF',
-    textColor: darkMode ? '#FFFFFF' : '#000000',
-    cardBackground: darkMode ? '#1e1e1e' : '#F0F0F0',
-    iconBackground: darkMode ? '#333333' : '#E0E0E0',
-    borderColor: darkMode ? '#2a2a2a' : '#E0E0E0',
-    secondaryText: darkMode ? '#888888' : '#666666',
-    headerBackground: darkMode ? '#121212' : '#FFFFFF',
-    statusBarStyle: darkMode ? "light-content" : "dark-content",
+  // Handle Confirm action
+  const handleConfirm = () => {
+    setModalVisible(false);
+    if (modalType === "delete") {
+      console.log("Account Deleted!");
+      // Add delete account logic
+    } else if (modalType === "logout") {
+      console.log("Logged Out!");
+      logoutUser(navigation);
+    }
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.backgroundColor }]}>
-      <StatusBar barStyle={theme.statusBarStyle} backgroundColor={theme.headerBackground} />
-      <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton}>
-            <Ionicons name="chevron-back" size={24} color={theme.textColor} />
-          </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: theme.textColor }]}>Profile</Text>
-          <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.bellIcon}>
-              <Ionicons name="notifications-outline" size={24} color={theme.textColor} />
+    <SafeAreaView style={styles.safeArea}>
+         <TouchableOpacity 
+        style={styles.arrowContainer} 
+        onPress={() => navigation.navigate('LandingPageScreen')}
+      >
+        <View style={styles.line} />
+        <Icon name="arrow-left" size={30} color="white" />
+      </TouchableOpacity>
+      <ScrollView 
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.container}>
+          {/* Cover Photo */}
+          <View style={styles.coverContainer}>
+            {/* Optional: Add gradient overlay */}
+            <View style={styles.coverGradient} />
+          </View>
+
+          {/* Profile Section */}
+          <View style={styles.profileContainer}>
+            <View style={styles.profileImageWrapper}>
+              {profileImage ? (
+                <Image source={{ uri: profileImage }} style={styles.profileImage} />
+              ) : (
+                <View style={styles.profileImagePlaceholder}>
+                  <Icon name="account" size={normalize(60)} color="#fff" />
+                </View>
+              )}
+              <TouchableOpacity style={styles.editProfileButton}>
+                <Icon name="camera" size={normalize(16)} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.nameContainer}>
+              <Text style={styles.userName}>{userName}</Text>
+              <Text style={styles.userType}>{userType}</Text>
+            </View>
+          </View>
+          
+          {/* Information Cards */}
+          {/* Personal Information Section */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Personal Information</Text>
+              <TouchableOpacity style={styles.editButton}>
+                <Icon name="pencil-outline" size={normalize(18)} color="white" />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.cardDivider} />
+            
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Full Name</Text>
+              <Text style={styles.infoValue}>{userName}</Text>
+            </View>
+            
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Gender</Text>
+              <Text style={styles.infoValue}>{gender}</Text>
+            </View>
+          </View>
+
+          {/* Contact Information Section */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Contact Information</Text>
+              <TouchableOpacity style={styles.editButton}>
+                <Icon name="pencil-outline" size={normalize(18)} color="white" />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.cardDivider} />
+            
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Mobile Number</Text>
+              <Text style={styles.infoValue}>{mobileNumber}</Text>
+            </View>
+          
+          </View>
+
+          {/* Account Settings */}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Account Settings</Text>
+            <View style={styles.cardDivider} />
+            
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity 
+                style={styles.settingsButton}
+                onPress={() => navigation.navigate('EditProfile')}
+              >
+                <Icon name="account-edit-outline" size={normalize(20)} color="white" />
+                <Text style={styles.settingsButtonText}>Edit Profile</Text>
+                <Icon name="chevron-right" size={normalize(20)} color="white" />
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.settingsButton}
+                onPress={() => navigation.navigate('EditProfile')}
+              >
+                <Icon name="history" size={normalize(20)} color="white" />
+                <Text style={styles.settingsButtonText}>History</Text>
+                <Icon name="chevron-right" size={normalize(20)} color="white" />
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.settingsButton}
+                onPress={() => navigation.navigate('EditProfile')}
+              >
+                <Icon name="map-marker-outline" size={normalize(20)} color="white" />
+                <Text style={styles.settingsButtonText}>Address</Text>
+                <Icon name="chevron-right" size={normalize(20)} color="white" />
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.settingsButton}
+                onPress={() => navigation.navigate('EditProfile')}
+              >
+                <Icon name="alert-circle-outline" size={normalize(20)} color="white" />
+                <Text style={styles.settingsButtonText}>Report</Text>
+                <Icon name="chevron-right" size={normalize(20)} color="white" />
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.settingsButton}
+                onPress={() => navigation.navigate('EditProfile')}
+              >
+                <Icon name="thumb-up-outline" size={normalize(20)} color="white" />
+                <Text style={styles.settingsButtonText}>FeedBack</Text>
+                <Icon name="chevron-right" size={normalize(20)} color="white" />
+              </TouchableOpacity>
+
+
+            </View>
+          </View>
+          
+          {/* Account Actions */}
+          <View style={styles.actionButtonsContainer}>
+            <TouchableOpacity 
+              style={[styles.actionButton, styles.logoutButton]}
+              onPress={() => handleShowModal("logout")}
+            >
+              <Icon name="logout" size={normalize(18)} color="#fff" />
+              <Text style={styles.logoutButtonText}>Logout</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.actionButton, styles.deleteButton]}
+              onPress={() => handleShowModal("delete")}
+            >
             </TouchableOpacity>
           </View>
         </View>
+      </ScrollView>
 
-        {/* Profile Section */}
-        <View style={styles.profileSection}>
-          <Image
-            source={{ uri: 'https://media.npr.org/assets/img/2015/09/23/ap_836720500193-13f1674f764e5180cf9f3349cfef258d181f2b32-s1100-c50.jpg' }}
-            style={styles.profileImage}
-          />
-          <Text style={[styles.profileName, { color: theme.textColor }]}>Joshulla Lamis</Text>
-          <TouchableOpacity onPress={() => navigateTo('ProfileScreen')} style={styles.viewProfileButton}>
-            <Text style={[styles.viewProfileText, { color: theme.secondaryText }]}>View Profile</Text>
-          </TouchableOpacity> 
-        </View>
-
-        {/* Quick Actions */}
-        <View style={styles.quickActionsContainer}>
-          <TouchableOpacity onPress={() => navigateTo('HistoryScreen')} style={[styles.quickAction, { backgroundColor: theme.cardBackground }]}>
-            <View style={[styles.iconContainer, { backgroundColor: theme.iconBackground }]}>
-              <Ionicons name="document-text-outline" size={22} color={theme.textColor} />
-            </View>
-            <Text style={[styles.quickActionText, { color: theme.textColor }]}>History</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity onPress={() => navigateTo('AddressScreen')} style={[styles.quickAction, { backgroundColor: theme.cardBackground }]}>
-            <View style={[styles.iconContainer, { backgroundColor: theme.iconBackground }]}>
-              <Ionicons name="location-outline" size={22} color={theme.textColor} />
-            </View>
-            <Text style={[styles.quickActionText, { color: theme.textColor }]}>Addresses</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Settings Section */}
-        <View style={styles.settingsContainer}>
-          <Text style={[styles.sectionTitle, { color: theme.secondaryText }]}>General</Text>
-          
-          <View style={[styles.settingItem, { borderBottomColor: theme.borderColor }]}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="contrast-outline" size={22} color={theme.textColor} />
-              <Text style={[styles.settingText, { color: theme.textColor }]}>Dark Mode</Text>
-            </View>
-            <Switch
-              value={darkMode}
-              onValueChange={toggleTheme}
-              trackColor={{ false: '#3e3e3e', true: '#333333' }}
-              thumbColor={darkMode ? '#ffffff' : '#f4f3f4'}
-            />
-          </View>
-          
-          {/* <View style={[styles.settingItem, { borderBottomColor: theme.borderColor }]}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="notifications-outline" size={22} color={theme.textColor} />
-              <Text style={[styles.settingText, { color: theme.textColor }]}>Notification</Text>
-            </View>
-            <Switch
-              value={notificationsEnabled}
-              onValueChange={setNotificationsEnabled}
-              trackColor={{ false: '#3e3e3e', true: '#333333' }}
-              thumbColor={notificationsEnabled ? '#ffffff' : '#f4f3f4'}
-            />
-          </View> */}
-        </View>
-
-        {/* Support Section */}
-        <View style={styles.settingsContainer}>
-          <Text style={[styles.sectionTitle, { color: theme.secondaryText }]}>Support</Text>
-          
-          <TouchableOpacity onPress={() => navigateTo('FeedScreen')} style={[styles.supportItem, { borderBottomColor: theme.borderColor }]}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="chatbubble-ellipses-outline" size={22} color={theme.textColor} />
-              <Text style={[styles.settingText, { color: theme.textColor }]}>Share Feedback</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={theme.secondaryText} />
-          </TouchableOpacity>
-          
-          <TouchableOpacity onPress={() => navigateTo('ReportScreen')} style={[styles.supportItem, { borderBottomColor: theme.borderColor }]}>
-            <View style={styles.settingLeft}>
-              <Ionicons name="alert-circle-outline" size={22} color={theme.textColor} />
-              <Text style={[styles.settingText, { color: theme.textColor }]}>Report an Issue</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={theme.secondaryText} />
-          </TouchableOpacity>
-        </View>
-
-
-      </View>
+      {/* Popup Modal */}
+      <PopupModal
+        visible={modalVisible}
+        title={modalType === "delete" ? "Delete Account" : "Logout"}
+        message={
+          modalType === "delete"
+            ? "Are you sure you want to delete your account? This action cannot be undone."
+            : "Are you sure you want to logout?"
+        }
+        onCancel={() => setModalVisible(false)}
+        onConfirm={handleConfirm}
+      />
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: "black",
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+  scrollView: {
+    flex: 1,
   },
   container: {
     flex: 1,
-    paddingHorizontal: 16,
+    backgroundColor: "black",
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 16,
+  coverContainer: {
+    height: normalize(120),
+    backgroundColor: "black",
+    position: "relative",
   },
-  backButton: {
-    padding: 4,
+  coverGradient: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: normalize(60),
+    backgroundColor: "rgba(0,0,0,0.1)",
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+  profileContainer: {
+    alignItems: "center",
+    marginTop: -normalize(50),
+    paddingHorizontal: normalize(20),
   },
-  headerRight: {
-    padding: 4,
+  profileImageWrapper: {
+    position: "relative",
+    marginBottom: normalize(10),
   },
-  profileSection: {
-    alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 24,
+  profileImagePlaceholder: {
+    width: normalize(100),
+    height: normalize(100),
+    borderRadius: normalize(50),
+    backgroundColor: "black",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: "#FFFFFF",
   },
   profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 12,
+    width: normalize(100),
+    height: normalize(100),
+    borderRadius: normalize(50),
+    borderWidth: 3,
+    borderColor: "#FFFFFF",
   },
-  profileName: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
+  editProfileButton: {
+    position: "absolute",
+    bottom: normalize(5),
+    right: normalize(5),
+    backgroundColor: "black",
+    width: normalize(30),
+    height: normalize(30),
+    borderRadius: normalize(15),
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
   },
-  viewProfileButton: {
-    marginTop: 4,
+  nameContainer: {
+    alignItems: 'center',
+    marginBottom: normalize(20),
   },
-  viewProfileText: {
-    fontSize: 14,
+  userName: {
+    fontSize: normalize(22),
+    fontWeight: "600",
+    color: "white",
+    marginBottom: normalize(5),
   },
-  quickActionsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 32,
+  userType: {
+    fontSize: normalize(14),
+    color: "white",
+    textTransform: "capitalize",
   },
-  quickAction: {
+  card: {
+    backgroundColor: "black",
+    borderRadius: normalize(12),
+    padding: normalize(16),
+    marginHorizontal: normalize(16),
+    marginBottom: normalize(16),
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3.84,
+    elevation: 3,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  cardTitle: {
+    fontSize: normalize(16),
+    fontWeight: "600",
+    color: "white",
+    marginBottom: normalize(8),
+  },
+  cardDivider: {
+    height: 1,
+    backgroundColor: "white",
+    marginBottom: normalize(16),
+  },
+  editButton: {
+    padding: normalize(5),
+  },
+  infoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: normalize(14),
+  },
+  infoLabel: {
+    fontSize: normalize(14),
+    color: "white",
     flex: 1,
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    marginHorizontal: 6,
   },
-  iconContainer: {
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 8,
+  infoValue: {
+    fontSize: normalize(14),
+    color: "white",
+    fontWeight: "500",
+    textAlign: "right",
+    flex: 2,
   },
-  quickActionText: {
-    fontSize: 14,
+  arrowContainer:{
+    marginLeft: hp(3),
   },
-  settingsContainer: {
-    marginBottom: 24,
+  line: {
+    width: 50,
+    height: 2,
+    backgroundColor: 'black',
   },
-  sectionTitle: {
-    fontSize: 16,
-    marginBottom: 12,
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
   },
-  settingItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
+  addButtonText: {
+    fontSize: normalize(14),
+    color: "white",
+    marginRight: normalize(5),
+  },
+  buttonContainer: {
+    marginTop: normalize(8),
+  },
+  settingsButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: normalize(12),
     borderBottomWidth: 1,
+    borderBottomColor: "#EEEEEE",
   },
-  supportItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
+  settingsButtonText: {
+    fontSize: normalize(15),
+    color: "white",
+    flex: 1,
+    marginLeft: normalize(15),
   },
-  settingLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  actionButtonsContainer: {
+    paddingHorizontal: normalize(16),
+    marginBottom: normalize(30),
   },
-  settingText: {
-    fontSize: 15,
-    marginLeft: 12,
+  actionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: normalize(14),
+    borderRadius: normalize(8),
+    marginBottom: normalize(12),
   },
   logoutButton: {
-    alignItems: 'center',
-    paddingVertical: 16,
-    marginTop: 16,
+    backgroundColor: "black",
   },
-  logoutText: {
-    fontSize: 16,
-    fontWeight: '500',
-  }
-});
-
-export default ProfileScreen;
+  logoutButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "600",
+    fontSize: normalize(15),
+    marginLeft: normalize(8),
+  },
+}); 

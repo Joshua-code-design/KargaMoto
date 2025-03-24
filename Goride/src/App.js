@@ -9,7 +9,6 @@ import OtpScreen from './screens/OtpScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import LandingPageScreen from './screens/LandingPageScreen';
 import ProfilesettingScreen from './screens/ProfilesettingScreen';
-import ProfileScreen from './screens/ProfileScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import AddressScreen from './screens/AddressScreen';
 import Map from './components/Map';
@@ -18,6 +17,7 @@ import RideScreen from './screens/RideScreen';
 import BookingScreen from './screens/BookingScreen';
 import SearchPlaceScreen from './screens/SearchPlaceScreen';
 import FeedScreen from './screens/FeedScreen';
+import FavScreen from './screens/FavScreen';
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -32,7 +32,6 @@ export default function App() {
         <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
         <Stack.Screen name="LandingPageScreen" component={LandingPageScreen} />
         <Stack.Screen name="ProfilesettingScreen" component={ProfilesettingScreen} />
-        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         <Stack.Screen name="HistoryScreen" component={HistoryScreen} />
         <Stack.Screen name="AddressScreen" component={AddressScreen} />
         <Stack.Screen name="Map" component={Map} />
@@ -41,6 +40,7 @@ export default function App() {
         <Stack.Screen name="BookingScreen" component={BookingScreen} />
         <Stack.Screen name="SearchPlaceScreen" component={SearchPlaceScreen} />
         <Stack.Screen name="FeedScreen" component={FeedScreen} />
+        <Stack.Screen name="FavScreen" component={FavScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

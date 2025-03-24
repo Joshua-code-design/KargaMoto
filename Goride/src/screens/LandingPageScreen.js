@@ -173,7 +173,7 @@ export default function HomeScreen() {
             style={styles.headerGradient}
           >
             <View style={styles.headerLogo}>
-              <MaterialCommunityIcons name="motorbike" size={24} color="#FFD700" style={styles.logoIcon} />
+              <MaterialCommunityIcons name="motorbike" size={24} color="#4E4FEB" style={styles.logoIcon} />
               <Text style={[styles.logoText, {fontSize: fontSize.medium}]}>KARGAMOTO</Text>
             </View>
             <TouchableOpacity
@@ -181,7 +181,7 @@ export default function HomeScreen() {
               onPress={() => navigateTo('MessagesScreen')}
             >
               <View style={styles.messageIconContainer}>
-                <Ionicons name="chatbubble-ellipses" size={isTablet ? 24 : 18} color="#FFFFFF" />
+                <Ionicons name="chatbubble-ellipses" size={isTablet ? 24 : 18} color="#4E4FEB" />
               </View>
             </TouchableOpacity>
           </LinearGradient>
@@ -211,14 +211,15 @@ export default function HomeScreen() {
           ]}
         >
           <LinearGradient
-            colors={['#131313', '#272727']}
-            start={{ x: 0, y: 0 }}
+            colors={['black', '#070717', 'red' , 'black' ]} 
+            top={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
+            bottom={{ x: 1, y: 1 }}
             style={styles.walletGradient}
           >
             <View style={styles.walletHeader}>
               <Text style={[styles.walletTitle, {fontSize: fontSize.medium}]}>Your Balance</Text>
-              <MaterialCommunityIcons name="wallet-outline" size={24} color="#FFD700" />
+              <MaterialCommunityIcons name="wallet-outline" size={24} color="black" />
             </View>
             <View style={styles.balanceRow}>
               <Text style={[styles.balanceAmount, {fontSize: fontSize.xlarge}]}>
@@ -229,7 +230,7 @@ export default function HomeScreen() {
                 onPress={animateTouchable}
               >
                 <LinearGradient
-                  colors={['#FFD700', '#FFC107']}
+                  colors={['#0000', '#4E4FEB']}
                   style={styles.depositGradient}
                 >
                   <Text style={[styles.depositText, {fontSize: fontSize.small}]}>DEPOSIT</Text>
@@ -257,7 +258,7 @@ export default function HomeScreen() {
             activeOpacity={0.8}
           >
             <LinearGradient
-              colors={['#222222', '#000000']}
+              colors={[ '#4E4FEB','#1F1F5E']} 
               style={styles.rideGradient}
             >
               <View style={styles.rideOptionContent}>
@@ -268,7 +269,7 @@ export default function HomeScreen() {
                 />
                 <View style={styles.rideTextContainer}>
                   <Text style={[styles.rideOptionText, { fontSize: fontSize.medium }]}>RIDE</Text>
-                  <Text style={[styles.rideOptionSubtext, { fontSize: fontSize.small }]}>Book now</Text>
+                  {/* <Text style={[styles.rideOptionSubtext, { fontSize: fontSize.small }]}>Book now</Text> */}
                 </View>
               </View>
             </LinearGradient>
@@ -280,7 +281,8 @@ export default function HomeScreen() {
             activeOpacity={0.8}
           >
             <LinearGradient
-              colors={['#222222', '#000000']}
+            
+              colors={['#4E4FEB', '#1F1F5E']} 
               style={styles.rideGradient}
             >
               <View style={styles.rideOptionContent}>
@@ -291,7 +293,7 @@ export default function HomeScreen() {
                 />
                 <View style={styles.rideTextContainer}>
                   <Text style={[styles.rideOptionText, { fontSize: fontSize.medium }]}>DELIVERY</Text>
-                  <Text style={[styles.rideOptionSubtext, { fontSize: fontSize.small }]}>Send packages</Text>
+                  {/* <Text style={[styles.rideOptionSubtext, { fontSize: fontSize.small }]}>Send packages</Text> */}
                 </View>
               </View>
             </LinearGradient>
@@ -343,7 +345,8 @@ export default function HomeScreen() {
                     marginBottom: spacing.xs
                   }
                 ]}>
-                  <FontAwesome5 name={item.icon} size={isTablet ? 18 : 14} color="#FFD700" />
+                  {/* icons */}
+                  <FontAwesome5 name={item.icon} size={isTablet ? 18 : 14} color="white" /> 
                 </View>
                 <Text style={[styles.recentText, {fontSize: fontSize.small}]}>{item.name}</Text>
               </TouchableOpacity>
@@ -425,7 +428,7 @@ export default function HomeScreen() {
           >
             {[
               { name: 'home', label: 'Home', screen: 'LandingPageScreen', active: true },
-              { name: 'heart-outline', label: 'Favorites', screen: 'Favorites', active: false },
+              { name: 'heart-outline', label: 'Favorites', screen: 'FavScreen', active: false },
               { name: 'person-outline', label: 'Profile', screen: 'ProfilesettingScreen', active: false },
             ].map((item, index) => (
               <TouchableOpacity
@@ -438,12 +441,12 @@ export default function HomeScreen() {
                 <Ionicons
                   name={item.name}
                   size={isTablet ? 24 : 22}
-                  color={item.active ? "#FFD700" : "#FFFFFF"}
+                  color={item.active ? "#4647D3" : "#4647D3"}
                 />
                 <Text
                   style={[
                     styles.navText,
-                    { fontSize: fontSize.small, color: item.active ? "#FFD700" : "#FFFFFF" }
+                    { fontSize: fontSize.small, color: item.active ? "#4647D3" : "#4647D3" }
                   ]}
                 >
                   {item.label}
@@ -544,7 +547,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   depositText: {
-    color: '#000000',
+    color: 'white',
     fontWeight: 'bold',
   },
   rideOptionsContainer: {
@@ -556,10 +559,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: '#00000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
-    shadowRadius: 4,
+    shadowRadius: 10,
   },
   rideGradient: {
     padding: 16,
@@ -681,7 +684,7 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#FFD700',
+    backgroundColor: '#800000',
   },
   navText: {
     marginTop: 4,

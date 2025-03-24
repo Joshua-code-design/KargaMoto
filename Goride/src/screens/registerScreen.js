@@ -380,6 +380,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
+    marginButton: hp(10),
     height: hp(8),
   },
   buttonText: {

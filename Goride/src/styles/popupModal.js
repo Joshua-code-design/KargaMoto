@@ -11,7 +11,8 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
       width: "80%",
-      backgroundColor: "#fff",
+      backgroundColor: "black",
+      color:'white',
       padding: 20,
       borderRadius: 10,
       alignItems: "center",
@@ -19,11 +20,13 @@ const styles = StyleSheet.create({
     title: {
       fontSize: 18,
       fontWeight: "bold",
+      color:"white",
     },
     message: {
       fontSize: 16,
       textAlign: "center",
       marginVertical: 10,
+      color: "white",
     },
     buttonContainer: {
       flexDirection: "row",
@@ -35,13 +38,13 @@ const styles = StyleSheet.create({
     cancelButton: {
       flex: 1,
       padding: 10,
-      backgroundColor: "#ccc",
+      backgroundColor: "white",
       borderRadius: 5,
       alignItems: "center",
       marginRight: 5,
     },
     cancelText: {
-      color: "#333",
+      color: "black",
       fontSize: 16,
     },
     confirmButton: {
@@ -53,7 +56,7 @@ const styles = StyleSheet.create({
       marginLeft: 5,
     },
     confirmText: {
-      color: "#fff",
+      color: "white",
       fontSize: 16,
     },
   });

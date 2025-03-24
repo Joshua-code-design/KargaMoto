@@ -5,7 +5,7 @@ const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f7f7f7',
+    backgroundColor: 'black',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   container: {
@@ -17,12 +17,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: width * 0.05,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: 'black',
     paddingTop: Platform.OS === 'ios' ? 0 : 10,
     paddingBottom: 10,
   },
   backButton: {
     padding: 8,
+    borderRadius: 20,
   },
   headerTitle: {
     fontWeight: '600',
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
   },
   mapImage: {
     width: '100%',
-    height: '120%',
+    height: '100%',
     opacity: 0.9,
   },
   mapOverlay: {
@@ -58,22 +59,24 @@ const styles = StyleSheet.create({
   mapText: {
     color: '#fff',
     fontWeight: '600',
-    textShadowColor: 'rgba(0,0,0,0.7)',
+    textShadowColor: 'rgba(0,0,0,0.5)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
     letterSpacing: 0.5,
+    textAlign: 'center',
+    paddingHorizontal: 20,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: '',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: -20,
     paddingTop: height * 0.03,
     flex: 1,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
+    shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.1,
-    shadowRadius: 5,
+    shadowRadius: 6,
     elevation: 5,
   },
   inputContainer: {
@@ -88,7 +91,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   pickupDot: {
-    borderRadius: 6,
     backgroundColor: '#111',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -98,11 +100,10 @@ const styles = StyleSheet.create({
   },
   locationLine: {
     width: 2,
-    backgroundColor: '#ddd',
+    backgroundColor: '#e0e0e0',
     marginVertical: 5,
   },
   destinationDot: {
-    borderRadius: 6,
     backgroundColor: '#4CAF50',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -115,13 +116,13 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: '#f9f9f9',
-    borderRadius: 12,
+    borderRadius: 14,
     marginBottom: height * 0.015,
     borderWidth: 1,
     borderColor: '#e0e0e0',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 2,
     elevation: 1,
   },
@@ -131,6 +132,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
     borderColor: '#222',
     backgroundColor: '#f5f5f5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 2,
   },
   inputLabel: {
     color: '#777',
@@ -144,8 +150,8 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     backgroundColor: '#f9f9f9',
-    borderBottomLeftRadius: 12,
-    borderBottomRightRadius: 12,
+    borderBottomLeftRadius: 14,
+    borderBottomRightRadius: 14,
     marginBottom: height * 0.015,
     borderWidth: 1,
     borderColor: '#222',
@@ -153,20 +159,25 @@ const styles = StyleSheet.create({
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    zIndex: 20,
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    zIndex: 10,
   },
-
   dropdownItem: {
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#eeeeee',
+  },
+  dropdownItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eeeeee',
   },
   dropdownTextContainer: {
+    marginLeft: 12,
     flex: 1,
-    marginLeft: 10,
   },
   dropdownItemText: {
     color: '#111',
@@ -177,25 +188,22 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   recentLocations: {
-    marginTop: 15,
+    marginTop: height * 0.02,
   },
   recentTitle: {
     fontWeight: '600',
     color: '#111',
-    marginBottom: 10,
+    marginBottom: height * 0.015,
   },
   recentItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f9f9f9',
-    borderRadius: 12,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eeeeee',
   },
   recentTextContainer: {
+    marginLeft: 12,
     flex: 1,
-    marginLeft: 10,
   },
   recentItemText: {
     color: '#111',
@@ -206,13 +214,13 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   footer: {
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
     backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#eeeeee',
   },
   continueButton: {
     backgroundColor: '#111',
-    borderRadius: 12,
+    borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -225,7 +233,7 @@ const styles = StyleSheet.create({
   continueButtonText: {
     color: '#fff',
     fontWeight: '600',
-    marginRight: 8,
+    marginRight: 10,
   },
   loadingOverlay: {
     position: 'absolute',
@@ -233,10 +241,10 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255,255,255,0.7)',
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 9999,
+    zIndex: 100,
   },
   loadingText: {
     marginTop: 10,
