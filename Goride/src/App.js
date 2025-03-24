@@ -49,3 +49,5 @@ export default function App() {
 // To do
 
 //fix bug after backing on Maps Component cant click anything
+
+//navigate from favscreen to maps with isselectaddress nga naka true tapos ang type(work or home) and then passback to favsceen

@@ -45,16 +45,16 @@ const Map = ({ route }) => {
       Alert.alert("No Location Selected", "Please select a location before confirming.");
       return;
     }
-
+  
     try {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${selectedLocation.latitude},${selectedLocation.longitude}&key=${GOOGLE_MAPS_API_KEY}`
       );
       const data = await response.json();
-
+  
       if (data.status === 'OK' && data.results.length > 0) {
         const address = data.results[0].formatted_address;
-
+  
         if (route.params?.isSelectingPickup) {
           navigation.navigate("RideScreen", {
             pickupAddress: address,
@@ -66,6 +66,14 @@ const Map = ({ route }) => {
             destinationAddress: address,
             pickupAddress: route.params.currentPickup,
             serviceType: route.params?.serviceType,
+          });
+        } else if (route.params?.isSelectingAddress) {
+          navigation.navigate("FavScreen", {
+            selectedLocation: {
+              address, // Pass the formatted address
+              latitude: selectedLocation.latitude, // Pass latitude
+              longitude: selectedLocation.longitude, // Pass longitude
+            },
           });
         }
       } else {
