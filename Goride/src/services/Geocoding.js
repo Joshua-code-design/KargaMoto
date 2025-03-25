@@ -66,7 +66,7 @@ export const calculateDistanceAndETA = async (pickup, destination) => {
   const requestBody = {
     origin: origin,
     destination: dest,
-    travelMode: 'TWO_WHEELER', // Options: DRIVE, WALK, BICYCLE, TWO_WHEELER, TRANSIT
+    travelMode: 'DRIVE', // Options: DRIVE, WALK, BICYCLE, TWO_WHEELER, TRANSIT
     routingPreference: 'TRAFFIC_AWARE', // No need for departureTime
     units: 'METRIC', // Use 'METRIC' for kilometers or 'IMPERIAL' for miles
   };

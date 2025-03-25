@@ -130,7 +130,7 @@ const LoginScreen = () => {
               style={styles.input}
               keyboardType="phone-pad"
               maxLength={10}
-              value={phoneNumber}
+              value={phoneNumber} 
               onFocus={handleFocus}
               onBlur={handleBlur}
               onChangeText={handleChangeText}
@@ -141,7 +141,7 @@ const LoginScreen = () => {
 
         <Animated.View style={{ transform: [{ scale: buttonAnimation }] }}>
           <TouchableOpacity style={[styles.button, loading && styles.buttonLoading]} onPress={handleButtonPress} disabled={loading}>
-            <Text style={styles.buttonText}>{loading ? "Processing..." : "Continue"}</Text>
+            <Text style={styles.buttonText}>{loading ? "On The Way..." : "Continue"}</Text>
             {!loading && <Ionicons name="arrow-forward" size={20} color="#FFFFFF" style={styles.buttonIcon} />}
           </TouchableOpacity>
         </Animated.View>

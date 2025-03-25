@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   StyleSheet, 
   Text, 
@@ -8,8 +8,7 @@ import {
   ScrollView, 
   SafeAreaView, 
   StatusBar, 
-  Platform, 
-  Animated,
+  Platform,
   useWindowDimensions
 } from 'react-native';
 import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -18,7 +17,20 @@ import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SharedElement } from 'react-navigation-shared-element';
 import * as Haptics from 'expo-haptics';
-import { BlurView } from 'expo-blur';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+
+// New professional color palette
+const COLORS = {
+  primary: '#1A2B4D',       // Deep Navy Blue
+  secondary: '#2E7D32',     // Forest Green
+  tertiary: '#26A69A',      // Soft Teal
+  accent: '#D4AF37',        // Muted Gold
+  background: '#F5F5F5',    // Light Gray
+  white: '#FFFFFF',         // White
+  lightGray: '#E0E0E0',     // Very Light Gray
+  darkGray: '#333333',      // Charcoal Gray
+  error: '#E53935',         // Bright Red
+};
 
 export default function HomeScreen() {
   // Use the hook for responsive dimensions
@@ -41,12 +53,6 @@ export default function HomeScreen() {
   
   // Destructure for cleaner code
   const { isSmallDevice, isTablet } = deviceSize;
-  
-  // Animated values
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.95)).current;
-  const translateYAnim = useRef(new Animated.Value(30)).current;
   
   // Responsive size calculations
   const fontSize = {
@@ -96,52 +102,8 @@ export default function HomeScreen() {
     return '₱ ' + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
-  // Animate elements on mount
-  useEffect(() => {
-    Animated.stagger(150, [
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateYAnim, {
-        toValue: 0,
-        duration: 700,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
-
-  // Header animation based on scroll
-  const headerOpacity = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [1, 0.9],
-    extrapolate: 'clamp',
-  });
-
-  const headerHeight = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [Platform.OS === 'ios' ? 110 : 90, 70],
-    extrapolate: 'clamp',
-  });
-
-  // Animation for touchable feedback with error handling
-  const animateTouchable = () => {
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch (error) {
-      console.log('Haptics not available');
-    }
-  };
-
   // Navigation with transition
   const navigateTo = (screen, params = {}) => {
-    animateTouchable();
     navigation.navigate(screen, params);
   };
 
@@ -150,172 +112,186 @@ export default function HomeScreen() {
   const carouselHeight = isTablet ? windowWidth * 0.25 : windowWidth * 0.4;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: COLORS.background }]}>
       <StatusBar 
-        barStyle="light-content" 
-        backgroundColor="#000000"
+        barStyle="dark-content" 
+        backgroundColor={COLORS.background}
         translucent
       />
       
-      {/* Animated Header with Glass Effect */}
-      <Animated.View 
+      {/* Header */}
+      <View 
         style={[
           styles.header, 
           { 
-            opacity: headerOpacity,
-            height: headerHeight,
+            backgroundColor: COLORS.background,
+            borderBottomWidth: 1,
+            borderBottomColor: COLORS.background,
           }
         ]}
       >
-        <BlurView intensity={80} tint="dark" style={styles.headerBlur}>
-          <LinearGradient
-            colors={['black', 'black']}
-            style={styles.headerGradient}
+        <View style={styles.headerContent}>
+          <View style={styles.headerLogo}>
+            <MaterialCommunityIcons name="motorbike" size={24} color={COLORS.tertiary} style={styles.logoIcon} />
+            <Text style={[styles.logoText, {fontSize: fontSize.medium, color: COLORS.tertiary}]}>KARGAMOTO</Text>
+          </View>
+          <TouchableOpacity
+            style={[styles.menuButton, { backgroundColor: COLORS.tertiary }]}
+            onPress={() => navigateTo('MessagesScreen')}
           >
-            <View style={styles.headerLogo}>
-              <MaterialCommunityIcons name="motorbike" size={24} color="#4E4FEB" style={styles.logoIcon} />
-              <Text style={[styles.logoText, {fontSize: fontSize.medium}]}>KARGAMOTO</Text>
-            </View>
-            <TouchableOpacity
-              style={styles.menuButton}
-              onPress={() => navigateTo('MessagesScreen')}
-            >
-              <View style={styles.messageIconContainer}>
-                <Ionicons name="chatbubble-ellipses" size={isTablet ? 24 : 18} color="#4E4FEB" />
-              </View>
-            </TouchableOpacity>
-          </LinearGradient>
-        </BlurView>
-      </Animated.View>
+            <Ionicons name="chatbubble-ellipses" size={isTablet ? 24 : 18} color={COLORS.primary} />
+          </TouchableOpacity>
+        </View>
+      </View>
       
-      <Animated.ScrollView 
+      <ScrollView 
         style={styles.content} 
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingBottom: spacing.large * 2}}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
-        scrollEventThrottle={16}
+        contentContainerStyle={{paddingBottom: spacing.large * 3}}
       >
-        {/* Wallet Card with Modern Animation */}
-        <Animated.View 
+        {/* Wallet Card */}
+        <View 
           style={[
             styles.walletCard,
             {
-              opacity: fadeAnim,
-              transform: [{ scale: scaleAnim }],
               marginHorizontal: spacing.medium,
-              marginTop: spacing.medium
+              marginTop: spacing.large,
+              backgroundColor: COLORS.tertiary,
+              borderRadius: 16,
+              shadowColor: COLORS.primary,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.1,
+              shadowRadius: 8,
+              elevation: 5,
             }
           ]}
         >
-          <LinearGradient
-            colors={['black', '#070717', 'red' , 'black' ]} 
-            top={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            bottom={{ x: 1, y: 1 }}
-            style={styles.walletGradient}
-          >
+          <View style={styles.walletContent}>
             <View style={styles.walletHeader}>
-              <Text style={[styles.walletTitle, {fontSize: fontSize.medium}]}>Your Balance</Text>
-              <MaterialCommunityIcons name="wallet-outline" size={24} color="black" />
+              <Text style={[styles.walletTitle, {fontSize: fontSize.medium, color: COLORS.white}]}>Your Balance</Text>
+              <MaterialCommunityIcons name="wallet-outline" size={24} color={COLORS.white} />
             </View>
             <View style={styles.balanceRow}>
-              <Text style={[styles.balanceAmount, {fontSize: fontSize.xlarge}]}>
+              <Text style={[styles.balanceAmount, {fontSize: fontSize.xlarge, color: COLORS.white}]}>
                 {formatCurrency(10000)}
               </Text>
               <TouchableOpacity 
-                style={styles.depositButton}
-                onPress={animateTouchable}
+                style={[styles.depositButton, { backgroundColor: COLORS.white }]}
               >
-                <LinearGradient
-                  colors={['#0000', '#4E4FEB']}
-                  style={styles.depositGradient}
-                >
-                  <Text style={[styles.depositText, {fontSize: fontSize.small}]}>DEPOSIT</Text>
-                </LinearGradient>
+                <Text style={[styles.depositText, {fontSize: fontSize.small, color: COLORS.darkGray, fontWeight: '600'}]}>DEPOSIT</Text>
               </TouchableOpacity>
             </View>
-          </LinearGradient>
-        </Animated.View>
+          </View>
+        </View>
         
-        {/* Modernized Ride Options */}
-        <Animated.View 
+        {/* Ride Options */}
+        <View 
           style={[
             styles.rideOptionsContainer,
             {
-              opacity: fadeAnim,
-              transform: [{ translateY: translateYAnim }],
               marginHorizontal: spacing.medium,
-              marginTop: spacing.medium
+              marginTop: spacing.large
             }
           ]}
         >
           <TouchableOpacity 
-            style={[styles.rideOption, { marginRight: spacing.small / 2 }]} 
+            style={[
+              styles.rideOption, 
+              { 
+                marginRight: spacing.small / 2,
+                backgroundColor: COLORS.white,
+                borderRadius: 16,
+                shadowColor: COLORS.primary,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+                elevation: 4,
+              }
+            ]} 
             onPress={() => navigateTo('RideScreen', { serviceType: 'Ride' })}
             activeOpacity={0.8}
           >
-            <LinearGradient
-              colors={[ '#4E4FEB','#1F1F5E']} 
-              style={styles.rideGradient}
-            >
-              <View style={styles.rideOptionContent}>
+            <View style={styles.rideOptionContent}>
+              <View style={[
+                styles.rideIconContainer, 
+                { backgroundColor: COLORS.lightGray }
+              ]}>
                 <Image 
                   source={require('../../assets/kms.png')} 
                   style={[styles.rideOptionImage, {width: isTablet ? 60 : 40, height: isTablet ? 60 : 40}]} 
                   resizeMode="contain"
                 />
-                <View style={styles.rideTextContainer}>
-                  <Text style={[styles.rideOptionText, { fontSize: fontSize.medium }]}>RIDE</Text>
-                  {/* <Text style={[styles.rideOptionSubtext, { fontSize: fontSize.small }]}>Book now</Text> */}
-                </View>
               </View>
-            </LinearGradient>
+              <View style={styles.rideTextContainer}>
+                <Text style={[
+                  styles.rideOptionText, 
+                  { fontSize: fontSize.medium, color: COLORS.primary, fontWeight: '600' }
+                ]}>RIDE</Text>
+              </View>
+            </View>
           </TouchableOpacity>
           
           <TouchableOpacity 
-            style={[styles.rideOption, { marginLeft: spacing.small / 2 }]}
+            style={[
+              styles.rideOption, 
+              { 
+                marginLeft: spacing.small / 2,
+                backgroundColor: COLORS.white,
+                borderRadius: 16,
+                shadowColor: COLORS.primary,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+                elevation: 4,
+              }
+            ]}
             onPress={() => navigateTo('RideScreen', { serviceType: 'Delivery' })}
             activeOpacity={0.8}
           >
-            <LinearGradient
-            
-              colors={['#4E4FEB', '#1F1F5E']} 
-              style={styles.rideGradient}
-            >
-              <View style={styles.rideOptionContent}>
+            <View style={styles.rideOptionContent}>
+              <View style={[
+                styles.rideIconContainer, 
+                { backgroundColor: COLORS.lightGray }
+              ]}>
                 <Image 
                   source={require('../../assets/kms.png')} 
                   style={[styles.rideOptionImage, {width: isTablet ? 60 : 40, height: isTablet ? 60 : 40}]}
                   resizeMode="contain"
                 />
-                <View style={styles.rideTextContainer}>
-                  <Text style={[styles.rideOptionText, { fontSize: fontSize.medium }]}>DELIVERY</Text>
-                  {/* <Text style={[styles.rideOptionSubtext, { fontSize: fontSize.small }]}>Send packages</Text> */}
-                </View>
               </View>
-            </LinearGradient>
+              <View style={styles.rideTextContainer}>
+                <Text style={[
+                  styles.rideOptionText, 
+                  { fontSize: fontSize.medium, color: COLORS.primary, fontWeight: '600' }
+                ]}>DELIVERY</Text>
+              </View>
+            </View>
           </TouchableOpacity>
-        </Animated.View>
+        </View>
         
         {/* Recent Destinations Section */}
-        <Animated.View 
+        <View 
           style={[
             styles.recentSection,
             {
-              opacity: fadeAnim,
-              transform: [{ translateY: translateYAnim }],
-              marginTop: spacing.medium,
+              marginTop: spacing.large,
               paddingHorizontal: spacing.medium
             }
           ]}
         >
           <View style={styles.sectionTitleContainer}>
-            <Text style={[styles.sectionTitle, {fontSize: fontSize.medium}]}>Recent Places</Text>
-            <TouchableOpacity style={styles.seeAllButton}>
-              <Text style={[styles.seeAllText, {fontSize: fontSize.small}]}>See All</Text>
+            <Text style={[
+              styles.sectionTitle, 
+              {fontSize: fontSize.medium, color: COLORS.primary, fontWeight: '600'}
+            ]}>Recent Places</Text>
+            <TouchableOpacity 
+              style={styles.seeAllButton}
+              onPress={() => navigateTo('AllPlacesScreen')}
+            >
+              <Text style={[
+                styles.seeAllText, 
+                {fontSize: fontSize.small, color: COLORS.secondary}
+              ]}>See All</Text>
             </TouchableOpacity>
           </View>
           
@@ -332,49 +308,79 @@ export default function HomeScreen() {
                   {
                     marginRight: spacing.small,
                     padding: spacing.small,
-                    minWidth: isTablet ? 120 : 90
+                    minWidth: isTablet ? 120 : 90,
+                    backgroundColor: COLORS.white,
+                    borderRadius: 12,
+                    shadowColor: COLORS.primary,
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 4,
+                    elevation: 2,
                   }
                 ]}
-                onPress={animateTouchable}
+                onPress={() => navigateTo('LocationScreen', { location: item.name })}
               >
                 <View style={[
                   styles.recentIconContainer,
                   {
                     width: isTablet ? 42 : 32,
                     height: isTablet ? 42 : 32,
-                    marginBottom: spacing.xs
+                    marginBottom: spacing.xs,
+                    backgroundColor: COLORS.lightGray,
+                    borderRadius: isTablet ? 21 : 16,
                   }
                 ]}>
-                  {/* icons */}
-                  <FontAwesome5 name={item.icon} size={isTablet ? 18 : 14} color="white" /> 
+                  <FontAwesome5 name={item.icon} size={isTablet ? 18 : 14} color={COLORS.primary} /> 
                 </View>
-                <Text style={[styles.recentText, {fontSize: fontSize.small}]}>{item.name}</Text>
+                <Text style={[
+                  styles.recentText, 
+                  {fontSize: fontSize.small, color: COLORS.darkGray, fontWeight: '500'}
+                ]}>{item.name}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
-        </Animated.View>
+        </View>
         
-        {/* Features Carousel with Animation */}
-        <Animated.View 
+        {/* Features Carousel */}
+        <View 
           style={[
             styles.featuresSection,
             {
-              opacity: fadeAnim,
-              transform: [{ translateY: translateYAnim }],
-              marginTop: spacing.medium,
+              marginTop: spacing.large,
               paddingHorizontal: spacing.medium
             }
           ]}
         >
           <View style={styles.sectionTitleContainer}>
-            <Text style={[styles.sectionTitle, {fontSize: fontSize.medium}]}>Featured</Text>
-            <TouchableOpacity style={styles.seeAllButton}>
-              <Text style={[styles.seeAllText, {fontSize: fontSize.small}]}>Explore</Text>
+            <Text style={[
+              styles.sectionTitle, 
+              {fontSize: fontSize.medium, color: COLORS.primary, fontWeight: '600'}
+            ]}>Featured</Text>
+            <TouchableOpacity 
+              style={styles.seeAllButton}
+              onPress={() => navigateTo('FeaturedScreen')}
+            >
+              <Text style={[
+                styles.seeAllText, 
+                {fontSize: fontSize.small, color: COLORS.secondary}
+              ]}>Explore</Text>
             </TouchableOpacity>
           </View>
           
-          {/* Enhanced Carousel */}
-          <View style={styles.carouselContainer}>
+          {/* Carousel with Modern Design */}
+          <View style={[
+            styles.carouselContainer, 
+            {
+              marginTop: spacing.small,
+              borderRadius: 16,
+              overflow: 'hidden',
+              shadowColor: COLORS.primary,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.2,
+              shadowRadius: 8,
+              elevation: 5,
+            }
+          ]}>
             <Carousel
               loop
               width={carouselWidth}
@@ -386,83 +392,95 @@ export default function HomeScreen() {
               renderItem={({ item, index }) => (
                 <TouchableOpacity 
                   activeOpacity={0.9}
-                  onPress={animateTouchable}
-                  style={[styles.carouselItemContainer, {borderRadius: spacing.small}]}
+                  onPress={() => navigateTo('FeatureDetailScreen', { feature: item })}
+                  style={[styles.carouselItemContainer, {borderRadius: 16}]}
                 >
                   <SharedElement id={`item.${index}.image`}>
                     <Image 
                       source={{ uri: item.uri }} 
-                      style={styles.carouselImage} 
+                      style={[styles.carouselImage, { borderRadius: 16 }]} 
                       resizeMode="cover"
                       defaultSource={require('../../assets/kms.png')} // Fallback image
                     />
                   </SharedElement>
                   <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.8)']}
-                    style={styles.carouselGradient}
+                    colors={['transparent', 'rgba(0,0,0,0.7)']}
+                    style={[styles.carouselGradient, { borderRadius: 16 }]}
                   >
-                    <Text style={[styles.carouselTitle, {fontSize: fontSize.medium}]}>{item.title}</Text>
-                    <Text style={[styles.carouselDescription, {fontSize: fontSize.small}]}>{item.description}</Text>
+                    <Text style={[
+                      styles.carouselTitle, 
+                      {fontSize: fontSize.medium, color: COLORS.white, fontWeight: '600'}
+                    ]}>{item.title}</Text>
+                    <Text style={[
+                      styles.carouselDescription, 
+                      {fontSize: fontSize.small, color: COLORS.white}
+                    ]}>{item.description}</Text>
                   </LinearGradient>
                 </TouchableOpacity>
               )}
             />
           </View>
-        </Animated.View>
-      </Animated.ScrollView>
+        </View>
+      </ScrollView>
       
-      {/* Modernized Bottom Navigation with Glass Effect */}
-      <BlurView intensity={90} tint="dark" style={styles.bottomNavBlur}>
-        <Animated.View
-          style={[
-            styles.bottomNav,
-            {
-              opacity: fadeAnim,
-              transform: [{ translateY: translateYAnim }]
-            }
-          ]}
-        >
-          <LinearGradient
-            colors={['black', 'rgba(0,0,0,0.85)']}
-            style={styles.bottomNavGradient}
+      {/* Bottom Navigation */}
+      <View style={[
+        styles.bottomNav,
+        {
+          backgroundColor: COLORS.white,
+          borderTopWidth: 1,
+          borderTopColor: COLORS.lightGray,
+          shadowColor: COLORS.primary,
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.05,
+          shadowRadius: 4,
+          elevation: 5,
+        }
+      ]}>
+        {[
+          { name: 'home', label: 'Home', screen: 'LandingPageScreen', active: true },
+          { name: 'heart-outline', label: 'Favorites', screen: 'FavScreen', active: false },
+          { name: 'person-outline', label: 'Profile', screen: 'ProfilesettingScreen', active: false },
+        ].map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.navItem}
+            onPress={() => navigateTo(item.screen)}
+            activeOpacity={0.7}
           >
-            {[
-              { name: 'home', label: 'Home', screen: 'LandingPageScreen', active: true },
-              { name: 'heart-outline', label: 'Favorites', screen: 'FavScreen', active: false },
-              { name: 'person-outline', label: 'Profile', screen: 'ProfilesettingScreen', active: false },
-            ].map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.navItem}
-                onPress={() => navigateTo(item.screen)}
-                activeOpacity={0.7}
-              >
-                {item.active && <View style={styles.activeIndicator} />}
-                <Ionicons
-                  name={item.name}
-                  size={isTablet ? 24 : 22}
-                  color={item.active ? "#4647D3" : "#4647D3"}
-                />
-                <Text
-                  style={[
-                    styles.navText,
-                    { fontSize: fontSize.small, color: item.active ? "#4647D3" : "#4647D3" }
-                  ]}
-                >
-                  {item.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </LinearGradient>
-        </Animated.View>
-      </BlurView>
+            {item.active && (
+              <View style={[
+                styles.activeIndicator, 
+                { backgroundColor: COLORS.secondary }
+              ]} />
+            )}
+            <Ionicons
+              name={item.name}
+              size={isTablet ? 24 : 22}
+              color={item.active ? COLORS.secondary : COLORS.darkGray}
+            />
+            <Text
+              style={[
+                styles.navText,
+                { 
+                  fontSize: fontSize.small, 
+                  color: item.active ? COLORS.secondary : COLORS.darkGray,
+                  fontWeight: item.active ? '600' : '400'
+                }
+              ]}
+            >
+              {item.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
   },
   header: {
     position: 'absolute',
@@ -471,52 +489,41 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 10,
   },
-  headerBlur: {
-    flex: 1,
-  },
-  headerGradient: {
+  headerContent: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'ios' ? 50 : 40,
     height: '100%',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   headerLogo: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: hp(4),
   },
   logoIcon: {
-    marginRight: 8,
+    marginRight: hp(2),
   },
   logoText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   menuButton: {
-    padding: 8,
-  },
-  messageIconContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    padding: 8,
+    width: 40,
+    height: 40,
     borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   content: {
     flex: 1,
     paddingTop: Platform.OS === 'ios' ? 110 : 90,
   },
   walletCard: {
-    borderRadius: 16,
     overflow: 'hidden',
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
   },
-  walletGradient: {
+  walletContent: {
     padding: 16,
-    borderRadius: 16,
   },
   walletHeader: {
     flexDirection: 'row',
@@ -525,30 +532,25 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   walletTitle: {
-    color: '#FFFFFF',
     fontWeight: '500',
   },
   balanceRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   balanceAmount: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   depositButton: {
-    borderRadius: 20,
-    overflow: 'hidden',
-  },
-  depositGradient: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   depositText: {
-    color: 'white',
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   rideOptionsContainer: {
     flexDirection: 'row',
@@ -556,38 +558,33 @@ const styles = StyleSheet.create({
   },
   rideOption: {
     flex: 1,
-    borderRadius: 16,
+    height: 80,
     overflow: 'hidden',
-    elevation: 5,
-    shadowColor: '#00000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-  },
-  rideGradient: {
-    padding: 16,
-    borderRadius: 16,
   },
   rideOptionContent: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+  },
+  rideIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
   },
   rideOptionImage: {
-    marginRight: 12,
+    width: 40,
+    height: 40,
   },
   rideTextContainer: {
     flex: 1,
   },
   rideOptionText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-  },
-  rideOptionSubtext: {
-    color: '#AAAAAA',
-    marginTop: 4,
-  },
-  recentSection: {
-    width: '100%',
+    fontWeight: '600',
   },
   sectionTitleContainer: {
     flexDirection: 'row',
@@ -596,44 +593,38 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   seeAllButton: {
-    padding: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
   },
   seeAllText: {
-    color: '#FFD700',
+    fontWeight: '500',
   },
   recentScrollContent: {
-    paddingBottom: 12,
+    paddingVertical: 8,
   },
   recentItem: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: 12,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   recentIconContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 16,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   recentText: {
-    color: '#FFFFFF',
     textAlign: 'center',
-  },
-  featuresSection: {
-    width: '100%',
+    marginTop: 4,
   },
   carouselContainer: {
-    alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: 8,
   },
   carouselItemContainer: {
-    overflow: 'hidden',
+    position: 'relative',
     width: '100%',
     height: '100%',
+    overflow: 'hidden',
   },
   carouselImage: {
     width: '100%',
@@ -649,28 +640,20 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   carouselTitle: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+    fontWeight: '700',
     marginBottom: 4,
   },
   carouselDescription: {
-    color: '#DDDDDD',
-  },
-  bottomNavBlur: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    fontWeight: '400',
   },
   bottomNav: {
-    width: '100%',
-    backgroundColor:'black'
-  },
-  bottomNavGradient: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: 12,
-    paddingBottom: Platform.OS === 'ios' ? 28 : 12,
+    paddingVertical: hp(2),
+    marginBottom: hp(2),
+    marginHorizontal: hp(4),
+    borderRadius: 30,
+    paddingBottom: Platform.OS === 'ios' ? 24 : 12,
   },
   navItem: {
     alignItems: 'center',
@@ -684,9 +667,8 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#800000',
   },
   navText: {
     marginTop: 4,
-  },
+  }
 });

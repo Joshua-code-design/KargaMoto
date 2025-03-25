@@ -8,7 +8,7 @@ import LoginScreen from './screens/LoginScreen';
 import OtpScreen from './screens/OtpScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import LandingPageScreen from './screens/LandingPageScreen';
-import ProfilesettingScreen from './screens/ProfilesettingScreen';
+import ProfilesettingScreen from './screens/ProfileScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import AddressScreen from './screens/AddressScreen';
 import Map from './components/Map';

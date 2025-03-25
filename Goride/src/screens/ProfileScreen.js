@@ -9,17 +9,41 @@ import {
   SafeAreaView,
   Dimensions,
   Platform,
-  StatusBar
+  StatusBar,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import PopupModal from '../components/PopupModal';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from '@react-navigation/native';
+import PopupModal from '../components/PopupModal';
 import { logoutUser } from '../services/Loginapi';
 
 // Get screen dimensions for responsiveness
 const { width, height } = Dimensions.get('window');
+
+// Determine if the device is a tablet
+const isTablet = width >= 600; // A common breakpoint for tablets
+
+// Define fontSize based on device type
+const fontSize = {
+  small: isTablet ? 14 : 12,
+  medium: isTablet ? 16 : 14,
+  large: isTablet ? 18 : 16
+};
+
+// Color palette
+const COLORS = {
+  primary: '#1A2B4D',       // Deep Navy Blue
+  secondary: '#2E7D32',     // Forest Green
+  tertiary: '#26A69A',      // Soft Teal
+  accent: '#D4AF37',        // Muted Gold
+  background: '#F5F5F5',    // Light Gray
+  white: '#FFFFFF',         // White
+  lightGray: '#E0E0E0',     // Very Light Gray
+  darkGray: '#333333',      // Charcoal Gray
+  error: '#E53935',         // Bright Red
+};
 
 // Calculate responsive sizes
 const scale = Math.min(width, height) / 375; // Base scale on 375px width (iPhone X)
@@ -30,21 +54,25 @@ export default function ProfileScreen() {
   const [profileImage, setProfileImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState("");
-  const [userName, setUserName] = useState("Loading...");
-  const [gender, setGender] = useState("Loading...");
-  const [mobileNumber, setMobileNumber] = useState("Loading...");
-  const [userType, setUserType] = useState("Loading...");
+  const [userDetails, setUserDetails] = useState({
+    userName: "Loading...",
+    gender: "Loading...",
+    mobileNumber: "Loading...",
+    userType: "Standard User"
+  });
 
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const userDetails = await AsyncStorage.getItem('userDetails');
-        if (userDetails !== null) {
-          const parsedDetails = JSON.parse(userDetails);
-          setUserName(parsedDetails.full_name || "Not provided");
-          setGender(parsedDetails.gender || "Not provided");
-          setMobileNumber(parsedDetails.phone_number || "Not provided");
-          setUserType(parsedDetails.user_type || "Standard User");
+        const storedUserDetails = await AsyncStorage.getItem('userDetails');
+        if (storedUserDetails !== null) {
+          const parsedDetails = JSON.parse(storedUserDetails);
+          setUserDetails({
+            userName: parsedDetails.full_name || "Not provided",
+            gender: parsedDetails.gender || "Not provided",
+            mobileNumber: parsedDetails.phone_number || "Not provided",
+            userType: parsedDetails.user_type || "Standard User"
+          });
         }
       } catch (error) {
         console.error("Error fetching user details:", error);
@@ -72,15 +100,19 @@ export default function ProfileScreen() {
     }
   };
 
+  const navigateTo = (screen) => {
+    navigation.navigate(screen);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
-         <TouchableOpacity 
+      <TouchableOpacity 
         style={styles.arrowContainer} 
         onPress={() => navigation.navigate('LandingPageScreen')}
       >
-        <View style={styles.line} />
-        <Icon name="arrow-left" size={30} color="white" />
+        <Icon name="arrow-left" size={30} color="#26A69A" />
       </TouchableOpacity>
+      
       <ScrollView 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -88,7 +120,6 @@ export default function ProfileScreen() {
         <View style={styles.container}>
           {/* Cover Photo */}
           <View style={styles.coverContainer}>
-            {/* Optional: Add gradient overlay */}
             <View style={styles.coverGradient} />
           </View>
 
@@ -99,27 +130,23 @@ export default function ProfileScreen() {
                 <Image source={{ uri: profileImage }} style={styles.profileImage} />
               ) : (
                 <View style={styles.profileImagePlaceholder}>
-                  <Icon name="account" size={normalize(60)} color="#fff" />
+                  <Icon name="account" size={normalize(60)} color="#26A69A" />
                 </View>
               )}
-              <TouchableOpacity style={styles.editProfileButton}>
-                <Icon name="camera" size={normalize(16)} color="#fff" />
-              </TouchableOpacity>
             </View>
             
             <View style={styles.nameContainer}>
-              <Text style={styles.userName}>{userName}</Text>
-              <Text style={styles.userType}>{userType}</Text>
+              <Text style={styles.userName}>{userDetails.userName}</Text>
+              <Text style={styles.userType}>{userDetails.userType}</Text>
             </View>
           </View>
           
-          {/* Information Cards */}
           {/* Personal Information Section */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Personal Information</Text>
               <TouchableOpacity style={styles.editButton}>
-                <Icon name="pencil-outline" size={normalize(18)} color="white" />
+                <Icon name="pencil-outline" size={normalize(18)} color="#26A69A" />
               </TouchableOpacity>
             </View>
             
@@ -127,12 +154,12 @@ export default function ProfileScreen() {
             
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Full Name</Text>
-              <Text style={styles.infoValue}>{userName}</Text>
+              <Text style={styles.infoValue}>{userDetails.userName}</Text>
             </View>
             
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Gender</Text>
-              <Text style={styles.infoValue}>{gender}</Text>
+              <Text style={styles.infoValue}>{userDetails.gender}</Text>
             </View>
           </View>
 
@@ -141,7 +168,7 @@ export default function ProfileScreen() {
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Contact Information</Text>
               <TouchableOpacity style={styles.editButton}>
-                <Icon name="pencil-outline" size={normalize(18)} color="white" />
+                <Icon name="pencil-outline" size={normalize(18)} color="#26A69A" />
               </TouchableOpacity>
             </View>
             
@@ -149,9 +176,8 @@ export default function ProfileScreen() {
             
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Mobile Number</Text>
-              <Text style={styles.infoValue}>{mobileNumber}</Text>
+              <Text style={styles.infoValue}>{userDetails.mobileNumber}</Text>
             </View>
-          
           </View>
 
           {/* Account Settings */}
@@ -160,44 +186,22 @@ export default function ProfileScreen() {
             <View style={styles.cardDivider} />
             
             <View style={styles.buttonContainer}>
-              <TouchableOpacity 
-                style={styles.settingsButton}
-                onPress={() => navigation.navigate('EditProfile')}
-              >
-                <Icon name="account-edit-outline" size={normalize(20)} color="white" />
-                <Text style={styles.settingsButtonText}>Edit Profile</Text>
-                <Icon name="chevron-right" size={normalize(20)} color="white" />
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                style={styles.settingsButton}
-                onPress={() => navigation.navigate('EditProfile')}
-              >
-                <Icon name="history" size={normalize(20)} color="white" />
-                <Text style={styles.settingsButtonText}>History</Text>
-                <Icon name="chevron-right" size={normalize(20)} color="white" />
-              </TouchableOpacity>
-
-
-              <TouchableOpacity 
-                style={styles.settingsButton}
-                onPress={() => navigation.navigate('EditProfile')}
-              >
-                <Icon name="alert-circle-outline" size={normalize(20)} color="white" />
-                <Text style={styles.settingsButtonText}>Report</Text>
-                <Icon name="chevron-right" size={normalize(20)} color="white" />
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                style={styles.settingsButton}
-                onPress={() => navigation.navigate('EditProfile')}
-              >
-                <Icon name="thumb-up-outline" size={normalize(20)} color="white" />
-                <Text style={styles.settingsButtonText}>FeedBack</Text>
-                <Icon name="chevron-right" size={normalize(20)} color="white" />
-              </TouchableOpacity>
-
-
+              {[
+                { icon: "account-edit-outline", label: "Edit Profile", screen: "EditProfile" },
+                { icon: "history", label: "History", screen: "History" },
+                { icon: "alert-circle-outline", label: "Report", screen: "Report" },
+                { icon: "thumb-up-outline", label: "Feedback", screen: "Feedback" }
+              ].map((item, index) => (
+                <TouchableOpacity 
+                  key={index}
+                  style={styles.settingsButton}
+                  onPress={() => navigation.navigate(item.screen)}
+                >
+                  <Icon name={item.icon} size={normalize(20)} color="#26A69A" />
+                  <Text style={styles.settingsButtonText}>{item.label}</Text>
+                  <Icon name="chevron-right" size={normalize(20)} color="#26A69A" />
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
           
@@ -207,14 +211,8 @@ export default function ProfileScreen() {
               style={[styles.actionButton, styles.logoutButton]}
               onPress={() => handleShowModal("logout")}
             >
-              <Icon name="logout" size={normalize(18)} color="#fff" />
+              <Icon name="logout" size={normalize(18)} color="#ffffff" />
               <Text style={styles.logoutButtonText}>Logout</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[styles.actionButton, styles.deleteButton]}
-              onPress={() => handleShowModal("delete")}
-            >
             </TouchableOpacity>
           </View>
         </View>
@@ -232,6 +230,58 @@ export default function ProfileScreen() {
         onCancel={() => setModalVisible(false)}
         onConfirm={handleConfirm}
       />
+
+      {/* Bottom Navigation */}
+      <View style={[
+        styles.bottomNav,
+        {
+          backgroundColor: COLORS.white,
+          borderTopWidth: 1,
+          borderTopColor: COLORS.lightGray,
+          shadowColor: COLORS.primary,
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.05,
+          shadowRadius: 4,
+          elevation: 5,
+        }
+      ]}>
+        {[
+          { name: 'home', label: 'Home', screen: 'LandingPageScreen', active: false },
+          { name: 'heart-outline', label: 'Favorites', screen: 'FavScreen', active: false },
+          { name: 'person-outline', label: 'Profile', screen: 'ProfilesettingScreen', active: true },
+        ].map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.navItem}
+            onPress={() => navigateTo(item.screen)}
+            activeOpacity={0.7}
+          >
+            {item.active && (
+              <View style={[
+                styles.activeIndicator, 
+                { backgroundColor: COLORS.secondary }
+              ]} />
+            )}
+            <Ionicons
+              name={item.name}
+              size={isTablet ? 24 : 22}
+              color={item.active ? COLORS.secondary : COLORS.darkGray}
+            />
+            <Text
+              style={[
+                styles.navText,
+                { 
+                  fontSize: fontSize.small, 
+                  color: item.active ? COLORS.secondary : COLORS.darkGray,
+                  fontWeight: item.active ? '600' : '400'
+                }
+              ]}
+            >
+              {item.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     </SafeAreaView>
   );
 }
@@ -239,7 +289,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "black",
+    backgroundColor: "#F5F5F5",
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   scrollView: {
@@ -247,10 +297,10 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "black",
+    backgroundColor: "#F5F5F5",
   },
   coverContainer: {
-    height: normalize(120),
+    height: normalize(50),
     backgroundColor: "black",
     position: "relative",
   },
@@ -260,7 +310,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: normalize(60),
-    backgroundColor: "rgba(0,0,0,0.1)",
+    backgroundColor: "#F5F5F5",
   },
   profileContainer: {
     alignItems: "center",
@@ -275,31 +325,11 @@ const styles = StyleSheet.create({
     width: normalize(100),
     height: normalize(100),
     borderRadius: normalize(50),
-    backgroundColor: "black",
+    backgroundColor: "#F5F5F5",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 3,
-    borderColor: "#FFFFFF",
-  },
-  profileImage: {
-    width: normalize(100),
-    height: normalize(100),
-    borderRadius: normalize(50),
-    borderWidth: 3,
-    borderColor: "#FFFFFF",
-  },
-  editProfileButton: {
-    position: "absolute",
-    bottom: normalize(5),
-    right: normalize(5),
-    backgroundColor: "black",
-    width: normalize(30),
-    height: normalize(30),
-    borderRadius: normalize(15),
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#FFFFFF",
+    borderColor: "#26A69A",
   },
   nameContainer: {
     alignItems: 'center',
@@ -308,25 +338,25 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: normalize(22),
     fontWeight: "600",
-    color: "white",
+    color: "#26A69A",
     marginBottom: normalize(5),
   },
   userType: {
     fontSize: normalize(14),
-    color: "white",
+    color: "#26A69A",
     textTransform: "capitalize",
   },
   card: {
-    backgroundColor: "black",
+    backgroundColor: "#FFFFFF",
     borderRadius: normalize(12),
     padding: normalize(16),
     marginHorizontal: normalize(16),
     marginBottom: normalize(16),
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 5,
     shadowRadius: 3.84,
-    elevation: 3,
+    elevation: 5,
   },
   cardHeader: {
     flexDirection: "row",
@@ -336,12 +366,12 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: normalize(16),
     fontWeight: "600",
-    color: "white",
+    color: "#26A69A",
     marginBottom: normalize(8),
   },
   cardDivider: {
     height: 1,
-    backgroundColor: "white",
+    backgroundColor: "#26A69A",
     marginBottom: normalize(16),
   },
   editButton: {
@@ -355,12 +385,12 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: normalize(14),
-    color: "white",
+    color: "#26A69A",
     flex: 1,
   },
   infoValue: {
     fontSize: normalize(14),
-    color: "white",
+    color: "#26A69A",
     fontWeight: "500",
     textAlign: "right",
     flex: 2,
@@ -371,7 +401,7 @@ const styles = StyleSheet.create({
   line: {
     width: 50,
     height: 2,
-    backgroundColor: 'black',
+    backgroundColor: '#26A69A',
   },
   addButton: {
     flexDirection: "row",
@@ -379,7 +409,7 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     fontSize: normalize(14),
-    color: "white",
+    color: "#26A69A",
     marginRight: normalize(5),
   },
   buttonContainer: {
@@ -390,11 +420,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: normalize(12),
     borderBottomWidth: 1,
-    borderBottomColor: "#EEEEEE",
+    borderBottomColor: "#26A69A",
   },
   settingsButtonText: {
     fontSize: normalize(15),
-    color: "white",
+    color: "#26A69A",
     flex: 1,
     marginLeft: normalize(15),
   },
@@ -411,7 +441,7 @@ const styles = StyleSheet.create({
     marginBottom: normalize(12),
   },
   logoutButton: {
-    backgroundColor: "black",
+    backgroundColor: "#26A69A",
   },
   logoutButtonText: {
     color: "#FFFFFF",
@@ -419,4 +449,34 @@ const styles = StyleSheet.create({
     fontSize: normalize(15),
     marginLeft: normalize(8),
   },
+
+  bottomNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: hp(2),
+    marginBottom: hp(2),
+    marginHorizontal: hp(5),
+    borderRadius: 30,
+    paddingBottom: Platform.OS === 'ios' ? 24 : 12,
+    backgroundColor: '#fff',
+    
+  },
+
+  navItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    paddingHorizontal: 16,
+  },
+  activeIndicator: {
+    position: 'absolute',
+    top: -12,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+  },
+  navText: {
+    marginTop: 4,
+  }
+
 }); 
