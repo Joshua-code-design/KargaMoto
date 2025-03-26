@@ -73,9 +73,14 @@ export const verifyOTP = async (phoneNumber, otp, navigation, inputRefs, setInpu
 
         if (response.data.user_type === "Driver") {
           await AsyncStorage.setItem('driverDetails', JSON.stringify(getUserDetails.data.driver));
+          console.log("Driver Login");
+          navigation.navigate('LandingPageScreen');
+        }else if(response.data.user_type === "Passenger"){
+          console.log("Passenger Login ");
+          navigation.navigate('LandingPageScreen');
         }
 
-        navigation.navigate('LandingPageScreen');
+       
       }, 1500); // Delay for 1.5 seconds
     }
   } catch (error) {
