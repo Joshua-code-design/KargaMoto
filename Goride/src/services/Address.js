@@ -1,5 +1,5 @@
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store'; 
 
   // const API_URL = "https://kargamotoapi.onrender.com/api";
   const API_URL = "http://192.168.1.28:5000/api";
@@ -12,7 +12,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
         }
 
         // Retrieve token from AsyncStorage
-        const token = await AsyncStorage.getItem('token');
+        const token = await SecureStore.getItemAsync('token');
 
         if (!token) {
             console.error("No token found. User might not be authenticated.");
@@ -43,7 +43,7 @@ export const getFavorites = async () => {
     try {
 
         // Retrieve token from AsyncStorage
-        const token = await AsyncStorage.getItem('token');
+        const token = await SecureStore.getItemAsync('token');
 
         if (!token) {
             console.error("No token found. User might not be authenticated.");

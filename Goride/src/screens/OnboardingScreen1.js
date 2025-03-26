@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import LottieView from 'lottie-react-native';
 import styles from '../styles/screen1'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store'; 
 
 const { width } = Dimensions.get('window');
 
@@ -16,7 +17,7 @@ const OnboardingScreen2 = ({ navigation }) => {
     const checkOnboardingStatus = async () => {
       try {
         const hasCompletedOnboarding = await AsyncStorage.getItem('hasCompletedOnboarding');
-        const token = await AsyncStorage.getItem('token');
+        const token = await SecureStore.getItemAsync('token');
 
         console.log(hasCompletedOnboarding);
         console.log(token);

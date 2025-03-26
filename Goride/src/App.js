@@ -50,4 +50,8 @@ export default function App() {
 
 //fix bug after backing on Maps Component cant click anything
 
+//use socket.io for real time location
 //navigate from favscreen to maps with isselectaddress nga naka true tapos ang type(work or home) and then passback to favsceen
+
+
+

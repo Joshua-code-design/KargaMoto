@@ -1,5 +1,5 @@
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store'; 
 import { Alert, Animated } from 'react-native';
 
   // const API_URL = "https://kargamotoapi.onrender.com/api";
@@ -7,7 +7,7 @@ import { Alert, Animated } from 'react-native';
 
   export const requestRide = async (pickup, destination,serviceType,fare) => {
     try {
-        const token = await AsyncStorage.getItem('token');
+        const token = await SecureStore.getItemAsync('token');
 
         // console.log("pickup:", pickup);
         // console.log("dropoff:", dropoff);
@@ -43,7 +43,7 @@ import { Alert, Animated } from 'react-native';
 
 export const addFavorites = async (home, work) => {
     try {
-        const token = await AsyncStorage.getItem('token');
+        const token = await SecureStore.getItemAsync('token');
 
         if (!token) {
             console.warn("No authentication token found.");
