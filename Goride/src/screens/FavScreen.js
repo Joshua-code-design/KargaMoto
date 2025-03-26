@@ -605,6 +605,43 @@ const styles = StyleSheet.create({
   navText: {
     marginTop: 4,
   },
+
+  deleteButton: {
+    padding: scale(8),
+  },
+  modalDeleteText: {
+    fontSize: scale(14),
+    color: '#666666',
+    textAlign: 'center',
+    marginBottom: scale(20),
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: scale(12),
+    borderRadius: scale(8),
+    marginHorizontal: scale(8),
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#F0F0F0',
+  },
+  deleteConfirmButton: {
+    backgroundColor: '#E53935',
+  },
+  cancelButtonText: {
+    color: '#333333',
+    fontSize: scale(14),
+    fontWeight: '500',
+  },
+  deleteConfirmButtonText: {
+    color: '#FFFFFF',
+    fontSize: scale(14),
+    fontWeight: '500',
+  },
 });
 
 export default AddressScreen;
