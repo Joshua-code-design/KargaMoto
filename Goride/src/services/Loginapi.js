@@ -1,5 +1,6 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store'; 
 import { Alert, Animated } from 'react-native';
 
   // const API_URL = "https://kargamotoapi.onrender.com/api";
@@ -53,10 +54,10 @@ export const verifyOTP = async (phoneNumber, otp, navigation, inputRefs, setInpu
       showToast('OTP Verified Successfully!', 'success');
 
       // Store token in AsyncStorage
-      await AsyncStorage.setItem('token', response.data.token);
+      await SecureStore.setItemAsync('token', response.data.token);
 
       // Get token from AsyncStorage
-      const token = await AsyncStorage.getItem('token');
+      const token = await SecureStore.getItemAsync('token');
 
       // Get user details from API
       const getUserDetails = await axios.get(`${API_URL}/get-user-details`, {
@@ -121,7 +122,7 @@ export const logoutUser = async (navigation) => {
   try {
     const response = await axios.post(`${API_URL}/logout`);
     if (response.status === 200) {
-      await AsyncStorage.removeItem('token');
+      await SecureStore.deleteItemAsync('token'); // Changed from AsyncStorage to SecureStore
       await AsyncStorage.removeItem('userDetails');
       navigation.navigate('LoginScreen');
     }

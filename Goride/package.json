@@ -28,6 +28,7 @@
     "expo-haptics": "~14.0.1",
     "expo-linear-gradient": "~14.0.2",
     "expo-location": "~18.0.7",
+    "expo-secure-store": "~14.0.1",
     "expo-status-bar": "~2.0.1",
     "goride": "file:",
     "lottie-react-native": "7.1.0",
