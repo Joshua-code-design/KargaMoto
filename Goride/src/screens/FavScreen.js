@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
   },
   navText: {
     marginTop: 4,
-  }
+  },
 });
 
 export default AddressScreen;

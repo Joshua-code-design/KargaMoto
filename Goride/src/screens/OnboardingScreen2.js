@@ -16,10 +16,10 @@ const OnboardingScreen1 = ({ navigation }) => {
       />
      
       <View style={styles.radioContainer}>
-        {[...Array(6)].map((_, index) => (
+        {[...Array(2)].map((_, index) => (
           <View
             key={index}
-            style={[styles.radioButton, index === 1 && styles.radioButtonActive]}
+            style={[styles.radioButton, index === 0 && styles.radioButtonActive]}
           />
         ))}
       </View>

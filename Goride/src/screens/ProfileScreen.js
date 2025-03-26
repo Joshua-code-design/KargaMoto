@@ -34,7 +34,7 @@ const fontSize = {
 
 // Color palette
 const COLORS = {
-  primary: '#1A2B4D',       // Deep Navy Blue
+  primary: '#000000',       // Deep Navy Blue
   secondary: '#2E7D32',     // Forest Green
   tertiary: '#26A69A',      // Soft Teal
   accent: '#D4AF37',        // Muted Gold
@@ -239,11 +239,15 @@ export default function ProfileScreen() {
           borderTopWidth: 1,
           borderTopColor: COLORS.lightGray,
           shadowColor: COLORS.primary,
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.05,
-          shadowRadius: 4,
-          elevation: 5,
+          shadowOffset: { 
+            width: 0, 
+            height: -2 
+          },
+          shadowOpacity: 0.15, // Converting 15 to decimal opacity
+          shadowRadius: 50,
+          elevation: 30,
         }
+        
       ]}>
         {[
           { name: 'home', label: 'Home', screen: 'LandingPageScreen', active: false },
@@ -287,6 +291,7 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+
   safeArea: {
     flex: 1,
     backgroundColor: "#F5F5F5",
@@ -449,19 +454,15 @@ const styles = StyleSheet.create({
     fontSize: normalize(15),
     marginLeft: normalize(8),
   },
-
   bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: hp(2),
     marginBottom: hp(2),
-    marginHorizontal: hp(5),
+    marginHorizontal: hp(4),
     borderRadius: 30,
     paddingBottom: Platform.OS === 'ios' ? 24 : 12,
-    backgroundColor: '#fff',
-    
   },
-
   navItem: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -477,6 +478,6 @@ const styles = StyleSheet.create({
   },
   navText: {
     marginTop: 4,
-  }
+  },
 
 }); 

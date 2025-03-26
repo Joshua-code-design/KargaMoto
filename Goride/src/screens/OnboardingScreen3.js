@@ -18,6 +18,7 @@ const OnboardingScreen3 = ({ navigation }) => {
   };
 
   return (
+    <ScrollView>  
     <SafeAreaView style={styles.container}>
       <LinearGradient
         colors={['rgba(0,0,0,0.7)', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
@@ -62,13 +63,10 @@ const OnboardingScreen3 = ({ navigation }) => {
       </ScrollView>
 
       <View style={styles.radioContainer}>
-        {[...Array(6)].map((_, index) => (
+        {[...Array(2)].map((_, index) => (
           <View
             key={index}
-            style={[
-              styles.radioButton,
-              index === 2 && styles.radioButtonActive 
-            ]}
+            style={[styles.radioButton, index === 1 && styles.radioButtonActive]}
           />
         ))}
       </View>
@@ -80,6 +78,7 @@ const OnboardingScreen3 = ({ navigation }) => {
           activeOpacity={0.7}
           disabled={!isChecked}
         >
+          
           <LinearGradient
             colors={isChecked ? ['#000000', '#000000'] : ['#9CA3AF', '#6B7280']}
             style={styles.gradient}
@@ -91,6 +90,7 @@ const OnboardingScreen3 = ({ navigation }) => {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
+    </ScrollView>
   );
 };
 
