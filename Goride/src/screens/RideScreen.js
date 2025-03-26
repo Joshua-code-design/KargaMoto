@@ -621,7 +621,7 @@ const RideScreen = () => {
             {/* Recent locations */}
             <View style={styles.recentLocations}>
               <Text style={[styles.recentTitle, { fontSize: dynamicStyles.fontSize.large }]}>
-                Recent Locations
+                Favorites Locations
               </Text>
               <TouchableOpacity
                 style={[styles.recentItem, { padding: dynamicStyles.padding.sm }]}

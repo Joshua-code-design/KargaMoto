@@ -2,22 +2,19 @@ import React, { useState, useEffect } from "react";
 import { 
   View, 
   Text, 
-  StyleSheet, 
   TouchableOpacity, 
   Image, 
   ScrollView, 
   SafeAreaView,
   Dimensions,
-  Platform,
-  StatusBar,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from '@react-navigation/native';
 import PopupModal from '../components/PopupModal';
 import { logoutUser } from '../services/Loginapi';
+import styles from '../styles/pofilescreen'; 
 
 // Get screen dimensions for responsiveness
 const { width, height } = Dimensions.get('window');
@@ -32,9 +29,8 @@ const fontSize = {
   large: isTablet ? 18 : 16
 };
 
-// Color palette
 const COLORS = {
-  primary: '#000000',       // Deep Navy Blue
+  primary: '#1A2B4D',       // Deep Navy Blue
   secondary: '#2E7D32',     // Forest Green
   tertiary: '#26A69A',      // Soft Teal
   accent: '#D4AF37',        // Muted Gold
@@ -120,7 +116,6 @@ export default function ProfileScreen() {
         <View style={styles.container}>
           {/* Cover Photo */}
           <View style={styles.coverContainer}>
-            <View style={styles.coverGradient} />
           </View>
 
           {/* Profile Section */}
@@ -145,9 +140,6 @@ export default function ProfileScreen() {
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Personal Information</Text>
-              <TouchableOpacity style={styles.editButton}>
-                <Icon name="pencil-outline" size={normalize(18)} color="#26A69A" />
-              </TouchableOpacity>
             </View>
             
             <View style={styles.cardDivider} />
@@ -167,9 +159,6 @@ export default function ProfileScreen() {
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Contact Information</Text>
-              <TouchableOpacity style={styles.editButton}>
-                <Icon name="pencil-outline" size={normalize(18)} color="#26A69A" />
-              </TouchableOpacity>
             </View>
             
             <View style={styles.cardDivider} />
@@ -187,10 +176,10 @@ export default function ProfileScreen() {
             
             <View style={styles.buttonContainer}>
               {[
-                { icon: "account-edit-outline", label: "Edit Profile", screen: "EditProfile" },
-                { icon: "history", label: "History", screen: "History" },
+                { icon: "account-edit-outline", label: "Edit Profile", screen: "EditScreen" },
+                { icon: "history", label: "History", screen: "HistoryScreen" },
                 { icon: "alert-circle-outline", label: "Report", screen: "Report" },
-                { icon: "thumb-up-outline", label: "Feedback", screen: "Feedback" }
+                { icon: "thumb-up-outline", label: "Feedback", screen: "FeedScreen" }
               ].map((item, index) => (
                 <TouchableOpacity 
                   key={index}
@@ -239,15 +228,11 @@ export default function ProfileScreen() {
           borderTopWidth: 1,
           borderTopColor: COLORS.lightGray,
           shadowColor: COLORS.primary,
-          shadowOffset: { 
-            width: 0, 
-            height: -2 
-          },
-          shadowOpacity: 0.15, // Converting 15 to decimal opacity
-          shadowRadius: 50,
-          elevation: 30,
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.05,
+          shadowRadius: 4,
+          elevation: 5,
         }
-        
       ]}>
         {[
           { name: 'home', label: 'Home', screen: 'LandingPageScreen', active: false },
@@ -290,194 +275,3 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-  },
-  coverContainer: {
-    height: normalize(50),
-    backgroundColor: "black",
-    position: "relative",
-  },
-  coverGradient: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: normalize(60),
-    backgroundColor: "#F5F5F5",
-  },
-  profileContainer: {
-    alignItems: "center",
-    marginTop: -normalize(50),
-    paddingHorizontal: normalize(20),
-  },
-  profileImageWrapper: {
-    position: "relative",
-    marginBottom: normalize(10),
-  },
-  profileImagePlaceholder: {
-    width: normalize(100),
-    height: normalize(100),
-    borderRadius: normalize(50),
-    backgroundColor: "#F5F5F5",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 3,
-    borderColor: "#26A69A",
-  },
-  nameContainer: {
-    alignItems: 'center',
-    marginBottom: normalize(20),
-  },
-  userName: {
-    fontSize: normalize(22),
-    fontWeight: "600",
-    color: "#26A69A",
-    marginBottom: normalize(5),
-  },
-  userType: {
-    fontSize: normalize(14),
-    color: "#26A69A",
-    textTransform: "capitalize",
-  },
-  card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: normalize(12),
-    padding: normalize(16),
-    marginHorizontal: normalize(16),
-    marginBottom: normalize(16),
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 5,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  cardTitle: {
-    fontSize: normalize(16),
-    fontWeight: "600",
-    color: "#26A69A",
-    marginBottom: normalize(8),
-  },
-  cardDivider: {
-    height: 1,
-    backgroundColor: "#26A69A",
-    marginBottom: normalize(16),
-  },
-  editButton: {
-    padding: normalize(5),
-  },
-  infoRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: normalize(14),
-  },
-  infoLabel: {
-    fontSize: normalize(14),
-    color: "#26A69A",
-    flex: 1,
-  },
-  infoValue: {
-    fontSize: normalize(14),
-    color: "#26A69A",
-    fontWeight: "500",
-    textAlign: "right",
-    flex: 2,
-  },
-  arrowContainer:{
-    marginLeft: hp(3),
-  },
-  line: {
-    width: 50,
-    height: 2,
-    backgroundColor: '#26A69A',
-  },
-  addButton: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  addButtonText: {
-    fontSize: normalize(14),
-    color: "#26A69A",
-    marginRight: normalize(5),
-  },
-  buttonContainer: {
-    marginTop: normalize(8),
-  },
-  settingsButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: normalize(12),
-    borderBottomWidth: 1,
-    borderBottomColor: "#26A69A",
-  },
-  settingsButtonText: {
-    fontSize: normalize(15),
-    color: "#26A69A",
-    flex: 1,
-    marginLeft: normalize(15),
-  },
-  actionButtonsContainer: {
-    paddingHorizontal: normalize(16),
-    marginBottom: normalize(30),
-  },
-  actionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: normalize(14),
-    borderRadius: normalize(8),
-    marginBottom: normalize(12),
-  },
-  logoutButton: {
-    backgroundColor: "#26A69A",
-  },
-  logoutButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "600",
-    fontSize: normalize(15),
-    marginLeft: normalize(8),
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: hp(2),
-    marginBottom: hp(2),
-    marginHorizontal: hp(4),
-    borderRadius: 30,
-    paddingBottom: Platform.OS === 'ios' ? 24 : 12,
-  },
-  navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-    paddingHorizontal: 16,
-  },
-  activeIndicator: {
-    position: 'absolute',
-    top: -12,
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-  },
-  navText: {
-    marginTop: 4,
-  },
-
-}); 

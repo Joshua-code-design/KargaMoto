@@ -1,3 +1,4 @@
+// File: src/screens/AddressScreen.js
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -10,11 +11,17 @@ import {
   Modal,
   ScrollView,
   Platform,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { addFavorites, getFavorites } from '../services/Address';
+import { 
+  addFavorites, 
+  getFavorites, 
+  deleteFavoriteAddress 
+} from '../services/Address';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { X, Trash2 } from 'lucide-react-native';
 
 // Get device dimensions
 const { width } = Dimensions.get('window');
@@ -64,6 +71,8 @@ const AddressScreen = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [addresses, setAddresses] = useState([]);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState(null);
 
   // Fetch addresses function
   const fetchAddresses = useCallback(async () => {
@@ -122,6 +131,41 @@ const AddressScreen = () => {
     }
   }, [route.params?.selectedLocation]);
 
+  // Handle address deletion
+  const handleDeleteAddress = async () => {
+    if (!addressToDelete) return;
+
+    try {
+      let result;
+      if (addressToDelete.type === 'Home') {
+        result = await deleteFavoriteAddress('home');
+      } else if (addressToDelete.type === 'Work') {
+        result = await deleteFavoriteAddress('work', addressToDelete.address);
+      }
+
+      if (result) {
+        // Refresh addresses
+        await fetchAddresses();
+        
+        // Close delete modal
+        setIsDeleteModalVisible(false);
+        setAddressToDelete(null);
+
+        // Show success message
+        Alert.alert('Success', `${addressToDelete.type} address deleted successfully`);
+      }
+    } catch (error) {
+      console.error('Error deleting address:', error);
+      Alert.alert('Error', 'Failed to delete address');
+    }
+  };
+
+  // Confirm delete modal
+  const showDeleteConfirmation = (address) => {
+    setAddressToDelete(address);
+    setIsDeleteModalVisible(true);
+  };
+
   // Add new address to database
   const handleAddAddress = async (type) => {
     if (selectedLocation) {
@@ -174,6 +218,12 @@ const AddressScreen = () => {
               </View>
               <Text style={styles.addressType}>{item.type}</Text>
             </View>
+            <TouchableOpacity 
+              style={styles.deleteButton} 
+              onPress={() => showDeleteConfirmation(item)}
+            >
+              <Trash2 size={scale(18)} color="#E53935" />
+            </TouchableOpacity>
           </View>
           <Text style={styles.addressText} numberOfLines={2}>{item.address}</Text>
           {item.isDefault && (
@@ -237,19 +287,65 @@ const AddressScreen = () => {
       <Modal visible={isModalVisible} transparent={true} animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Select Address Type</Text>
+            {/* Close/Delete Icon */}
             <TouchableOpacity 
-              style={styles.modalOption} 
+              style={styles.closeIconContainer} 
+              onPress={() => setIsModalVisible(false)}
+            >
+              <X color="gray" size={24} />
+            </TouchableOpacity>
+            
+            <Text style={styles.modalTitle}>Select Address Type</Text>
+            <TouchableOpacity
+              style={styles.modalOption}
               onPress={() => handleAddAddress('Home')}
             >
               <Text>Home</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.modalOption} 
+            <TouchableOpacity
+              style={styles.modalOption}
               onPress={() => handleAddAddress('Work')}
             >
               <Text>Work</Text>
             </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        visible={isDeleteModalVisible}
+        transparent={true}
+        animationType="slide"
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity 
+              style={styles.closeIconContainer} 
+              onPress={() => setIsDeleteModalVisible(false)}
+            >
+              <X color="gray" size={24} />
+            </TouchableOpacity>
+            
+            <Text style={styles.modalTitle}>Delete Address</Text>
+            <Text style={styles.modalDeleteText}>
+              Are you sure you want to delete this {addressToDelete?.type} address?
+            </Text>
+            
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setIsDeleteModalVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.deleteConfirmButton]}
+                onPress={handleDeleteAddress}
+              >
+                <Text style={styles.deleteConfirmButtonText}>Delete</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
@@ -308,7 +404,6 @@ const AddressScreen = () => {
     </SafeAreaView>
   );
 };
-
 // Styles
 const styles = StyleSheet.create({
   container: {

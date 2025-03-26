@@ -16,7 +16,6 @@ import Carousel from 'react-native-reanimated-carousel';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SharedElement } from 'react-navigation-shared-element';
-import * as Haptics from 'expo-haptics';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 // New professional color palette
@@ -288,10 +287,6 @@ export default function HomeScreen() {
               style={styles.seeAllButton}
               onPress={() => navigateTo('AllPlacesScreen')}
             >
-              <Text style={[
-                styles.seeAllText, 
-                {fontSize: fontSize.small, color: COLORS.secondary}
-              ]}>See All</Text>
             </TouchableOpacity>
           </View>
           
@@ -670,5 +665,5 @@ const styles = StyleSheet.create({
   },
   navText: {
     marginTop: 4,
-  }
+  },
 });
