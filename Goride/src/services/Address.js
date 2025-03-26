@@ -38,6 +38,29 @@ import * as SecureStore from 'expo-secure-store';
     }
 };
 
+export const deleteFavorites = async (addressId) => {
+    try {
+      const token = await SecureStore.getItemAsync('token');
+      if (!token) throw new Error('Authentication required');
+  
+      const response = await axios.post(`${API_URL}/delete-favorites`, 
+        { addressId }, // Sending the ID
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+  
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting address:', error);
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message
+      };
+    }
+  };
+
+
 
 export const getFavorites = async () => {
     try {

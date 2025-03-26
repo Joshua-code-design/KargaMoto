@@ -18,7 +18,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { 
   addFavorites, 
   getFavorites, 
-  deleteFavoriteAddress 
+  deleteFavorites 
 } from '../services/Address';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { X, Trash2 } from 'lucide-react-native';
@@ -78,7 +78,7 @@ const AddressScreen = () => {
   const fetchAddresses = useCallback(async () => {
     try {
       const favorites = await getFavorites();
-      console.log('favorites', favorites);
+    
 
       if (favorites?.data) {
         const { homes, works } = favorites.data;
@@ -86,26 +86,28 @@ const AddressScreen = () => {
 
         // Add home addresses
         if (homes && homes.length > 0) {
-          formattedAddresses.push({
-            id: 'home',
-            type: 'Home',
-            address: homes[0].address,
-            latitude: homes[0].latitude,
-            longitude: homes[0].longitude,
-            isDefault: true,
+          homes.forEach((home) => {
+            formattedAddresses.push({
+              id: home._id, // Use the actual MongoDB _id
+              type: 'Home',
+              address: home.address,
+              latitude: home.latitude,
+              longitude: home.longitude,
+              isDefault: formattedAddresses.length === 0 // First item is default
+            });
           });
         }
 
         // Add work addresses
         if (works && works.length > 0) {
-          works.forEach((work, index) => {
+          works.forEach((work) => {
             formattedAddresses.push({
-              id: `work-${index}`,
+              id: work._id, // Use the actual MongoDB _id
               type: 'Work',
               address: work.address,
               latitude: work.latitude,
               longitude: work.longitude,
-              isDefault: homes.length === 0 && index === 0,
+              isDefault: formattedAddresses.length === 0 // First item is default if no homes
             });
           });
         }
@@ -135,28 +137,22 @@ const AddressScreen = () => {
   const handleDeleteAddress = async () => {
     if (!addressToDelete) return;
 
+    console.log('address to delete id', addressToDelete);
+    
     try {
-      let result;
-      if (addressToDelete.type === 'Home') {
-        result = await deleteFavoriteAddress('home');
-      } else if (addressToDelete.type === 'Work') {
-        result = await deleteFavoriteAddress('work', addressToDelete.address);
-      }
-
-      if (result) {
-        // Refresh addresses
+      // Now passing the address ID instead of the address string
+      const result = await deleteFavorites(addressToDelete.id);
+      
+      if (result.success) {
         await fetchAddresses();
-        
-        // Close delete modal
         setIsDeleteModalVisible(false);
-        setAddressToDelete(null);
-
-        // Show success message
-        Alert.alert('Success', `${addressToDelete.type} address deleted successfully`);
+        Alert.alert('Success', 'Address deleted successfully');
+      } else {
+        Alert.alert('Error', result.error || 'Failed to delete address');
       }
     } catch (error) {
-      console.error('Error deleting address:', error);
-      Alert.alert('Error', 'Failed to delete address');
+      Alert.alert('Error', error.message || 'Failed to delete address');
+      console.error('Delete error:', error);
     }
   };
 
@@ -178,7 +174,7 @@ const AddressScreen = () => {
         const result = await addFavorites(home, work);
 
         if (result) {
-          console.log('Address saved successfully:', result);
+          
           
           // Refresh addresses immediately
           await fetchAddresses();
