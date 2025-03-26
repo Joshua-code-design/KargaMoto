@@ -31,6 +31,7 @@
     "expo-status-bar": "~2.0.1",
     "goride": "file:",
     "lottie-react-native": "7.1.0",
+    "lucide-react-native": "^0.484.0",
     "react": "18.3.1",
     "react-native": "0.76.7",
     "react-native-country-picker-modal": "^2.0.0",

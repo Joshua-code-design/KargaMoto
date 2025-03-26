@@ -18,6 +18,7 @@ import BookingScreen from './screens/BookingScreen';
 import SearchPlaceScreen from './screens/SearchPlaceScreen';
 import FeedScreen from './screens/FeedScreen';
 import FavScreen from './screens/FavScreen';
+import EditScreen from './screens/EditScreen';
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -41,6 +42,7 @@ export default function App() {
         <Stack.Screen name="SearchPlaceScreen" component={SearchPlaceScreen} />
         <Stack.Screen name="FeedScreen" component={FeedScreen} />
         <Stack.Screen name="FavScreen" component={FavScreen} />
+        <Stack.Screen name="EditScreen" component={EditScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
