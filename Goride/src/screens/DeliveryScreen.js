@@ -473,6 +473,7 @@ const LocationScreen = () => {
                 style={styles.recentItem}
                 onPress={() => selectDestinationOption('Home - 123 Main St', 'saved')}
               >
+                {/* to change */}
                 <Ionicons name="home-outline" size={20} color="#111" />
                 <View style={styles.recentTextContainer}>
                   <Text style={styles.recentItemText}>Home</Text>

@@ -2,7 +2,7 @@ import axios from "axios";
 import * as SecureStore from 'expo-secure-store'; 
 import { Alert, Animated } from 'react-native';
 
-  // const API_URL = "https://kargamotoapi.onrender.com/api";
+  //const API_URL = "https://kargamotoapi.onrender.com/api";
   const API_URL = "http://192.168.1.28:5000/api";
 
   export const requestRide = async (pickup, destination,serviceType,fare) => {

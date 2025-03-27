@@ -3,8 +3,50 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from 'expo-secure-store'; 
 import { Alert, Animated } from 'react-native';
 
-  // const API_URL = "https://kargamotoapi.onrender.com/api";
+//const API_URL = "https://kargamotoapi.onrender.com/api";
 const API_URL = "http://192.168.1.28:5000/api";
+
+
+export const userDetails = async () => {
+  const token = await SecureStore.getItemAsync('token');
+
+  const getUserDetails = await axios.get(`${API_URL}/get-user-details`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return getUserDetails;
+};
+
+export const updateUser = async (fullName,gender,phone) => {
+  try {
+    const token = await SecureStore.getItemAsync('token');
+
+    if (!token) {
+      console.error("No token found. User might not be authenticated.");
+      return null;
+    }
+
+    const response = await axios.post(
+      `${API_URL}/update-user-details`,
+      {
+        full_name: fullName,
+        gender: gender,
+        phone_number: phone
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 export const loginUser = async (phoneNumber, showToast, navigation, setLoading) => {
   setLoading(true);
@@ -104,10 +146,12 @@ export const verifyOTP = async (phoneNumber, otp, navigation, inputRefs, setInpu
   }
 };
 
-export const registerUser = async (fullName, phoneNumber,gender) => {
+
+
+
+export const registerUser = async (fullName,gender) => {
   try {
     const response = await axios.post(`${API_URL}/register-user`, {
-      full_name: fullName,
       phone_number: phoneNumber,
       gender: gender
     });
@@ -116,6 +160,8 @@ export const registerUser = async (fullName, phoneNumber,gender) => {
     throw error;
   }
 };
+
+
 
 
 export const logoutUser = async (navigation) => {

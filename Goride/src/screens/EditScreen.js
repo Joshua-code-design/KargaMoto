@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   View, 
   Text, 
@@ -13,6 +13,9 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
+import {userDetails,updateUser} from '../services/Loginapi';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 // Responsive Dimensions
 const { width, height } = Dimensions.get('window');
@@ -38,11 +41,28 @@ const COLORS = {
 export default function EditProfileScreen() {
   const navigation = useNavigation();
   const [formData, setFormData] = useState({
-    fullName: 'John Doe',
-    email: 'johndoe@example.com',
-    phoneNumber: '+1 (555) 123-4567',
+    fullName: 'Loading...',
+    email: 'Loading...',
+    phoneNumber: 'Loading...',
     gender: 'Male'
   });
+
+  useEffect(() => {
+    const getUserDetails = async () => {    
+      const response = await userDetails();
+  
+      // Extract user data correctly
+      const userData = response.data.user;  
+  
+      setFormData({
+        fullName: userData.full_name,  
+        phoneNumber: userData.phone_number,
+        gender: userData.gender,
+      });
+    };      
+  
+    getUserDetails();
+  }, []);   
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -51,7 +71,54 @@ export default function EditProfileScreen() {
     }));
   };
 
-  const renderInputField = (label, field, icon, keyboardType = 'default') => (
+  const handleSaveChanges = async () => {
+    try {
+      if (!formData.fullName || !formData.gender) {
+        alert("Please fill in all fields");
+        return;
+      }
+  
+      const response = await updateUser(
+        formData.fullName,
+        formData.gender,
+        formData.phoneNumber
+      );
+      
+      if (response.status === 200) {
+        alert(response.data.message);
+  
+        // Get fresh user details
+        const updatedDetails = await userDetails();
+        const userData = updatedDetails.data.user;
+        
+        // Prepare updated storage object (NO user wrapper)
+        const updatedUser = {
+          ...userData, // Spread all original fields
+          full_name: formData.fullName, // Updated fields
+          phone_number: formData.phoneNumber,
+          gender: formData.gender
+        };
+  
+        // Update state
+        setFormData({
+          fullName: formData.fullName,
+          phoneNumber: formData.phoneNumber,
+          gender: formData.gender,
+        });
+        
+        // Store directly (no user wrapper)
+        await AsyncStorage.setItem('userDetails', JSON.stringify(updatedUser));
+        navigation.navigate('ProfilesettingScreen');
+      } else {
+        alert("Error Updating User");
+      }
+    } catch (error) {
+      console.error("Update error:", error);
+      alert(error.response?.data?.error || "Update failed");
+    }
+  };
+
+  const renderInputFieldverification = (label, field, icon, keyboardType = 'default') => (
     <View style={styles.inputContainer}>
       <View style={styles.inputIconContainer}>
         <Icon name={icon} size={responsiveFontSize(24)} color={COLORS.tertiary} />
@@ -134,14 +201,15 @@ export default function EditProfileScreen() {
             </View>
           </View>
 
-          {renderInputField('Full Name', 'fullName', 'account-outline')}
-          {renderInputField('Phone Number', 'phoneNumber', 'phone-outline', 'phone-pad')}
+          {renderInputFieldverification('Full Name', 'fullName', 'account-outline')}
+          {renderInputFieldverification('Phone Number', 'phoneNumber', 'phone-outline', 'phone-pad')}
           
           {renderGenderSelection()}
 
-          <TouchableOpacity style={styles.saveButton}>
-            <Text style={styles.saveButtonText}>Save Changes</Text>
+          <TouchableOpacity style={styles.saveButton} onPress={handleSaveChanges}>
+              <Text style={styles.saveButtonText}>Save Changes</Text>
           </TouchableOpacity>
+
         </View>
       </ScrollView>
     </SafeAreaView>

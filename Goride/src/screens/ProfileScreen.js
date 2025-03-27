@@ -63,18 +63,20 @@ export default function ProfileScreen() {
         const storedUserDetails = await AsyncStorage.getItem('userDetails');
         if (storedUserDetails !== null) {
           const parsedDetails = JSON.parse(storedUserDetails);
+          
+          // Access properties through the 'user' object
           setUserDetails({
-            userName: parsedDetails.full_name || "Not provided",
-            gender: parsedDetails.gender || "Not provided",
-            mobileNumber: parsedDetails.phone_number || "Not provided",
-            userType: parsedDetails.user_type || "Standard User"
+            userName: parsedDetails?.full_name || "Not provided",  // direct access
+            gender: parsedDetails?.gender || "Not provided",
+            mobileNumber: parsedDetails?.phone_number || "Not provided",
+            userType: parsedDetails?.user_type || "Standard User"
           });
         }
       } catch (error) {
         console.error("Error fetching user details:", error);
       }
     };
-
+  
     fetchUserDetails();
   }, []);
 

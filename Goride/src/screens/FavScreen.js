@@ -136,9 +136,7 @@ const AddressScreen = () => {
   // Handle address deletion
   const handleDeleteAddress = async () => {
     if (!addressToDelete) return;
-
-    console.log('address to delete id', addressToDelete);
-    
+        
     try {
       // Now passing the address ID instead of the address string
       const result = await deleteFavorites(addressToDelete.id);
