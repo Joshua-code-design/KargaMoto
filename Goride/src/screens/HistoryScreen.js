@@ -1,27 +1,48 @@
 import React from 'react';
-import { View, Text, SafeAreaView, StyleSheet, FlatList, StatusBar, ImageBackground } from 'react-native';
+import { View, Text, SafeAreaView,FlatList, StatusBar, ImageBackground, Dimensions, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; 
+import styles from '../styles/history'
+
+const { width, height } = Dimensions.get('window');
 
 const HistoryScreen = () => {
   const bookingHistory = [
-    { id: '1', title: 'Booking to Downtown', date: '2023-10-01', status: 'Completed' },
-    { id: '2', title: 'Booking to Airport', date: '2023-10-02', status: 'Completed' },
-    { id: '3', title: 'Booking to Grandma\'s', date: '2023-10-03', status: 'Cancelled' },
+    { id: '1', title: 'Downtown Express', date: '2023-10-01', status: 'Completed', pickupLocation: 'Main Street', dropoffLocation: 'City Center', icon: 'business' },
+    { id: '2', title: 'Airport Transfer', date: '2023-10-02', status: 'Completed', pickupLocation: 'Home', dropoffLocation: 'International Airport', icon: 'airplane' },
+    { id: '3', title: 'Family Visit', date: '2023-10-03', status: 'Cancelled', pickupLocation: 'City Center', dropoffLocation: 'Suburbs', icon: 'home' },
   ];
 
   const renderItem = ({ item }) => {
-    const statusColor = item.status === 'Completed' ? '#4CAF50' : '#F44336';
+    const statusColor = item.status === 'Completed' ? '#4CAF50' : '#FF5722';
     
     return (
-      <View style={styles.historyItem}>
-        <View style={styles.contentContainer}>
-          <Text style={styles.historyTitle}>{item.title}</Text>
-          <Text style={styles.historyDate}>{formatDate(item.date)}</Text>
+      <TouchableOpacity style={styles.historyItem} activeOpacity={0.7}>
+        <View style={styles.itemLeftContent}>
+          <View style={styles.iconContainer}>
+            <Ionicons 
+              name={item.icon} 
+              size={24} 
+              color={statusColor} 
+            />
+          </View>
+          <View style={styles.contentContainer}>
+            <Text style={styles.historyTitle} numberOfLines={1}>{item.title}</Text>
+            <View style={styles.locationContainer}>
+              <Text style={styles.locationText}>
+                <Ionicons name="location-outline" size={12} color="#757575" /> 
+                {item.pickupLocation} → {item.dropoffLocation}
+              </Text>
+            </View>
+            <Text style={styles.historyDate}>{formatDate(item.date)}</Text>
+          </View>
         </View>
         <View style={styles.statusContainer}>
           <View style={[styles.statusIndicator, { backgroundColor: statusColor }]} />
-          <Text style={[styles.historyStatus, { color: statusColor }]}>{item.status}</Text>
+          <Text style={[styles.historyStatus, { color: statusColor }]}>
+            {item.status}
+          </Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -32,15 +53,22 @@ const HistoryScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <ImageBackground 
-        source={require('../../assets/history.png')} 
+      <StatusBar 
+        barStyle="dark-content" 
+        backgroundColor="transparent" 
+        translucent={true} 
+      />
+      <ImageBackground
+        source={require('../../assets/history.png')} // Modern, subtle background
         style={styles.backgroundImage}
         resizeMode="cover"
       >
         <View style={styles.overlay}>
           <View style={styles.header}>
             <Text style={styles.headerTitle}>Booking History</Text>
+            <TouchableOpacity style={styles.filterButton}>
+              <Ionicons name="filter" size={24} color="#212121" />
+            </TouchableOpacity>
           </View>
           
           {bookingHistory.length > 0 ? (
@@ -50,9 +78,16 @@ const HistoryScreen = () => {
               keyExtractor={(item) => item.id}
               contentContainerStyle={styles.listContainer}
               showsVerticalScrollIndicator={false}
+              ListEmptyComponent={
+                <View style={styles.emptyContainer}>
+                  <Ionicons name="document-text-outline" size={64} color="#E0E0E0" />
+                  <Text style={styles.emptyText}>No booking history found</Text>
+                </View>
+              }
             />
           ) : (
             <View style={styles.emptyContainer}>
+              <Ionicons name="document-text-outline" size={64} color="#E0E0E0" />
               <Text style={styles.emptyText}>No booking history found</Text>
             </View>
           )}
@@ -62,84 +97,5 @@ const HistoryScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  backgroundImage: {
-    width: '100%',
-    height: '100%',
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
-    paddingHorizontal: 16,
-  },
-  header: {
-    paddingVertical: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#000000',
-    letterSpacing: 0.5,
-  },
-  listContainer: {
-    paddingVertical: 16,
-  },
-  historyItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  contentContainer: {
-    flex: 1,
-  },
-  historyTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000000',
-    marginBottom: 4,
-  },
-  historyDate: {
-    fontSize: 14,
-    color: '#757575',
-  },
-  statusContainer: {
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  statusIndicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 6,
-  },
-  historyStatus: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#757575',
-  },
-});
 
 export default HistoryScreen;

@@ -14,7 +14,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from '@react-navigation/native';
 import PopupModal from '../components/PopupModal';
 import { logoutUser } from '../services/Loginapi';
-import styles from '../styles/pofilescreen'; 
+import ButtonBar from '../components/Buttonbar';
+import styles from '../styles/pofiles'; 
 
 // Get screen dimensions for responsiveness
 const { width, height } = Dimensions.get('window');
@@ -223,56 +224,7 @@ export default function ProfileScreen() {
       />
 
       {/* Bottom Navigation */}
-      <View style={[
-        styles.bottomNav,
-        {
-          backgroundColor: COLORS.white,
-          borderTopWidth: 1,
-          borderTopColor: COLORS.lightGray,
-          shadowColor: COLORS.primary,
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.05,
-          shadowRadius: 4,
-          elevation: 5,
-        }
-      ]}>
-        {[
-          { name: 'home', label: 'Home', screen: 'LandingPageScreen', active: false },
-          { name: 'heart-outline', label: 'Favorites', screen: 'FavScreen', active: false },
-          { name: 'person-outline', label: 'Profile', screen: 'ProfilesettingScreen', active: true },
-        ].map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.navItem}
-            onPress={() => navigateTo(item.screen)}
-            activeOpacity={0.7}
-          >
-            {item.active && (
-              <View style={[
-                styles.activeIndicator, 
-                { backgroundColor: COLORS.secondary }
-              ]} />
-            )}
-            <Ionicons
-              name={item.name}
-              size={isTablet ? 24 : 22}
-              color={item.active ? COLORS.secondary : COLORS.darkGray}
-            />
-            <Text
-              style={[
-                styles.navText,
-                { 
-                  fontSize: fontSize.small, 
-                  color: item.active ? COLORS.secondary : COLORS.darkGray,
-                  fontWeight: item.active ? '600' : '400'
-                }
-              ]}
-            >
-              {item.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <ButtonBar isTablet={isTablet} />
     </SafeAreaView>
   );
 }

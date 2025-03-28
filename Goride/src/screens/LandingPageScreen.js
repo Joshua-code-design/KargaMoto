@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  StyleSheet, 
   Text, 
   View, 
   Image, 
@@ -8,7 +7,6 @@ import {
   ScrollView, 
   SafeAreaView, 
   StatusBar, 
-  Platform,
   useWindowDimensions
 } from 'react-native';
 import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -16,7 +14,8 @@ import Carousel from 'react-native-reanimated-carousel';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SharedElement } from 'react-navigation-shared-element';
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import ButtonBar from '../components/ButtonbarHome';
+import styles from '../styles/landingpage';
 
 // New professional color palette
 const COLORS = {
@@ -71,7 +70,7 @@ export default function HomeScreen() {
   // Modern carousel images with better quality and error handling
   const carouselItems = [
     { 
-      uri: 'https://www.apurple.co/wp-content/uploads/2023/01/Book-A-Ride.jpg',
+      uri: 'https://thumbs.dreamstime.com/z/modern-taxi-banner-ad-promotional-code-vector-illustration-free-ride-discount-card-top-view-city-map-geolocatio-157567537.jpg',
       title: 'Quick Ride',
       description: 'Get to your destination faster'
     },
@@ -148,6 +147,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{paddingBottom: spacing.large * 3}}
       >
+
         {/* Wallet Card */}
         <View 
           style={[
@@ -213,7 +213,7 @@ export default function HomeScreen() {
             <View style={styles.rideOptionContent}>
               <View style={[
                 styles.rideIconContainer, 
-                { backgroundColor: COLORS.lightGray }
+                { backgroundColor: COLORS.tertiary }
               ]}>
                 <Image 
                   source={require('../../assets/kms.png')} 
@@ -250,7 +250,7 @@ export default function HomeScreen() {
             <View style={styles.rideOptionContent}>
               <View style={[
                 styles.rideIconContainer, 
-                { backgroundColor: COLORS.lightGray }
+                { backgroundColor: COLORS.tertiary }
               ]}>
                 <Image 
                   source={require('../../assets/kms.png')} 
@@ -321,11 +321,11 @@ export default function HomeScreen() {
                     width: isTablet ? 42 : 32,
                     height: isTablet ? 42 : 32,
                     marginBottom: spacing.xs,
-                    backgroundColor: COLORS.lightGray,
+                    backgroundColor: COLORS.tertiary,
                     borderRadius: isTablet ? 21 : 16,
                   }
                 ]}>
-                  <FontAwesome5 name={item.icon} size={isTablet ? 18 : 14} color={COLORS.primary} /> 
+                  <FontAwesome5 name={item.icon} size={isTablet ? 18 : 14} color={COLORS.white} /> 
                 </View>
                 <Text style={[
                   styles.recentText, 
@@ -417,253 +417,10 @@ export default function HomeScreen() {
           </View>
         </View>
       </ScrollView>
-      
+
       {/* Bottom Navigation */}
-      <View style={[
-        styles.bottomNav,
-        {
-          backgroundColor: COLORS.white,
-          borderTopWidth: 1,
-          borderTopColor: COLORS.lightGray,
-          shadowColor: COLORS.primary,
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.05,
-          shadowRadius: 4,
-          elevation: 5,
-        }
-      ]}>
-        {[
-          { name: 'home', label: 'Home', screen: 'LandingPageScreen', active: true },
-          { name: 'heart-outline', label: 'Favorites', screen: 'FavScreen', active: false },
-          { name: 'person-outline', label: 'Profile', screen: 'ProfilesettingScreen', active: false },
-        ].map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.navItem}
-            onPress={() => navigateTo(item.screen)}
-            activeOpacity={0.7}
-          >
-            {item.active && (
-              <View style={[
-                styles.activeIndicator, 
-                { backgroundColor: COLORS.secondary }
-              ]} />
-            )}
-            <Ionicons
-              name={item.name}
-              size={isTablet ? 24 : 22}
-              color={item.active ? COLORS.secondary : COLORS.darkGray}
-            />
-            <Text
-              style={[
-                styles.navText,
-                { 
-                  fontSize: fontSize.small, 
-                  color: item.active ? COLORS.secondary : COLORS.darkGray,
-                  fontWeight: item.active ? '600' : '400'
-                }
-              ]}
-            >
-              {item.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <ButtonBar isTablet={isTablet} />
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 10,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    height: '100%',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-  },
-  headerLogo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: hp(4),
-  },
-  logoIcon: {
-    marginRight: hp(2),
-  },
-  logoText: {
-    fontWeight: '700',
-  },
-  menuButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  content: {
-    flex: 1,
-    paddingTop: Platform.OS === 'ios' ? 110 : 90,
-  },
-  walletCard: {
-    overflow: 'hidden',
-  },
-  walletContent: {
-    padding: 16,
-  },
-  walletHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  walletTitle: {
-    fontWeight: '500',
-  },
-  balanceRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  balanceAmount: {
-    fontWeight: '700',
-  },
-  depositButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  depositText: {
-    fontWeight: '600',
-  },
-  rideOptionsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  rideOption: {
-    flex: 1,
-    height: 80,
-    overflow: 'hidden',
-  },
-  rideOptionContent: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 12,
-  },
-  rideIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  rideOptionImage: {
-    width: 40,
-    height: 40,
-  },
-  rideTextContainer: {
-    flex: 1,
-  },
-  rideOptionText: {
-    fontWeight: '600',
-  },
-  sectionTitleContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontWeight: '600',
-  },
-  seeAllButton: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-  },
-  seeAllText: {
-    fontWeight: '500',
-  },
-  recentScrollContent: {
-    paddingVertical: 8,
-  },
-  recentItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  recentIconContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  recentText: {
-    textAlign: 'center',
-    marginTop: 4,
-  },
-  carouselContainer: {
-    marginVertical: 8,
-  },
-  carouselItemContainer: {
-    position: 'relative',
-    width: '100%',
-    height: '100%',
-    overflow: 'hidden',
-  },
-  carouselImage: {
-    width: '100%',
-    height: '100%',
-  },
-  carouselGradient: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 16,
-    height: '50%',
-    justifyContent: 'flex-end',
-  },
-  carouselTitle: {
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  carouselDescription: {
-    fontWeight: '400',
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: hp(2),
-    marginBottom: hp(2),
-    marginHorizontal: hp(4),
-    borderRadius: 30,
-    paddingBottom: Platform.OS === 'ios' ? 24 : 12,
-  },
-  navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-    paddingHorizontal: 16,
-  },
-  activeIndicator: {
-    position: 'absolute',
-    top: -12,
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-  },
-  navText: {
-    marginTop: 4,
-  },
-});

@@ -19,7 +19,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { geocodeAddress, reverseGeocodeCoordinates } from '../services/Geocoding';
 import * as Haptics from 'expo-haptics';
-import styles from '../styles/riderScreen';
+import styles from '../styles/ride';
 
 const RideScreen = () => {
   // Screen dimensions with listener for orientation changes

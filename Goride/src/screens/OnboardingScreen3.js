@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Image, TouchableOpacity, Text, SafeAreaView, ScrollView, Pressable, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import styles from '../styles/screen3'; 
+import styles from '../styles/on3'; 
 
 const OnboardingScreen3 = ({ navigation }) => {
   const [isChecked, setIsChecked] = useState(false);

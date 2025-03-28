@@ -16,7 +16,18 @@ import { Ionicons } from '@expo/vector-icons';
 import { verifyOTP } from '../services/Loginapi';
 import styles from '../styles/otp';
 
+const OtpScreen = ({ navigation, route }) => {
+  const { phoneNumber } = route.params;
+  const [otp, setOtp] = useState(['1', '2', '3', '4', '5', '6']);
+  const [timer, setTimer] = useState(60);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
+  const [inputStatus, setInputStatus] = useState('default'); // 'default', 'success', 'error'
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const inputRefs = useRef([]);
 
+  
 // Toast Component
 const Toast = ({ visible, message, type, onHide }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -70,16 +81,6 @@ const Toast = ({ visible, message, type, onHide }) => {
   );
 };
 
-const OtpScreen = ({ navigation, route }) => {
-  const { phoneNumber } = route.params;
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [timer, setTimer] = useState(60);
-  const [toastVisible, setToastVisible] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-  const [toastType, setToastType] = useState('success');
-  const [inputStatus, setInputStatus] = useState('default'); // 'default', 'success', 'error'
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const inputRefs = useRef([]);
   
   // Track screen width for responsiveness
   const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);

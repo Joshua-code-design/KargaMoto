@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Image, TouchableOpacity, Text, SafeAreaView } from 'react-native';
-import styles from '../styles/screen2'; 
+import styles from '../styles/on2'; 
 
 const OnboardingScreen1 = ({ navigation }) => {
   const handleNext = () => {
