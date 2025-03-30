@@ -18,7 +18,7 @@ import {
   deleteFavorites 
 } from '../services/Address';
 import { X, Trash2 } from 'lucide-react-native';
-import ButtonBar from '../components/Buttonbar';
+import ButtonBar from '../components/buttonbarFav';
 import styles from'../styles/fav';
 
 // Get device dimensions

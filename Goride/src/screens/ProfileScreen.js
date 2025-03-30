@@ -14,7 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from '@react-navigation/native';
 import PopupModal from '../components/PopupModal';
 import { logoutUser } from '../services/Loginapi';
-import ButtonBar from '../components/Buttonbar';
+import ButtonBar from '../components/buttonbarProf';
 import styles from '../styles/pofiles'; 
 
 // Get screen dimensions for responsiveness
