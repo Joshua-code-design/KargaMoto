@@ -18,6 +18,7 @@ import * as Location from 'expo-location';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { geocodeAddress, reverseGeocodeCoordinates } from '../services/Geocoding';
+import { getFavorites } from '../services/Address';
 import * as Haptics from 'expo-haptics';
 import styles from '../styles/ride';
 
@@ -31,6 +32,10 @@ const RideScreen = () => {
   const [destinationDropdownVisible, setDestinationDropdownVisible] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState('Choose your destination');
   const [isLoading, setIsLoading] = useState(false);
+  const [favoriteLocations, setFavoriteLocations] = useState({
+    homes: [],
+    works: []
+  });
   
   // Navigation
   const navigation = useNavigation();
@@ -38,7 +43,7 @@ const RideScreen = () => {
   const serviceType = route.params?.serviceType;
   const [service, setService] = useState(serviceType);
 
-  // Animation values - simplified and consolidated
+  // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const cardSlideAnim = useRef(new Animated.Value(50)).current;
   const buttonAnim = useRef(new Animated.Value(0.95)).current;
@@ -47,12 +52,46 @@ const RideScreen = () => {
     destination: new Animated.Value(1)
   }).current;
 
+  // Fetch favorite locations
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      try {
+        const response = await getFavorites();
+        const data = response.data;
+    
+        // Process home locations
+        const homes = data.homes?.map(home => ({
+          id: home._id,
+          name: 'Home',
+          address: home.address,
+          latitude: home.latitude,
+          longitude: home.longitude,
+          type: 'home'
+        })) || [];
+    
+        // Process work locations
+        const works = data.works?.map(work => ({
+          id: work._id,
+          name: 'Work',
+          address: work.address,
+          latitude: work.latitude,
+          longitude: work.longitude,
+          type: 'work'
+        })) || [];
+    
+        setFavoriteLocations({ homes, works });
+      } catch (error) {
+        console.error("Error fetching favorites:", error);
+      }
+    };
+    fetchFavorites();
+  }, []);
+  
   // Dimension change listener
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', ({ window }) => {
       setDimensions(window);
     });
-    
     return () => subscription?.remove();
   }, []);
 
@@ -62,7 +101,6 @@ const RideScreen = () => {
       setService(route.params.serviceType);
     }
     
-    // Handle location updates from other screens
     if (route.params?.pickupAddress) {
       setSelectedPickup(route.params.pickupAddress);
     }
@@ -77,7 +115,7 @@ const RideScreen = () => {
     }
   }, [route.params]);
 
-  // Initial animations - streamlined for better performance
+  // Initial animations
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -163,9 +201,7 @@ const RideScreen = () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setIsLoading(false);
-        Alert.alert('Permission Needed', 'Please enable location access to use this feature.', [
-          { text: 'OK', style: 'default' }
-        ]);
+        Alert.alert('Permission Needed', 'Please enable location access to use this feature.');
         return;
       }
 
@@ -180,7 +216,7 @@ const RideScreen = () => {
         setSelectedPickup(address);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } catch (error) {
-        Alert.alert('Location Error', 'Unable to determine your current location. Please try again or enter manually.');
+        Alert.alert('Location Error', 'Unable to determine your current location.');
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       } finally {
         setIsLoading(false);
@@ -206,11 +242,8 @@ const RideScreen = () => {
         currentDestination: selectedDestination,
         serviceType: service,
       });
-    } else {
+    } else if (type === 'saved') {
       setSelectedPickup(option);
-    }
-
-    if (type !== 'current') {
       setPickupDropdownVisible(false);
     }
   };
@@ -238,7 +271,7 @@ const RideScreen = () => {
         currentDestination: selectedDestination,
         serviceType: service,
       });
-    } else {
+    } else if (type === 'saved') {
       setSelectedDestination(option);
       setDestinationDropdownVisible(false);
     }
@@ -246,7 +279,6 @@ const RideScreen = () => {
 
   // Handle continue button press
   const handleContinue = async () => {
-    // Button press animation
     Animated.sequence([
       Animated.timing(buttonAnim, {
         toValue: 0.95,
@@ -263,41 +295,33 @@ const RideScreen = () => {
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-    // Validate inputs
     if (selectedPickup === 'Set pickup location' || selectedDestination === 'Choose your destination') {
-      Alert.alert('Missing Information', 'Please select both pickup and destination locations to continue.');
+      Alert.alert('Missing Information', 'Please select both pickup and destination locations.');
       return;
     }
 
     try {
       setIsLoading(true);
-
-      // Get coordinates for pickup and destination
       const pickupLocation = await geocodeAddress(selectedPickup);
       const destinationLocation = await geocodeAddress(selectedDestination);
 
       if (!pickupLocation || !destinationLocation) {
-        Alert.alert('Location Error', 'Could not determine coordinates for the selected locations. Please try different locations.');
+        Alert.alert('Location Error', 'Could not determine coordinates for the selected locations.');
         return;
       }
 
-      const pickup = {
-        latitude: pickupLocation.latitude,
-        longitude: pickupLocation.longitude,
-        address: selectedPickup,
-      };
-
-      const dropoff = {
-        latitude: destinationLocation.latitude,
-        longitude: destinationLocation.longitude,
-        address: selectedDestination,
-      };
-
-      // Navigate to booking screen with the location data
       navigation.navigate('BookingScreen', { 
         serviceType: service, 
-        pickup: pickup, 
-        destination: dropoff 
+        pickup: {
+          latitude: pickupLocation.latitude,
+          longitude: pickupLocation.longitude,
+          address: selectedPickup,
+        }, 
+        destination: {
+          latitude: destinationLocation.latitude,
+          longitude: destinationLocation.longitude,
+          address: selectedDestination,
+        } 
       });
     } catch (error) {
       Alert.alert('Error', 'Something went wrong. Please try again.');
@@ -313,7 +337,7 @@ const RideScreen = () => {
     navigation.navigate(screen);
   };
 
-  // Dynamic styles based on screen dimensions for better responsiveness
+  // Dynamic styles based on screen dimensions
   const dynamicStyles = {
     mapHeight: dimensions.height * (dimensions.height < 700 ? 0.22 : 0.25),
     fontSize: {
@@ -354,7 +378,6 @@ const RideScreen = () => {
           <TouchableOpacity 
             onPress={() => navigateTo('LandingPageScreen')} 
             style={styles.backButton}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Ionicons name="arrow-back" size={dynamicStyles.iconSize.medium} color="#111" />
           </TouchableOpacity>
@@ -391,11 +414,9 @@ const RideScreen = () => {
               resizeMode="cover"
             />
             <View style={styles.mapOverlay}>
-              <Animated.View>
-                <Text style={[styles.mapText, { fontSize: dynamicStyles.fontSize.xl }]}>
-                  Where are you going today?
-                </Text>
-              </Animated.View>
+              <Text style={[styles.mapText, { fontSize: dynamicStyles.fontSize.xl }]}>
+                Where are you going today?
+              </Text>
             </View>
           </Animated.View>
 
@@ -445,7 +466,6 @@ const RideScreen = () => {
                       pickupDropdownVisible && styles.inputActive,
                       { padding: dynamicStyles.padding.sm }
                     ]}
-                    activeOpacity={0.7}
                     onPress={togglePickupDropdown}
                   >
                     <Text style={[styles.inputLabel, { fontSize: dynamicStyles.fontSize.small }]}>PICKUP</Text>
@@ -480,11 +500,7 @@ const RideScreen = () => {
                         style={[styles.dropdownItem, { padding: dynamicStyles.padding.sm }]}
                         onPress={() => selectPickupOption('Use current location', 'current')}
                       >
-                        <MaterialIcons 
-                          name="my-location" 
-                          size={dynamicStyles.iconSize.small} 
-                          color="#111" 
-                        />
+                        <MaterialIcons name="my-location" size={dynamicStyles.iconSize.small} color="#111" />
                         <View style={styles.dropdownTextContainer}>
                           <Text style={[styles.dropdownItemText, { fontSize: dynamicStyles.fontSize.medium }]}>
                             Use current location
@@ -499,11 +515,7 @@ const RideScreen = () => {
                         style={[styles.dropdownItem, { padding: dynamicStyles.padding.sm }]}
                         onPress={() => selectPickupOption('Search for a place', 'search')}
                       >
-                        <MaterialIcons 
-                          name="search" 
-                          size={dynamicStyles.iconSize.small} 
-                          color="#111" 
-                        />
+                        <MaterialIcons name="search" size={dynamicStyles.iconSize.small} color="#111" />
                         <View style={styles.dropdownTextContainer}>
                           <Text style={[styles.dropdownItemText, { fontSize: dynamicStyles.fontSize.medium }]}>
                             Search for a place
@@ -518,11 +530,7 @@ const RideScreen = () => {
                         style={[styles.dropdownItem, { padding: dynamicStyles.padding.sm }]}
                         onPress={() => selectPickupOption('Pick from map', 'map')}
                       >
-                        <MaterialIcons 
-                          name="map" 
-                          size={dynamicStyles.iconSize.small} 
-                          color="#111" 
-                        />
+                        <MaterialIcons name="map" size={dynamicStyles.iconSize.small} color="#111" />
                         <View style={styles.dropdownTextContainer}>
                           <Text style={[styles.dropdownItemText, { fontSize: dynamicStyles.fontSize.medium }]}>
                             Pick from map
@@ -544,7 +552,6 @@ const RideScreen = () => {
                       destinationDropdownVisible && styles.inputActive,
                       { padding: dynamicStyles.padding.sm }
                     ]}
-                    activeOpacity={0.7}
                     onPress={toggleDestinationDropdown}
                   >
                     <Text style={[styles.inputLabel, { fontSize: dynamicStyles.fontSize.small }]}>DESTINATION</Text>
@@ -579,11 +586,7 @@ const RideScreen = () => {
                         style={[styles.dropdownItem, { padding: dynamicStyles.padding.sm }]}
                         onPress={() => selectDestinationOption('Search for a place', 'search')}
                       >
-                        <MaterialIcons 
-                          name="search" 
-                          size={dynamicStyles.iconSize.small} 
-                          color="#111" 
-                        />
+                        <MaterialIcons name="search" size={dynamicStyles.iconSize.small} color="#111" />
                         <View style={styles.dropdownTextContainer}>
                           <Text style={[styles.dropdownItemText, { fontSize: dynamicStyles.fontSize.medium }]}>
                             Search for a place
@@ -598,11 +601,7 @@ const RideScreen = () => {
                         style={[styles.dropdownItem, { padding: dynamicStyles.padding.sm }]}
                         onPress={() => selectDestinationOption('Pick from map', 'map')}
                       >
-                        <MaterialIcons 
-                          name="map" 
-                          size={dynamicStyles.iconSize.small} 
-                          color="#111" 
-                        />
+                        <MaterialIcons name="map" size={dynamicStyles.iconSize.small} color="#111" />
                         <View style={styles.dropdownTextContainer}>
                           <Text style={[styles.dropdownItemText, { fontSize: dynamicStyles.fontSize.medium }]}>
                             Pick from map
@@ -618,58 +617,82 @@ const RideScreen = () => {
               </View>
             </View>
 
-            {/* Recent locations */}
+            {/* Favorite locations */}
             <View style={styles.recentLocations}>
               <Text style={[styles.recentTitle, { fontSize: dynamicStyles.fontSize.large }]}>
-                Favorites Locations
+                Favorite Locations
               </Text>
-              <TouchableOpacity
-                style={[styles.recentItem, { padding: dynamicStyles.padding.sm }]}
-                onPress={() => selectDestinationOption('Home - 123 Main St', 'saved')}
-              >
-                <MaterialIcons 
-                  name="home" 
-                  size={dynamicStyles.iconSize.small} 
-                  color="#111" 
-                />
-                <View style={styles.recentTextContainer}>
-                  <Text style={[styles.recentItemText, { fontSize: dynamicStyles.fontSize.medium }]}>
-                    Home
-                  </Text>
-                  <Text style={[styles.recentItemSubtext, { fontSize: dynamicStyles.fontSize.small }]}>
-                    123 Main St
-                  </Text>
-                </View>
-                <MaterialIcons 
-                  name="arrow-forward-ios" 
-                  size={dynamicStyles.iconSize.small * 0.8} 
-                  color="#777" 
-                />
-              </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[styles.recentItem, { padding: dynamicStyles.padding.sm }]}
-                onPress={() => selectDestinationOption('Work - 456 Office Park', 'saved')}
-              >
-                <MaterialIcons 
-                  name="work" 
-                  size={dynamicStyles.iconSize.small} 
-                  color="#111" 
-                />
-                <View style={styles.recentTextContainer}>
-                  <Text style={[styles.recentItemText, { fontSize: dynamicStyles.fontSize.medium }]}>
-                    Work
-                  </Text>
-                  <Text style={[styles.recentItemSubtext, { fontSize: dynamicStyles.fontSize.small }]}>
-                    456 Office Park
-                  </Text>
-                </View>
-                <MaterialIcons 
-                  name="arrow-forward-ios" 
-                  size={dynamicStyles.iconSize.small * 0.8} 
-                  color="#777" 
-                />
-              </TouchableOpacity>
+              {/* Home locations */}
+              {favoriteLocations.homes.length > 0 && favoriteLocations.homes.map((home, index) => (
+                <TouchableOpacity
+                  key={`home-${index}`}
+                  style={[styles.recentItem, { padding: dynamicStyles.padding.sm }]}
+                  onPress={() => selectDestinationOption(home.address, 'saved')}
+                >
+                  <MaterialIcons 
+                    name="home" 
+                    size={dynamicStyles.iconSize.small} 
+                    color="#111" 
+                  />
+                  <View style={styles.recentTextContainer}>
+                    <Text style={[styles.recentItemText, { fontSize: dynamicStyles.fontSize.medium }]}>
+                      {home.name}
+                    </Text>
+                    <Text 
+                      style={[styles.recentItemSubtext, { fontSize: dynamicStyles.fontSize.small }]}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {home.address}
+                    </Text>
+                  </View>
+                  <MaterialIcons 
+                    name="arrow-forward-ios" 
+                    size={dynamicStyles.iconSize.small * 0.8} 
+                    color="#777" 
+                  />
+                </TouchableOpacity>
+              ))}
+
+              {/* Work locations */}
+              {favoriteLocations.works.length > 0 && favoriteLocations.works.map((work, index) => (
+                <TouchableOpacity
+                  key={`work-${index}`}
+                  style={[styles.recentItem, { padding: dynamicStyles.padding.sm }]}
+                  onPress={() => selectDestinationOption(work.address, 'saved')}
+                >
+                  <MaterialIcons 
+                    name="work" 
+                    size={dynamicStyles.iconSize.small} 
+                    color="#111" 
+                  />
+                  <View style={styles.recentTextContainer}>
+                    <Text style={[styles.recentItemText, { fontSize: dynamicStyles.fontSize.medium }]}>
+                      {work.name}
+                    </Text>
+                    <Text 
+                      style={[styles.recentItemSubtext, { fontSize: dynamicStyles.fontSize.small }]}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {work.address}
+                    </Text>
+                  </View>
+                  <MaterialIcons 
+                    name="arrow-forward-ios" 
+                    size={dynamicStyles.iconSize.small * 0.8} 
+                    color="#777" 
+                  />
+                </TouchableOpacity>
+              ))}
+
+              {/* Empty state */}
+              {favoriteLocations.homes.length === 0 && favoriteLocations.works.length === 0 && (
+                <Text style={[styles.noFavoritesText, { fontSize: dynamicStyles.fontSize.medium }]}>
+                  No favorite locations saved yet
+                </Text>
+              )}
             </View>
           </Animated.View>
         </View>
@@ -691,7 +714,6 @@ const RideScreen = () => {
           >
             <TouchableOpacity
               style={[styles.continueButton, { padding: dynamicStyles.padding.sm }]}
-              activeOpacity={0.7}
               onPress={handleContinue}
               disabled={isLoading}
             >
