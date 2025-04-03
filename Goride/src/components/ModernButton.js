@@ -1,6 +1,6 @@
 import React from "react";
 import { TouchableOpacity, Text, } from "react-native";
-import styles from '../styles/modernButton.js'; 
+import styles from '../../styles/modernButton.js'; 
 
 
 const ModernButton = ({ title, onPress, color = "#007bff" }) => {

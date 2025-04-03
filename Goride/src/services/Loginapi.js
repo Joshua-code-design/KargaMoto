@@ -4,7 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 import { Alert, Animated } from 'react-native';
 
 //const API_URL = "https://kargamotoapi.onrender.com/api";
- const API_URL = "http://192.168.1.25:5000/api";
+ const API_URL = "http://192.168.1.56:5000/api";
 
 
 export const userDetails = async () => {

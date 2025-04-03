@@ -2,7 +2,6 @@ import React from "react";
 import { Modal, View, Text, TouchableOpacity, } from "react-native";
 import styles from '../styles/popupModal.js'; 
 
-
 const PopupModal = ({ visible, title, message, onCancel, onConfirm }) => {
   return (
     <Modal transparent={true} visible={visible} animationType="fade">

@@ -3,23 +3,23 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 
 // Import screens from src/screens/
-import OnboardingScreen1 from '../screens/OnboardingScreen1';
-import OnboardingScreen2 from '../screens/OnboardingScreen2';
-import OnboardingScreen3 from '../screens/OnboardingScreen3';
-import LoginScreen from '../screens/LoginScreen';
-import OtpScreen from '../screens/OtpScreen';
-import RegisterScreen from '../screens/RegisterScreen';
-import LandingPageScreen from '../screens/LandingPageScreen';
-import ProfileScreen from '../screens/ProfileScreen';
-import HistoryScreen from '../screens/HistoryScreen';
-import AddressScreen from '../screens/AddressScreen';
-import Map from '../components/Map';
-import RideScreen from '../screens/RideScreen';
-import BookingScreen from '../screens/BookingScreen';
-import SearchPlaceScreen from '../screens/SearchPlaceScreen';
-import FeedScreen from '../screens/FeedScreen';
-import FavScreen from '../screens/FavScreen';
-import EditScreen from '../screens/EditScreen';
+import OnboardingScreen1 from '../screens/Customer/OnboardingScreen1';  
+import OnboardingScreen2 from '../screens/Customer/OnboardingScreen2';  
+import OnboardingScreen3 from '../screens/Customer/OnboardingScreen3';  
+import LoginScreen from '../screens/Customer/LoginScreen';  
+import OtpScreen from '../screens/Customer/OtpScreen';  
+import RegisterScreen from '../screens/Customer/RegisterScreen';  
+import LandingPageScreen from '../screens/Customer/LandingPageScreen';  
+import ProfileScreen from '../screens/Customer/ProfileScreen';  
+import HistoryScreen from '../screens/Customer/HistoryScreen';  
+import AddressScreen from '../screens/Customer/AddressScreen';  
+import Map from '../components/Map';  
+import RideScreen from '../screens/Customer/RideScreen';  
+import BookingScreen from '../screens/Customer/BookingScreen';  
+import SearchPlaceScreen from '../screens/Customer/SearchPlaceScreen';  
+import FeedScreen from '../screens/Customer/FeedScreen';  
+import FavScreen from '../screens/Customer/FavScreen';  
+import EditScreen from '../screens/Customer/EditScreen';  
 
 const Stack = createStackNavigator();
 

@@ -17,10 +17,10 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { geocodeAddress, reverseGeocodeCoordinates } from '../services/Geocoding';
-import { getFavorites } from '../services/Address';
+import { geocodeAddress, reverseGeocodeCoordinates } from '../../services/Geocoding';
+import { getFavorites } from '../../services/Address';
 import * as Haptics from 'expo-haptics';
-import styles from '../styles/ride';
+import styles from '../../styles/ride';
 
 const RideScreen = () => {
   // Screen dimensions with listener for orientation changes
@@ -409,7 +409,7 @@ const RideScreen = () => {
             ]}
           >
             <Image
-              source={require('../../assets/kms.png')}
+              source={require('../../../assets/kms.png')}
               style={styles.mapImage}
               resizeMode="cover"
             />

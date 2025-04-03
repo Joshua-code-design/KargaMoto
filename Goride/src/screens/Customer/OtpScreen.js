@@ -13,8 +13,8 @@ import {
   Dimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { verifyOTP } from '../services/Loginapi';
-import styles from '../styles/otp';
+import { verifyOTP } from '../../services/Loginapi';
+import styles from '../../styles/otp';
 
 const OtpScreen = ({ navigation, route }) => {
   const { phoneNumber } = route.params;

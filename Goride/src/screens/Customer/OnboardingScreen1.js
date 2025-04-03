@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { View, Text, SafeAreaView, Dimensions, Animated, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import LottieView from 'lottie-react-native';
-import styles from '../styles/on1'; 
+import styles from '../../styles/on1'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store'; 
 

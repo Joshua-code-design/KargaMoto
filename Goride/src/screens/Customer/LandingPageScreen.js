@@ -14,8 +14,8 @@ import Carousel from 'react-native-reanimated-carousel';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SharedElement } from 'react-navigation-shared-element';
-import ButtonBar from '../components/ButtonbarHome';
-import styles from '../styles/landingpage';
+import ButtonBar from '../../components/ButtonbarHome';
+import styles from '../../styles/landingpage';
 
 // New professional color palette
 const COLORS = {
@@ -216,7 +216,7 @@ export default function HomeScreen() {
                 { backgroundColor: COLORS.tertiary }
               ]}>
                 <Image 
-                  source={require('../../assets/kms.png')} 
+                  source={require('../../../assets/kms.png')} 
                   style={[styles.rideOptionImage, {width: isTablet ? 60 : 40, height: isTablet ? 60 : 40}]} 
                   resizeMode="contain"
                 />
@@ -253,7 +253,7 @@ export default function HomeScreen() {
                 { backgroundColor: COLORS.tertiary }
               ]}>
                 <Image 
-                  source={require('../../assets/kms.png')} 
+                  source={require('../../../assets/kms.png')} 
                   style={[styles.rideOptionImage, {width: isTablet ? 60 : 40, height: isTablet ? 60 : 40}]}
                   resizeMode="contain"
                 />
@@ -395,7 +395,7 @@ export default function HomeScreen() {
                       source={{ uri: item.uri }} 
                       style={[styles.carouselImage, { borderRadius: 16 }]} 
                       resizeMode="cover"
-                      defaultSource={require('../../assets/kms.png')} // Fallback image
+                      defaultSource={require('../../../assets/kms.png')} // Fallback image
                     />
                   </SharedElement>
                   <LinearGradient

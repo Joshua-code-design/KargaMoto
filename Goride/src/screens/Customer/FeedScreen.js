@@ -253,7 +253,7 @@ const FeedScreen = ({ navigation }) => {
         >
 
           <View style={styles.formSection}>
-            <Image source={require('../../assets/Habal.png')}
+            <Image source={require('../../../assets/Habal.png')}
             style={styles.image}/>
 
             {/* Paragraph */}

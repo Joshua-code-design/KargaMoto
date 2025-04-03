@@ -16,10 +16,10 @@ import {
   addFavorites, 
   getFavorites, 
   deleteFavorites 
-} from '../services/Address';
+} from '../../services/Address';
 import { X, Trash2 } from 'lucide-react-native';
-import ButtonBar from '../components/buttonbarFav';
-import styles from'../styles/fav';
+import ButtonBar from '../../components/buttonbarFav';
+import styles from'../../styles/fav';
 
 // Get device dimensions
 const { width } = Dimensions.get('window');

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Image, TouchableOpacity, Text, SafeAreaView } from 'react-native';
-import styles from '../styles/on2'; 
+import styles from '../../styles/on2'; 
 
 const OnboardingScreen1 = ({ navigation }) => {
   const handleNext = () => {
@@ -10,7 +10,7 @@ const OnboardingScreen1 = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <Image
-        source={require('../../assets/Habal.png')}
+        source={require('../../../assets/Habal.png')}
         style={styles.fullScreenImage}
         resizeMode="cover"
       />

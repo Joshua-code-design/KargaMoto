@@ -10,8 +10,8 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { loginUser } from "../services/Loginapi"; // Import API function
-import styles from "../styles/login";
+import { loginUser } from "../../services/Loginapi"; // Import API function
+import styles from "../../styles/login";
 
 const Toast = ({ visible, message, success, onHide }) => {
   const opacity = useRef(new Animated.Value(0)).current;
@@ -106,7 +106,7 @@ const LoginScreen = () => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-        <Image source={require("../../assets/Habalaaa.png")} style={styles.backgroundImage} resizeMode="cover" />
+        <Image source={require("../../../assets/Habalaaa.png")} style={styles.backgroundImage} resizeMode="cover" />
 
         <Toast visible={toast.visible} message={toast.message} success={toast.success} onHide={hideToast} />
 
@@ -115,7 +115,7 @@ const LoginScreen = () => {
 
         <View style={styles.inputContainer}>
           <View style={styles.countryContainer}>
-            <Image source={require("../../assets/flags.png")} style={styles.flag} />
+            <Image source={require("../../../assets/flags.png")} style={styles.flag} />
             <Text style={styles.callingCode}>+63</Text>
           </View>
 

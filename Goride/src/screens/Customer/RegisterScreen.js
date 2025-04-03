@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
-import { registerUser } from '../services/Loginapi';
+import { registerUser } from '../../services/Loginapi';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 const { width } = Dimensions.get('window');
@@ -162,7 +162,7 @@ const RegisterScreen = () => {
 
       <View style={styles.formContainer}>
         <Image 
-          source={require('../../assets/kms.png')} 
+          source={require('../../../assets/kms.png')} 
           style={styles.logoImage}
         />
         <Text style={styles.logoText}>Account Registration</Text>
@@ -173,7 +173,7 @@ const RegisterScreen = () => {
             <Text style={styles.inputLabel}>Phone Number</Text>
             <View style={[styles.input, styles.disabledInput]}>
               <Image 
-                source={require('../../assets/iconphone.png')} 
+                source={require('../../../assets/iconphone.png')} 
                 style={styles.inputImage} 
               />
               <Text style={styles.phoneText}>{"+63" + phoneNumber}</Text>
@@ -184,7 +184,7 @@ const RegisterScreen = () => {
             <Text style={styles.inputLabel}>First Name</Text>
             <View style={styles.input}>
               <Image 
-                source={require('../../assets/iconuser.png')} 
+                source={require('../../../assets/iconuser.png')} 
                 style={styles.inputImage} 
               />
               <TextInput
@@ -201,7 +201,7 @@ const RegisterScreen = () => {
             <Text style={styles.inputLabel}>Last Name</Text>
             <View style={styles.input}>
               <Image 
-                source={require('../../assets/iconuser.png')} 
+                source={require('../../../assets/iconuser.png')} 
                 style={styles.inputImage} 
               />
               <TextInput

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, SafeAreaView,FlatList, StatusBar, ImageBackground, Dimensions, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
-import styles from '../styles/history'
+import styles from '../../styles/history'
 
 const { width, height } = Dimensions.get('window');
 
@@ -59,7 +59,7 @@ const HistoryScreen = () => {
         translucent={true} 
       />
       <ImageBackground
-        source={require('../../assets/history.png')} // Modern, subtle background
+        source={require('../../../assets/history.png')} // Modern, subtle background
         style={styles.backgroundImage}
         resizeMode="cover"
       >

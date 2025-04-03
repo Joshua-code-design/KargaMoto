@@ -18,8 +18,8 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { ActivityIndicator } from "react-native";
 import { decode } from "@mapbox/polyline";
-import { calculateDistanceAndETA } from '../services/Geocoding';
-import { requestRide } from '../services/MapsApi';
+import { calculateDistanceAndETA } from '../../services/Geocoding';
+import { requestRide } from '../../services/MapsApi';
 
 // Get device dimensions and pixel ratio for true responsiveness
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');

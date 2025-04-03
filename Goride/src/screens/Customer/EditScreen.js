@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
-import {userDetails,updateUser} from '../services/Loginapi';
+import {userDetails,updateUser} from '../../services/Loginapi';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 

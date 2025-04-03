@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Image, TouchableOpacity, Text, SafeAreaView, ScrollView, Pressable, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import styles from '../styles/on3'; 
+import styles from '../../styles/on3'; 
 
 const OnboardingScreen3 = ({ navigation }) => {
   const [isChecked, setIsChecked] = useState(false);
@@ -25,7 +25,7 @@ const OnboardingScreen3 = ({ navigation }) => {
         style={styles.gradient}
       />
       <Image
-        source={require('../../assets/Habalaaa.png')}
+        source={require('../../../assets/Habalaaa.png')}
         style={styles.backgroundImage}
         resizeMode="cover"
       />
