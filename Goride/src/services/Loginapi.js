@@ -3,8 +3,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from 'expo-secure-store'; 
 import { Alert, Animated } from 'react-native';
 
-//const API_URL = "https://kargamotoapi.onrender.com/api";
- const API_URL = "http://192.168.1.56:5000/api";
+const API_URL = "https://kargamotoapi.onrender.com/api";
+//  const API_URL = "http://192.168.1.56:5000/api";
 
 
 export const userDetails = async () => {
@@ -117,7 +117,7 @@ export const verifyOTP = async (phoneNumber, otp, navigation, inputRefs, setInpu
         if (response.data.user_type === "Driver") {
           await AsyncStorage.setItem('driverDetails', JSON.stringify(getUserDetails.data.driver));
           console.log("Driver Login");
-          navigation.navigate('LandingPageScreen');
+          navigation.navigate('LandingPageRider');
         }else if(response.data.user_type === "Passenger"){
           console.log("Passenger Login ");
           navigation.navigate('LandingPageScreen');

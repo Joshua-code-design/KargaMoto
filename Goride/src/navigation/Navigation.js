@@ -20,7 +20,8 @@ import SearchPlaceScreen from '../screens/Customer/SearchPlaceScreen';
 import FeedScreen from '../screens/Customer/FeedScreen';  
 import FavScreen from '../screens/Customer/FavScreen';  
 import EditScreen from '../screens/Customer/EditScreen';  
-
+import LandingPageRider from '../rider/screens/LandingPageRider';  
+  
 const Stack = createStackNavigator();
 
 const Navigation = () => {
@@ -44,6 +45,7 @@ const Navigation = () => {
         <Stack.Screen name="FeedScreen" component={FeedScreen} />
         <Stack.Screen name="FavScreen" component={FavScreen} />
         <Stack.Screen name="EditScreen" component={EditScreen} />
+        <Stack.Screen name="LandingPageRider" component={LandingPageRider} />
       </Stack.Navigator>
     </NavigationContainer>
   );
