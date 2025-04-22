@@ -24,7 +24,7 @@ export default function BottomNavigation({ isTablet }) {
   // Navigation items configuration
   const navItems = [
     { name: 'home', label: 'Home', screen: 'LandingPageScreen', active: true },
-    { name: 'heart-outline', label: 'Passenger', screen: 'FavScreen', active: false },
+    { name: 'people-outline', label: 'Passenger', screen: 'Passenger', active: false },
     { name: 'person-outline', label: 'Profile', screen: 'ProfileScreen', active: false },
   ];
 
