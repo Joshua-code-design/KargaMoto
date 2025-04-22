@@ -15,7 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SharedElement } from 'react-navigation-shared-element';
 import ButtonBar from '../../components/ButtonbarHome';
-import styles from '../../styles/ridepage';
+import styles from '../../styles/landingpage';
 
 // New professional color palette
 const COLORS = {

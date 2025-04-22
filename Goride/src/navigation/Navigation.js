@@ -20,8 +20,7 @@ import SearchPlaceScreen from '../screens/Customer/SearchPlaceScreen';
 import FeedScreen from '../screens/Customer/FeedScreen';  
 import FavScreen from '../screens/Customer/FavScreen';  
 import EditScreen from '../screens/Customer/EditScreen';  
-import LandingPageRider from '../rider/screens/LandingPageRider';  
-  
+import LandingPageRider from '../screens/Rider/LandingPageRider';  
 const Stack = createStackNavigator();
 
 const Navigation = () => {
