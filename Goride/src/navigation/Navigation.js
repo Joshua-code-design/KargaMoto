@@ -21,6 +21,7 @@ import FeedScreen from '../screens/Customer/FeedScreen';
 import FavScreen from '../screens/Customer/FavScreen';  
 import EditScreen from '../screens/Customer/EditScreen';  
 import LandingPageRider from '../screens/Rider/LandingPageRider';  
+import Rideprofile from '../screens/Rider/Rideprofile';  
 const Stack = createStackNavigator();
 
 const Navigation = () => {
@@ -45,6 +46,7 @@ const Navigation = () => {
         <Stack.Screen name="FavScreen" component={FavScreen} />
         <Stack.Screen name="EditScreen" component={EditScreen} />
         <Stack.Screen name="LandingPageRider" component={LandingPageRider} />
+        <Stack.Screen name="Rideprofile" component={Rideprofile} />
       </Stack.Navigator>
     </NavigationContainer>
   );
