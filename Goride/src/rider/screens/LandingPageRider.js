@@ -15,7 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SharedElement } from 'react-navigation-shared-element';
 import ButtonBar from '../../components/ButtonbarHome';
-import styles from '../../styles/landingpage';
+import styles from '../../styles/ridepage';
 
 // New professional color palette
 const COLORS = {
@@ -166,20 +166,40 @@ export default function HomeScreen() {
           ]}
         >
           <View style={styles.walletContent}>
+          <MaterialCommunityIcons 
+            name="wallet-outline" 
+            size={20} 
+            color={COLORS.textDark} 
+            style={styles.walletIcon} 
+          />
             <View style={styles.walletHeader}>
               <Text style={[styles.walletTitle, {fontSize: fontSize.medium, color: COLORS.white}]}>Your Balance</Text>
-              <MaterialCommunityIcons name="wallet-outline" size={24} color={COLORS.white} />
+              <Text style={[styles.walletTitle, {fontSize: fontSize.medium, color: COLORS.white}]}>Earning of your cashiess transaction</Text>
+              
             </View>
+            <View>
+            </View>
+            
             <View style={styles.balanceRow}>
               <Text style={[styles.balanceAmount, {fontSize: fontSize.xlarge, color: COLORS.white}]}>
                 {formatCurrency(10000)}
               </Text>
+              
+              
+            </View>
+            <View style={styles.balanceRow}>
+            <TouchableOpacity 
+                style={[styles.depositButton, { backgroundColor: COLORS.white }]}
+              >
+                <Text style={[styles.depositText, {fontSize: fontSize.small, color: COLORS.darkGray, fontWeight: '600'}]}>CASH-OUT</Text>
+                
+              </TouchableOpacity>
               <TouchableOpacity 
                 style={[styles.depositButton, { backgroundColor: COLORS.white }]}
               >
-                <Text style={[styles.depositText, {fontSize: fontSize.small, color: COLORS.darkGray, fontWeight: '600'}]}>DEPOSIT</Text>
+                <Text style={[styles.depositText, {fontSize: fontSize.small, color: COLORS.darkGray, fontWeight: '600'}]}>TRANSFER</Text>
               </TouchableOpacity>
-            </View>
+              </View> 
           </View>
         </View>
 
@@ -202,18 +222,21 @@ export default function HomeScreen() {
         >
           <View style={styles.walletContent}>
             <View style={styles.walletHeader}>
-              <Text style={[styles.walletTitle, {fontSize: fontSize.medium, color: COLORS.white}]}>Your Balance</Text>
-              <MaterialCommunityIcons name="wallet-outline" size={24} color={COLORS.white} />
+              <Text style={[styles.walletTitle, {fontSize: fontSize.medium, color: COLORS.white}]}>KARGA Moto Credit</Text>
             </View>
             <View style={styles.balanceRow}>
               <Text style={[styles.balanceAmount, {fontSize: fontSize.xlarge, color: COLORS.white}]}>
                 {formatCurrency(10000)}
               </Text>
-              <TouchableOpacity 
+            </View>
+            <Text style={[styles.walletTitle, {fontSize: fontSize.medium, color: COLORS.white}]}>Minimum balance to accept a booking</Text>
+            <View style={styles.balanceRow}>
+            <TouchableOpacity 
                 style={[styles.depositButton, { backgroundColor: COLORS.white }]}
               >
-                <Text style={[styles.depositText, {fontSize: fontSize.small, color: COLORS.darkGray, fontWeight: '600'}]}>DEPOSIT</Text>
+                <Text style={[styles.depositText, {fontSize: fontSize.small, color: COLORS.darkGray, fontWeight: '600'}]}>Top Up</Text>
               </TouchableOpacity>
+              
             </View>
           </View>
         </View>
