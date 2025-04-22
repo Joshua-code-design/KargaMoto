@@ -1,15 +1,24 @@
 import { StyleSheet, Dimensions } from 'react-native';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+
+const COLORS = {
+  primary: '#1A2B4D',       // Deep Navy Blue
+  secondary: '#2E7D32',     // Forest Green
+  tertiary: '#26A69A',      // Soft Teal
+  accent: '#D4AF37',        // Muted Gold
+  background: '#F5F5F5',    // Light Gray
+  white: '#FFFFFF',         // White
+  lightGray: '#E0E0E0',     // Very Light Gray
+  darkGray: '#333333',      // Charcoal Gray
+  error: '#E53935',         // Bright Red
+};
 
 const { width, height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
-  },
-  fullScreenImage: {
-    width: '100%',
-    height: '100%',
+    backgroundColor: COLORS.tertiary,
   },
   contentContainer: {
     position: 'absolute',
@@ -17,19 +26,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 0.06,
     width: '100%',
   },
-  title: {
-    fontSize: width * 0.08,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: height * 0.015,
-    textAlign: 'center',
+  titleContainer:{
+    marginTop: hp('10%'),
+    padding: wp('5%'),
+    gap: hp('2%')
   },
-  description: {
-    fontSize: width * 0.04,
-    color: '#CCCCCC',
-    textAlign: 'center',
-    lineHeight: width * 0.06,
-    paddingHorizontal: width * 0.05,
+  title:{
+   fontSize: wp('5'),
+   color: COLORS.darkGray,
+   fontFamily: 'Poppins-Bold', 
+  },
+  subtitle:{
+   fontSize: wp('5'),
+   color: COLORS.darkGray,
+   fontFamily: 'Courier',
   },
   radioContainer: {
     position: 'absolute',
@@ -49,7 +59,7 @@ const styles = StyleSheet.create({
     margin: width * 0.01,
   },
   radioButtonActive: {
-    backgroundColor: 'black',
+    backgroundColor: COLORS.white,
     width: width * 0.025,
     height: width * 0.025,
     borderRadius: width * 0.0125,
@@ -68,17 +78,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 0.08,
     borderRadius: width * 0.06,
     elevation: 3,
-    shadowColor: '#000',
+    shadowColor: COLORS.white,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     minWidth: width * 0.3,
   },
   nextButton: {
-    backgroundColor: '#141010',
+    backgroundColor: COLORS.white,
   },
   nextButtonText: {
-    color: 'white',
+    color: COLORS.darkGray,
     fontSize: width * 0.04,
     fontWeight: '600',
     textAlign: 'center',
