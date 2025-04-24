@@ -108,7 +108,7 @@ export default function EditProfileScreen() {
         
         // Store directly (no user wrapper)
         await AsyncStorage.setItem('userDetails', JSON.stringify(updatedUser));
-        navigation.navigate('ProfilesettingScreen');
+        navigation.navigate('ProfileScreen');
       } else {
         alert("Error Updating User");
       }

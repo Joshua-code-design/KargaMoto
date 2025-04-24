@@ -1,45 +1,51 @@
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store'; 
 import { Alert, Animated } from 'react-native';
+import { io } from 'socket.io-client';
 
 //   const API_URL = "https://kargamotoapi.onrender.com/api";
 const API_URL = "http://192.168.1.13:5000/api";
 
-  export const requestRide = async (pickup, destination,serviceType,fare) => {
-    try {
-        const token = await SecureStore.getItemAsync('token');
-
-        // console.log("pickup:", pickup);
-        // console.log("dropoff:", dropoff);
-        // console.log("serviceType:", ServiceType);
-
-        const response = await axios.post(`${API_URL}/book-service`, {
-            booking_type: serviceType,
-            pickup_location: {
-                latitude: pickup.latitude,
-                longitude: pickup.longitude,
-                address: pickup.address
-            },
-            dropoff_location: {
-                latitude: destination.latitude,
-                longitude: destination.longitude,
-                address: destination.address
-            },
-            fare: fare,
-            status: "requested"
-        }, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-        return response.data;
-
-    } catch (error) {
-        console.error("Error requesting ride:", error);
-        return null;
-    }
-};
-
+const socket = io('http://your-server-ip:5000', {
+    transports: ['websocket']
+  });
+  
+  export const requestRide = async (pickup, destination, serviceType, fare) => {
+      try {
+          const token = await SecureStore.getItemAsync('token');
+  
+          const response = await axios.post(`${API_URL}/book-service`, {
+              booking_type: serviceType,
+              pickup_location: {
+                  latitude: pickup.latitude,
+                  longitude: pickup.longitude,
+                  address: pickup.address
+              },
+              dropoff_location: {
+                  latitude: destination.latitude,
+                  longitude: destination.longitude,
+                  address: destination.address
+              },
+              fare: fare,
+              status: "requested"
+          }, {
+              headers: {
+                  Authorization: `Bearer ${token}`
+              }
+          });
+  
+          // Emit socket event after successful booking
+          if (response.data && response.data._id) {
+              socket.emit('newBooking', response.data);
+          }
+  
+          return response.data;
+  
+      } catch (error) {
+          console.error("Error requesting ride:", error);
+          return null;
+      }
+  };
 
 export const addFavorites = async (home, work) => {
     try {

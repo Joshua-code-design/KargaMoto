@@ -112,7 +112,13 @@ const FavScreen = () => {
         setAddresses(formattedAddresses);
       }
     } catch (error) {
-      console.error('Error fetching addresses:', error);
+      if (error.response?.status === 404) {
+        // If it's a 404, treat it as empty list
+        console.warn('No favorites found — treating as empty list.');
+        setAddresses([]);
+      } else {
+        console.error('Error fetching addresses:', error);
+      }
     }
   }, []);
 

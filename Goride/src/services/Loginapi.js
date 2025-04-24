@@ -6,6 +6,20 @@ import { Alert, Animated } from 'react-native';
 // const API_URL = "https://kargamotoapi.onrender.com/api";
  const API_URL = "http://192.168.1.13:5000/api";
 
+ export const testServer = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/ping`);
+    if (response.status === 200) {
+      console.log('✅ Connected to backend server');
+    } else {
+      console.log('⚠️ Server responded but not OK');
+      return;
+    }
+  } catch (error) {
+    console.log('❌ Failed to connect to server:', error.message);
+    return;
+  }
+};
 
 export const userDetails = async () => {
   const token = await SecureStore.getItemAsync('token');
@@ -169,7 +183,8 @@ export const logoutUser = async (navigation) => {
     const response = await axios.post(`${API_URL}/logout`);
     if (response.status === 200) {
       await SecureStore.deleteItemAsync('token'); // Changed from AsyncStorage to SecureStore
-      await AsyncStorage.removeItem('userDetails');
+      await AsyncStorage.clear();
+      
       navigation.navigate('LoginScreen');
     }
   } catch (error) {

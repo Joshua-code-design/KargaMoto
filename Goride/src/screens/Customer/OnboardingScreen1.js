@@ -5,7 +5,9 @@ import LottieView from 'lottie-react-native';
 import styles from '../../styles/on1'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store'; 
-
+import * as Network from 'expo-network';
+import { useNavigation } from '@react-navigation/native';
+import { testServer } from '../../services/Loginapi'; // Adjust the import path as necessary
 const { width } = Dimensions.get('window');
 
 const OnboardingScreen2 = ({ navigation }) => {
@@ -16,31 +18,51 @@ const OnboardingScreen2 = ({ navigation }) => {
   useEffect(() => {
     const checkOnboardingStatus = async () => {
       try {
+        // 1. Check for internet connection
+        const networkState = await Network.getNetworkStateAsync();
+        const isConnected = networkState.isConnected && networkState.isInternetReachable;
+  
+        if (!isConnected) {
+          console.log('❌ No internet connection');
+          return; // optionally exit early if no internet
+        }
+      
+        // 2. Test server connection
+      await testServer(); // Test server connection
+    
         const hasCompletedOnboarding = await AsyncStorage.getItem('hasCompletedOnboarding');
         const token = await SecureStore.getItemAsync('token');
-
+  
         console.log(hasCompletedOnboarding);
         console.log(token);
-        //checks if user has completed onboarding
+  
         if (hasCompletedOnboarding === null) {
-          // Stay on OnboardingScreen
           Animated.parallel([
             Animated.timing(fadeAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
             Animated.timing(slideAnim, { toValue: 0, duration: 800, useNativeDriver: true }),
             Animated.spring(lottieSlideAnim, { toValue: 0, tension: 30, friction: 7, useNativeDriver: true })
           ]).start();
-          //if user has completed onboarding and token is null, navigate to login screen
         } else if (hasCompletedOnboarding === 'true' && token === null) {
           navigation.navigate('LoginScreen');
-          //if user has completed onboarding and token is not null, navigate to landing page screen
         } else if (hasCompletedOnboarding === 'true' && token !== null) {
-          navigation.navigate('LandingPageScreen');
+          // Change when its Driver or Passenger
+          const userDetails = await AsyncStorage.getItem('userDetails');
+          const userDetailsParsed = JSON.parse(userDetails);
+          console.log("User Details:", userDetailsParsed);
+          if (userDetailsParsed.user_type == "Driver") { 
+            navigation.navigate('LandingPageRider');
+          }else if(userDetailsParsed.user_type == "Passenger"){
+            navigation.navigate('LandingPageScreen');
+          }else { 
+            console.log("User type not recognized:", userDetailsParsed.user_type);
+          }
+         
         }
       } catch (error) {
         console.error('Failed to check onboarding status:', error);
       }
     };
-
+  
     checkOnboardingStatus();
   }, []);
 

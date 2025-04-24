@@ -92,7 +92,7 @@ export default function HomeScreen() {
     { name: 'Office', icon: 'briefcase' },
     { name: 'Sandoval St.', icon: 'map-marker' },
     { name: 'Lincoln St.', icon: 'map-marker' },
-    { name: 'Ayala Mall', icon: 'shopping' }
+    { name: 'Ayala Mall', icon: 'store' }
   ];
 
   // Format currency
@@ -135,7 +135,7 @@ export default function HomeScreen() {
           </View>
           <TouchableOpacity
             style={[styles.menuButton, { backgroundColor: COLORS.tertiary }]}
-            onPress={() => navigateTo('MessagesScreen')}
+            onPress={() => navigateTo('SocketTest')}
           >
             <Ionicons name="chatbubble-ellipses" size={isTablet ? 24 : 18} color={COLORS.primary} />
           </TouchableOpacity>
