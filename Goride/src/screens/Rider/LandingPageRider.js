@@ -14,7 +14,7 @@ import Carousel from 'react-native-reanimated-carousel';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SharedElement } from 'react-navigation-shared-element';
-import ButtonBar from '../../components/ButtonbarHome';
+import ButtonBar from '../../components/ButtonbarRider';
 import styles from '../../styles/landingpage';
 
 // New professional color palette

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Image, TouchableOpacity, Text, SafeAreaView } from 'react-native';
+import { View,  TouchableOpacity, Text, SafeAreaView } from 'react-native';
 import styles from '../../styles/on2'; 
 
 const OnboardingScreen1 = ({ navigation }) => {
@@ -9,12 +9,12 @@ const OnboardingScreen1 = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Image
-        source={require('../../../assets/Habal.png')}
-        style={styles.fullScreenImage}
-        resizeMode="cover"
-      />
-     
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>WELCOME TO KARGAMOTO</Text>
+        <Text style={styles.subtitle}>
+          Fast reliable and affortdable motorcycle delivery service
+        </Text>
+      </View>
       <View style={styles.radioContainer}>
         {[...Array(2)].map((_, index) => (
           <View

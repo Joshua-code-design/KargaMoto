@@ -89,7 +89,7 @@ const OnboardingScreen2 = ({ navigation }) => {
         <View style={styles.headerContainer}>
           <Animated.View style={[styles.lottieContainer, { transform: [{ translateX: lottieSlideAnim }] }]}>
             <Animated.View style={[styles.logoContainer, { opacity: fadeAnim }]}>
-              <Text style={styles.logoText}>KARGA MOTO</Text>
+              <Text style={styles.logoText}>KARGAMOTO</Text>
             </Animated.View>
             <LottieView source={{ uri: 'https://lottie.host/7e9c099d-8dc4-4129-ba4d-20fd0ead33cf/NqN84LP2cn.lottie' }} autoPlay loop style={styles.lottieAnimation} />
           </Animated.View>
@@ -97,11 +97,6 @@ const OnboardingScreen2 = ({ navigation }) => {
       </Animated.View>
 
       <Animated.View style={[styles.bottomContainer, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-        <View style={styles.progressContainer}>
-          {[...Array(6)].map((_, index) => (
-            <View key={index} style={[styles.progressDot, index === 0 && styles.progressDotActive]} />
-          ))}
-        </View>
         <TouchableOpacity style={styles.ctaButton} onPress={handleNext} activeOpacity={0.8}>
           <Text style={styles.ctaText}>GET STARTED</Text>
         </TouchableOpacity>
