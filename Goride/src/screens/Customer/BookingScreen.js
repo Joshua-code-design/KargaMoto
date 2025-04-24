@@ -119,6 +119,9 @@ const BookingConfirmationScreen = ({ navigation }) => {
 
   const onConfirmBooking = async () => {
     try {   
+      const convertedDistance = parseFloat(distance);
+      const convertedDuration = parseFloat(duration);
+
       if (!fare || isNaN(fare) || fare <= 0) {
         console.error("Invalid fare value:", fare);
         Alert.alert("Error", "Failed to calculate fare. Please try again.");
@@ -134,8 +137,19 @@ const BookingConfirmationScreen = ({ navigation }) => {
         Alert.alert("Error", "Failed to calculate location. Please try again.");      
         return;
       }
-      
-      await requestRide(pickup, destination,serviceType, fare);
+      if(!distance){
+        console.error("Invalid distance value:", distance);     
+        Alert.alert("Error", "Failed to calculate distance. Please try again.");
+        return;
+      }
+      if(!duration){      
+        console.error("Invalid duration value:", duration); 
+        Alert.alert("Error", "Failed to calculate duration. Please try again.");
+        return;
+      }
+  
+     
+      await requestRide(pickup, destination, serviceType, fare, convertedDistance, convertedDuration);
       Alert.alert("Success", "Your ride has been successfully requested.");
 
     } catch (error) {

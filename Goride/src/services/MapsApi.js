@@ -10,7 +10,7 @@ const socket = io('http://your-server-ip:5000', {
     transports: ['websocket']
   });
   
-  export const requestRide = async (pickup, destination, serviceType, fare) => {
+  export const requestRide = async (pickup, destination, serviceType, fare,convertedDistance,convertedDuration) => {
       try {
           const token = await SecureStore.getItemAsync('token');
   
@@ -27,6 +27,8 @@ const socket = io('http://your-server-ip:5000', {
                   address: destination.address
               },
               fare: fare,
+              distance: convertedDistance,
+              duration: convertedDuration,
               status: "requested"
           }, {
               headers: {
