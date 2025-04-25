@@ -24,11 +24,18 @@ const OnboardingScreen2 = ({ navigation }) => {
   
         if (!isConnected) {
           console.log('❌ No internet connection');
-          return; // optionally exit early if no internet
+          navigation.navigate('NoInternetScreen'); // Navigate to a "No Internet" screen
+          return; // Exit early if no internet
         }
       
-        // 2. Test server connection
-      await testServer(); // Test server connection
+         // 2. Test server connection with proper error handling
+         const serverTest = await testServer();
+         if (!serverTest.connected) {
+           console.log('❌ Server connection failed');
+           navigation.navigate('NoInternetScreen');
+           return;
+         }
+         console.log('✅ Server connection successful');
     
         const hasCompletedOnboarding = await AsyncStorage.getItem('hasCompletedOnboarding');
         const token = await SecureStore.getItemAsync('token');
