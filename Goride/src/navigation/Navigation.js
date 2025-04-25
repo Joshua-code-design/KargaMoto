@@ -23,6 +23,7 @@ import EditScreen from '../screens/Customer/EditScreen';
 import LandingPageRider from '../screens/Rider/LandingPageRider';  
 import SocketTest from '../screens/Rider/SocketTest';
 import Rideprofile from '../screens/Rider/Rideprofile';  
+import NoInternetScreen from '../screens/Error/NoInternet';
 const Stack = createStackNavigator();
 
 const Navigation = () => {
@@ -50,6 +51,8 @@ const Navigation = () => {
        
         <Stack.Screen name="SocketTest" component={SocketTest} />
         <Stack.Screen name="Rideprofile" component={Rideprofile} />
+
+        <Stack.Screen name="NoInternetScreen" component={NoInternetScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -2,22 +2,35 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from 'expo-secure-store'; 
 import { Alert, Animated } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 // const API_URL = "https://kargamotoapi.onrender.com/api";
  const API_URL = "http://192.168.1.13:5000/api";
 
- export const testServer = async () => {
+// In your connection test file (keep the improved version from earlier)
+export const testServer = async () => {
   try {
     const response = await axios.get(`${API_URL}/ping`);
-    if (response.status === 200) {
-      console.log('✅ Connected to backend server');
-    } else {
-      console.log('⚠️ Server responded but not OK');
-      return;
-    }
+    return {
+      connected: response.status === 200,
+      status: response.status,
+      message: 'Connected to backend server'
+    };
   } catch (error) {
-    console.log('❌ Failed to connect to server:', error.message);
-    return;
+    if (axios.isAxiosError(error)) {
+      return {
+        connected: false,
+        status: error.response?.status || 0,
+        message: error.response 
+          ? `Server error: ${error.response.status}`
+          : 'No response from server'
+      };
+    }
+    return {
+      connected: false,
+      status: 0,
+      message: 'Connection test failed'
+    };
   }
 };
 
