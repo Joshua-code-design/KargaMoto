@@ -96,8 +96,16 @@ const OnboardingScreen2 = ({ navigation }) => {
         </View>
       </Animated.View>
 
-      <Animated.View style={[styles.bottomContainer, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-        <TouchableOpacity style={styles.ctaButton} onPress={handleNext} activeOpacity={0.8}>
+      <Animated.View style={[styles.bottomContainer, { 
+        opacity: fadeAnim, 
+        transform: [{ translateY: slideAnim }],
+        zIndex: 1 
+      }]}>
+        <TouchableOpacity 
+          style={styles.ctaButton} 
+          onPress={handleNext} 
+          activeOpacity={0.8}
+        >
           <Text style={styles.ctaText}>GET STARTED</Text>
         </TouchableOpacity>
       </Animated.View>
