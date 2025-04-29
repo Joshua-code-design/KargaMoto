@@ -52,6 +52,7 @@ const BookingConfirmationScreen = ({ navigation }) => {
   const [mapUrl, setMapUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [polylineCoords, setPolylineCoords] = useState([]);
+  const [GooglePolyline, setGooglePolyline] = useState();
 
   // Extract location details
   const pickupAddress = pickup?.address || "Unknown Pickup Location";
@@ -70,12 +71,17 @@ const BookingConfirmationScreen = ({ navigation }) => {
           const seconds = typeof duration === "string" ? parseFloat(duration) : duration;
           return isNaN(seconds) ? "N/A" : `${Math.floor(seconds / 60)} minutes`;
         };
-  
+
+
         setDistance(result.distance);
         setDuration(formatDuration(result.eta));
   
         if (result.polyline) {
           // Decode polyline using @mapbox/polyline
+
+          //store on polyline on usestate
+          setGooglePolyline(result.polyline);
+         
           const decodedPolyline = decode(result.polyline).map(([lat, lng]) => ({
             latitude: lat,
             longitude: lng,
@@ -149,7 +155,7 @@ const BookingConfirmationScreen = ({ navigation }) => {
       }
   
      
-      await requestRide(pickup, destination, serviceType, fare, convertedDistance, convertedDuration);
+      await requestRide(pickup, destination, serviceType, fare, convertedDistance, convertedDuration,GooglePolyline);
       Alert.alert("Success", "Your ride has been successfully requested.");
 
     } catch (error) {

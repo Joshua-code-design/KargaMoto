@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import io from 'socket.io-client';
 
-const SOCKET_URL = 'http://192.168.1.13:5000';
+const SOCKET_URL = 'http://192.168.1.31:5000';
 const { width, height } = Dimensions.get('window');
 const isTablet = width > 768;
 

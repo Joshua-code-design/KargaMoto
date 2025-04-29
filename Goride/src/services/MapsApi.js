@@ -4,13 +4,13 @@ import { Alert, Animated } from 'react-native';
 import { io } from 'socket.io-client';
 
 //   const API_URL = "https://kargamotoapi.onrender.com/api";
-const API_URL = "http://192.168.1.13:5000/api";
+const API_URL = "http://192.168.1.31:5000/api";
 
-const socket = io('http://your-server-ip:5000', {
+const socket = io('http://192.168.1.31:5000', {
     transports: ['websocket']
   });
   
-  export const requestRide = async (pickup, destination, serviceType, fare,convertedDistance,convertedDuration) => {
+  export const requestRide = async (pickup, destination, serviceType, fare,convertedDistance,convertedDuration,GooglePolyline) => {
       try {
           const token = await SecureStore.getItemAsync('token');
   
@@ -29,7 +29,8 @@ const socket = io('http://your-server-ip:5000', {
               fare: fare,
               distance: convertedDistance,
               duration: convertedDuration,
-              status: "requested"
+              status: "requested",
+              polyline: GooglePolyline,
           }, {
               headers: {
                   Authorization: `Bearer ${token}`

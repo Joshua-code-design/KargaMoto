@@ -5,7 +5,7 @@ import { Alert, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 // const API_URL = "https://kargamotoapi.onrender.com/api";
- const API_URL = "http://192.168.1.13:5000/api";
+ const API_URL = "http://192.168.1.31:5000/api";
 
 // In your connection test file (keep the improved version from earlier)
 export const testServer = async () => {
