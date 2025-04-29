@@ -23,7 +23,8 @@ import EditScreen from '../screens/Customer/EditScreen';
 import LandingPageRider from '../screens/Rider/LandingPageRider';  
 import SocketTest from '../screens/Rider/SocketTest';
 import Rideprofile from '../screens/Rider/Rideprofile';  
-import NoInternetScreen from '../screens/Error/NoInternet';
+import NoInternetScreen from '../screens/Error/NoInternetScreen';
+import ServiceError from '../screens/Error/ServiceError';
 const Stack = createStackNavigator();
 
 const Navigation = () => {
@@ -48,11 +49,10 @@ const Navigation = () => {
         <Stack.Screen name="FavScreen" component={FavScreen} />
         <Stack.Screen name="EditScreen" component={EditScreen} />
         <Stack.Screen name="LandingPageRider" component={LandingPageRider} />
-       
         <Stack.Screen name="SocketTest" component={SocketTest} />
         <Stack.Screen name="Rideprofile" component={Rideprofile} />
-
         <Stack.Screen name="NoInternetScreen" component={NoInternetScreen} />
+        <Stack.Screen name="ServiceError" component={ServiceError} />
       </Stack.Navigator>
     </NavigationContainer>
   );
