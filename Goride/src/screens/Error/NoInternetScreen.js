@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, Image } from 'react-native';
 
 export default function NoInternetScreen() {
@@ -19,7 +19,7 @@ export default function NoInternetScreen() {
       />
       <Text style={styles.title}>No Internet Connection</Text>
       <Text style={styles.subtitle}>
-        Please check your connection and try again.
+        Please check your Internet and try again.
       </Text>
     </View>
   );

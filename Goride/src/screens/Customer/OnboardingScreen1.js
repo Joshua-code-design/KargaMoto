@@ -32,7 +32,7 @@ const OnboardingScreen2 = ({ navigation }) => {
          const serverTest = await testServer();
          if (!serverTest.connected) {
            console.log('❌ Server connection failed');
-           navigation.navigate('NoInternetScreen');
+           navigation.navigate('ServiceError');
            return;
          }
          console.log('✅ Server connection successful');
