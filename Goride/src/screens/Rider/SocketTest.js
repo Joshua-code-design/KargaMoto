@@ -15,8 +15,11 @@ import {
   Alert
 } from 'react-native';
 import io from 'socket.io-client';
+import axios from 'axios';
+import {acceptBooking} from '../../services/Booking';
 
 const SOCKET_URL = 'http://192.168.1.31:5000';
+const API_BASE_URL = 'http://192.168.1.31:5000/api';
 const { width, height } = Dimensions.get('window');
 const isTablet = width > 768;
 
@@ -42,7 +45,7 @@ const ConnectionStatus = ({ connected, onReconnect }) => (
   </View>
 );
 
-const BookingCard = ({ booking, onPress }) => {
+const BookingCard = ({ booking, onPress, onAccept }) => {
   const getStatusColor = (status) => {
     switch(status) {
       case 'requested': return '#ff9800';
@@ -101,6 +104,20 @@ const BookingCard = ({ booking, onPress }) => {
     );
   };
 
+  const renderActionButton = () => {
+    if (booking.status !== 'requested') return null;
+    
+    return (
+      <TouchableOpacity
+        style={styles.acceptButton}
+        onPress={() => onAccept(booking._id)}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.acceptButtonText}>Accept Booking</Text>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <TouchableOpacity
       style={styles.card}
@@ -140,6 +157,8 @@ const BookingCard = ({ booking, onPress }) => {
         {renderLocation(booking.pickup_location, "📍 Pickup Location")}
         {renderLocation(booking.dropoff_location, "🏁 Dropoff Location")}
       </View>
+
+      {renderActionButton()}
     </TouchableOpacity>
   );
 };
@@ -214,6 +233,27 @@ export default function App() {
     });
   };
 
+  const handleAcceptBooking = async (bookingId) => {
+    
+    const result = await acceptBooking(bookingId);
+    
+    if (result?.error) {
+        Alert.alert(
+            "Error",
+            result.error,
+            [{ text: "OK" }]
+        );
+    } else {
+        Alert.alert(
+            "Success",
+            "Booking accepted successfully!",
+            [{ text: "OK" }]
+        );
+        // Refresh bookings after successful acceptance
+        fetchBookings();
+    }
+  };
+
   useEffect(() => {
     const socket = initializeSocket();
     
@@ -242,11 +282,14 @@ export default function App() {
   const handleBookingPress = (booking) => {
     Alert.alert(
       `Booking Details: ${booking._id.slice(-8)}`,
-      `Would you like to view more details or perform actions on this booking?`,
+      `Status: ${booking.status}\nType: ${booking.booking_type}\nFare: $${booking.fare?.toFixed(2) || '0.00'}`,
       [
-        { text: "Cancel", style: "cancel" },
-        { text: "View Details", onPress: () => console.log("View details pressed") }
-      ]
+        { text: "Close", style: "cancel" },
+        booking.status === 'requested' && {
+          text: "Accept Booking",
+          onPress: () => handleAcceptBooking(booking._id)
+        }
+      ].filter(Boolean) // Remove falsy values
     );
   };
 
@@ -272,7 +315,11 @@ export default function App() {
             data={bookings}
             keyExtractor={(item) => item._id}
             renderItem={({ item }) => (
-              <BookingCard booking={item} onPress={() => handleBookingPress(item)} />
+              <BookingCard 
+                booking={item} 
+                onPress={() => handleBookingPress(item)}
+                onAccept={handleAcceptBooking}
+              />
             )}
             contentContainerStyle={styles.listContainer}
             showsVerticalScrollIndicator={false}
@@ -444,7 +491,6 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: 'white',
     borderRadius: 20,
-   
   },
   locationTitle: {
     fontSize: isTablet ? 16 : 14,
@@ -457,10 +503,6 @@ const styles = StyleSheet.create({
     color: '#424242',
     marginBottom: 8,
   },
-  coordinatesContainer: {
-    flexDirection: 'row',
-    marginTop: 4,
-  },
   mapButton: {
     backgroundColor: '#f0f4ff',
     paddingVertical: 6,
@@ -472,6 +514,19 @@ const styles = StyleSheet.create({
     color: '#4285f4',
     fontSize: isTablet ? 14 : 12,
     fontWeight: '500',
+  },
+  acceptButton: {
+    backgroundColor: '#4CAF50',
+    padding: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+  },
+  acceptButtonText: {
+    color: 'white',
+    fontSize: isTablet ? 16 : 14,
+    fontWeight: 'bold',
   },
   loadingContainer: {
     flex: 1,
