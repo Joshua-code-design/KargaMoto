@@ -1,4 +1,5 @@
 import React from 'react';
+import Constants from 'expo-constants';
 import { 
   View, 
   SafeAreaView, 
@@ -12,6 +13,8 @@ import {
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+const apiKey = Constants.expoConfig.extra.googleApiKey;
 
 const SearchPlaceScreen = () => {
   const navigation = useNavigation();
@@ -62,7 +65,7 @@ const SearchPlaceScreen = () => {
             placeholder={`Search for a ${isPickup ? 'pickup' : 'destination'} in Bacolod City`}
             onPress={handlePlaceSelect}
             query={{
-              key: 'AIzaSyBezmbkcpuSIpDOrFtMkGfsU3u_ZDf7xlg', // Replace with your Google API Key
+              key: `${apiKey}`, // Replace with your Google API Key
               language: 'en',
               components: 'country:PH', // Restrict to the Philippines
               location: '10.6765,122.9509', // Bacolod City's lat & lng

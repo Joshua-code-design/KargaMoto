@@ -1,10 +1,10 @@
+import Constants from 'expo-constants';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store'; 
 import { Alert, Animated } from 'react-native';
 import { io } from 'socket.io-client';
 
-const API_URL = "http://192.168.1.31:5000/api";
-// const API_URL = "https://kargamotoapi.onrender.com/api";
+const API_URL = Constants.expoConfig.extra.serverUrl ;
 
 export const acceptBooking = async (bookingId) => {
 

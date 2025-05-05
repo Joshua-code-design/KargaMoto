@@ -1,8 +1,9 @@
+import Constants from 'expo-constants';
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store'; 
 
-  // const API_URL = "https://kargamotoapi.onrender.com/api";
-   const API_URL = "http://192.168.1.31:5000/api";
+  const API_URL = Constants.expoConfig.extra.serverUrl ;
+ 
 
   export const addFavorites = async (home, work) => {
     try {

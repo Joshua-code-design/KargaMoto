@@ -1,14 +1,19 @@
+import Constants from 'expo-constants';
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store'; 
 import { Alert, Animated } from 'react-native';
 import { io } from 'socket.io-client';
 
-//   const API_URL = "https://kargamotoapi.onrender.com/api";
-const API_URL = "http://192.168.1.31:5000/api";
 
-const socket = io('http://192.168.1.31:5000', {
-    transports: ['websocket']
-  });
+const API_URL = Constants.expoConfig.extra.serverUrl ;
+
+
+
+const SOCKET_URL = Constants.expoConfig.extra.socketUrl;
+
+const socket = io(`${SOCKET_URL}`, {
+  transports: ['websocket']
+});
   
   export const requestRide = async (pickup, destination, serviceType, fare,convertedDistance,convertedDuration,GooglePolyline) => {
       try {
