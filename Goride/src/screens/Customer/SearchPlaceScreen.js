@@ -14,6 +14,8 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+
+
 const apiKey = Constants.expoConfig.extra.googleApiKey;
 
 const SearchPlaceScreen = () => {

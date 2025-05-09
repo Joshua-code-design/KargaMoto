@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
@@ -15,8 +16,8 @@ import {
   Alert
 } from 'react-native';
 import io from 'socket.io-client';
-import axios from 'axios';
 import {acceptBooking} from '../../services/Booking';
+
 
 const SOCKET_URL = Constants.expoConfig.extra.socketUrl;
 
