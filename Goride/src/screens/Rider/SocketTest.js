@@ -18,8 +18,8 @@ import io from 'socket.io-client';
 import axios from 'axios';
 import {acceptBooking} from '../../services/Booking';
 
-const SOCKET_URL = 'http://192.168.1.43:5000';
-const API_BASE_URL = 'http://192.168.1.43:5000/api';
+const SOCKET_URL = Constants.expoConfig.extra.socketUrl;
+
 const { width, height } = Dimensions.get('window');
 const isTablet = width > 768;
 
