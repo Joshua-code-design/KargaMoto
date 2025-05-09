@@ -1,6 +1,9 @@
+import Constants from 'expo-constants';
 import axios from 'axios';
 // services/Geocoding.js
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBezmbkcpuSIpDOrFtMkGfsU3u_ZDf7xlg';
+
+const GOOGLE_MAPS_API_KEY = Constants.expoConfig.extra.googleApiKey;
+
 
 // Forward Geocoding: Convert address to coordinates
 export const geocodeAddress = async (address) => {

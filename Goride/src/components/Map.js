@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Alert, ActivityIndicator, Platform } from 'react-native';
 import MapView, { Marker, Circle, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -7,7 +8,8 @@ import { useNavigation } from '@react-navigation/native';
 const { width, height } = Dimensions.get('window');
 
 // Add your Google Maps API key here
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBezmbkcpuSIpDOrFtMkGfsU3u_ZDf7xlg';
+const GOOGLE_MAPS_API_KEY = Constants.expoConfig.extra.googleApiKey;
+//const GOOGLE_MAPS_API_KEY = 'AIzaSyBezmbkcpuSIpDOrFtMkGfsU3u_ZDf7xlg';
 
 const Map = ({ route }) => {
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -50,6 +52,7 @@ const Map = ({ route }) => {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${selectedLocation.latitude},${selectedLocation.longitude}&key=${GOOGLE_MAPS_API_KEY}`
       );
+      //to move in backend for security reasons
       const data = await response.json();
   
       if (data.status === 'OK' && data.results.length > 0) {
