@@ -24,6 +24,7 @@ import SearchRiderScreen from '../screens/Customer/SearchRiderScreen';
 import LandingPageRider from '../screens/Rider/LandingPageRider';  
 import SocketTest from '../screens/Rider/SocketTest';
 import Rideprofile from '../screens/Rider/Rideprofile';  
+import RidePassenger from '../screens/Rider/RidePassenger';  
 import NoInternetScreen from '../screens/Error/NoInternetScreen';
 import ServiceError from '../screens/Error/ServiceError';
 const Stack = createStackNavigator();
@@ -52,6 +53,7 @@ const Navigation = () => {
         <Stack.Screen name="LandingPageRider" component={LandingPageRider} />
         <Stack.Screen name="SocketTest" component={SocketTest} />
         <Stack.Screen name="Rideprofile" component={Rideprofile} />
+        <Stack.Screen name="RidePassenger" component={RidePassenger} />
         <Stack.Screen name="NoInternetScreen" component={NoInternetScreen} />
         <Stack.Screen name="ServiceError" component={ServiceError} />
         <Stack.Screen name="SearchRiderScreen" component={SearchRiderScreen} />
