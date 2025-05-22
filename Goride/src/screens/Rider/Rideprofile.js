@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-c
 import PopupModal from '../../components/PopupModal';
 import { logoutUser } from '../../services/Loginapi';
 import ButtonBar from '../../components/buttonbarRiderProf';

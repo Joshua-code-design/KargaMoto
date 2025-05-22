@@ -400,14 +400,23 @@ export default function App() {
   };
 
   useEffect(() => {
-    const socket = initializeSocket();
+  const socket = initializeSocket();
+
+  socket.on('bookingUpdate', (update) => {
+    console.log('Received booking update:', update); // Debug log
     
-    return () => {
-      if (socket) {
-        socket.disconnect();
-      }
-    };
-  }, []);
+    if (update.action === 'status-updated' || update.action === 'accepted') {
+      setBookings(prev => sortBookings(
+        prev.map(booking => 
+          booking._id === update.booking._id ? update.booking : booking
+        )
+      ));
+    }
+    // Handle other actions...
+  });
+
+  return () => socket.disconnect();
+}, []);
 
   const reconnect = () => {
     if (socket) {
