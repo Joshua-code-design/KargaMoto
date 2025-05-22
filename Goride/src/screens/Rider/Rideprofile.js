@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from '@react-navigation/native';
+c
 import PopupModal from '../../components/PopupModal';
 import { logoutUser } from '../../services/Loginapi';
 import ButtonBar from '../../components/buttonbarRiderProf';
@@ -104,6 +104,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+
       <TouchableOpacity 
         style={styles.arrowContainer} 
         onPress={() => navigation.navigate('LandingPageScreen')}

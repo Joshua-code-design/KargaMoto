@@ -8,7 +8,6 @@ import {
   SafeAreaView,
   Dimensions,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from '@react-navigation/native';
