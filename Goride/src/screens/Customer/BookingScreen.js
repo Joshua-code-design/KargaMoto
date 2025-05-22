@@ -154,23 +154,28 @@ const BookingConfirmationScreen = ({ navigation }) => {
         return;
       }
      
-      const response = await requestRide(pickup, destination, serviceType, fare, convertedDistance, convertedDuration);
-      if (response.success) {
-    Alert.alert("Success", "Your ride has been successfully requested.");
-    navigation.navigate("SearchingScreen");
-     } else {
-    Alert.alert("Error", response.message || "Failed to request ride");
-    }
-  
-     
-      await requestRide(pickup, destination, serviceType, fare, convertedDistance, convertedDuration,GooglePolyline);
-      Alert.alert("Success", "Your ride has been successfully requested.");
+      const response = await requestRide(
+        pickup, 
+        destination, 
+        serviceType, 
+        fare, 
+        convertedDistance, 
+        convertedDuration,
+        GooglePolyline
+      );
+      
+      if (response) {
+        Alert.alert("Success", "Your ride has been successfully requested.");
+        navigation.navigate("SearchRiderScreen");
+      } else {
+        Alert.alert("Error", "Failed to request ride. Please try again.");
+      }
 
     } catch (error) {
       console.error("Error requesting ride:", error);
       Alert.alert("Error", "Failed to request ride. Please try again.");
     }
-  }
+};
   
   // Show alert when screen loads
   useEffect(() => {
